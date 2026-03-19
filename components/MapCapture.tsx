@@ -52,7 +52,7 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
     }
 
     if (Object.keys(images).length > 0) {
-      sessionStorage.setItem('mapImages', JSON.stringify(images))
+      try { sessionStorage.setItem('mapImages', JSON.stringify(images)) } catch { /* quota exceeded, skip cache */ }
       onAllCaptured(images)
     }
   }, [onAllCaptured])
@@ -60,6 +60,7 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
   useEffect(() => {
     if (!containerRef.current) return
     const maps: L.Map[] = []
+    const lastGeoIdx = locations.reduce((acc, l, i) => l.geo ? i : acc, -1)
 
     locations.forEach((loc, idx) => {
       if (!loc.geo) return
@@ -110,7 +111,7 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
 
       map.whenReady(() => {
         // After all maps ready, capture
-        if (idx === locations.filter(l => l.geo).length - 1) {
+        if (idx === lastGeoIdx) {
           captureAll()
         }
       })
