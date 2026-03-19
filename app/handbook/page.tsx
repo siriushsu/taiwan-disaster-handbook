@@ -282,7 +282,7 @@ export default function HandbookPage() {
                           </span>
                         )}
                         <button onClick={() => recalcShelterDistance(locIdx, si, 'shelters')}
-                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                          className="text-xs bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 px-1.5 py-0.5 rounded transition-colors">↻ 更新</button>
                       </div>
                     </div>
                   ))}
@@ -329,7 +329,7 @@ export default function HandbookPage() {
                           </span>
                         )}
                         <button onClick={() => recalcShelterDistance(locIdx, si, 'airRaid')}
-                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                          className="text-xs bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 px-1.5 py-0.5 rounded transition-colors">↻ 更新</button>
                       </div>
                     </div>
                   ))}
@@ -364,7 +364,7 @@ export default function HandbookPage() {
                           </span>
                         )}
                         <button onClick={() => recalcShelterDistance(locIdx, mi, 'medical')}
-                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                          className="text-xs bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 px-1.5 py-0.5 rounded transition-colors">↻ 更新</button>
                       </div>
                     </div>
                   ))}

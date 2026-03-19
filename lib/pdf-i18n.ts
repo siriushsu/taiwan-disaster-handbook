@@ -257,6 +257,163 @@ const TEXT: Record<string, [string, string]> = {
 
   // Cover bilingual
   cover_bi_title: ['Family Emergency Handbook', 'Taiwan Family Emergency Handbook'],
+
+  // Distance units
+  dist_meters: ['公尺', 'm'],
+  dist_km: ['公里', 'km'],
+  walk_about: ['步行約', '~'],
+  walk_min: ['分鐘', 'min walk'],
+  walk_1min: ['步行約 1 分鐘', '~1 min walk'],
+
+  // Compass directions
+  compass_n: ['北', 'N'],
+  compass_ne: ['東北', 'NE'],
+  compass_e: ['東', 'E'],
+  compass_se: ['東南', 'SE'],
+  compass_s: ['南', 'S'],
+  compass_sw: ['西南', 'SW'],
+  compass_w: ['西', 'W'],
+  compass_nw: ['西北', 'NW'],
+
+  // Map legend
+  map_legend_full: ['● 紅=住家　● 藍=避難所　● 紫=防空　● 綠=醫療', '● Red=Home ● Blue=Shelter ● Purple=Air Raid ● Green=Medical'],
+  map_legend_short: ['藍=避難所　紫=防空　綠=醫療', 'Blue=Shelter Purple=Air Raid Green=Medical'],
+  map_dir_from_home: ['方位為從住家出發的方向', 'Directions from home'],
+  label_shelter: ['避難所', 'Shelter'],
+  label_air_raid: ['防空', 'Air Raid'],
+  label_er: ['急診', 'ER'],
+  label_medical: ['醫療', 'Medical'],
+
+  // Location page extras
+  loc_evac_guide_suffix: ['完整避難指南', 'Complete Evacuation Guide'],
+  loc_apt_building: ['公寓大樓', 'Apartment building'],
+  loc_floor_suffix: ['樓', 'F'],
+  loc_fallback_primary: ['最近的公園或廣場', 'Nearest park or plaza'],
+  loc_fallback_backup: ['里辦公室或區公所', 'Village office or district office'],
+  loc_fallback_plaza: ['最近廣場', 'Nearest plaza'],
+  loc_capacity_prefix: ['可容納', 'Cap.'],
+  loc_capacity_suffix: ['人', ''],
+  loc_evac_guide_footer: ['避難指南', 'Evacuation Guide'],
+
+  // Apartment evacuation dynamic
+  apt_basement_eq: ['地震後立刻往地上樓層移動，走安全梯，絕對不搭電梯', 'After earthquake, move upstairs immediately via stairs — NEVER elevator'],
+  apt_floor_eq: ['地震後走安全梯下樓，絕對不搭電梯', 'After earthquake, take stairs down — NEVER elevator'],
+  apt_basement_flood: ['地下室在水災時最危險！聽到豪雨警報或看到積水，立刻撤離到地上樓層', 'Basements are most dangerous during floods! Evacuate upstairs at rain warning or flooding'],
+  apt_go_to_meeting: ['直接前往集合點：', 'Go directly to meeting point: '],
+  apt_basement_prefix: ['您住地下', 'You live on basement floor'],
+
+  // House evacuation
+  house_1: ['地震時躲在堅固桌子下或承重牆旁。搖晃停止後再移動', 'During earthquake, hide under sturdy table or next to load-bearing wall. Move after shaking stops'],
+  house_2: ['確認瓦斯已關閉、電源總開關已切斷', 'Confirm gas is off, main power switch is cut'],
+  house_3: ['從最近的出口離開建物，注意頭上掉落物', 'Exit through nearest door, watch for falling objects'],
+  house_4_prefix: ['帶著緊急背包，前往集合點：', 'Bring go-bag, head to meeting point: '],
+
+  // Action card footer
+  action_footer: ['緊急行動卡（請貼冰箱）', 'Emergency Action Card (stick on fridge)'],
+
+  // Action card fire dynamic
+  fire_apt_basement: ['低姿勢爬行 → 摸門把不燙才開門 → 走安全梯往地上樓層移動 → 打 119', 'Crawl low → Touch door handle (if not hot, open) → Take stairs to upper floors → Call 119'],
+  fire_apt_floor_pre: ['低姿勢爬行 → 摸門把不燙才開門 → 走安全梯下', 'Crawl low → Touch door handle (if not hot, open) → Take stairs down'],
+  fire_apt_floor_post: ['→ 打 119', ' → Call 119'],
+  fire_action_house: ['蹲低移動 → 從最近出口離開 → 不要回頭拿東西 → 打 119', 'Stay low → Exit through nearest door → Don\'t go back for belongings → Call 119'],
+
+  // Meeting point fallback
+  meeting_fallback: ['最近公園或廣場', 'Nearest park or plaza'],
+
+  // Reunion page
+  reunion_special_needs: ['特殊需求', 'Special Needs'],
+  reunion_contact_backup: ['備用', 'Backup'],
+  reunion_out_of_city: ['外縣市聯絡人 — 失聯時全家各自打這支，由他確認大家狀況', 'Out-of-city contact — call this person when disconnected from family'],
+  comm_2_text: ['發一則簡訊或 LINE 給家庭群組：「我在 [地點]，[安全/受傷]」', 'Send SMS or LINE to family group: "I\'m at [location], [safe/injured]"'],
+  comm_4_with_contact_pre: ['若聯繫不上家人，打給外縣市聯絡人', 'If you can\'t reach family, call out-of-city contact'],
+  comm_4_with_contact_post: ['，請他統一回報', ', ask them to coordinate'],
+  comm_4_no_contact: ['若聯繫不上家人，前往約定集合點等候', 'If you can\'t reach family, go to agreed meeting point and wait'],
+  label_contact_relation_wrap: ['（', '('],
+  label_contact_relation_wrap_end: ['）', ')'],
+
+  // Member overview
+  member_desc_full: ['每位成員的避難、健康、聯絡資訊。急救時請出示此頁給醫護人員。沿虛線剪下隨身卡放進皮夾。', 'Each member\'s shelter, health, and contact info. Show this page to paramedics. Cut along dotted line for wallet card.'],
+  member_emerg_numbers: ['119消防 110警察 166防空 1991留言板', '119 Fire 110 Police 166 Air Raid 1991 Message Board'],
+  label_has_er_paren: ['（有急診）', '(Has ER)'],
+
+  // Supply checklist dynamic
+  supply_food_count: ['人份', 'person(s)'],
+  chk_water_dynamic_pre: ['飲用水', 'Drinking water'],
+  chk_water_dynamic_unit: ['公升（每人 2L/天 × 3 天）', 'liters (2L/person/day × 3 days)'],
+  chk_infant_formula_pre: ['嬰幼兒奶粉/配方奶 3 天份（', 'Infant formula (3-day supply) ('],
+  chk_infant_formula_post: ['）', ')'],
+  chk_infant_formula_default: ['奶粉/副食品（如有嬰幼兒）', 'Formula/baby food (if infant present)'],
+  chk_infant_baby_food: ['嬰兒副食品（米精、果泥罐頭）', 'Baby food (rice cereal, fruit puree)'],
+  chk_pet_supply_pre: ['寵物：', 'Pet: '],
+  chk_pet_supply_default: ['飼料', 'pet food'],
+  chk_pet_supply_post: [' 3 天份 + 飲水', ' 3-day supply + water'],
+  chk_meds_pre: ['的藥：', '\'s medication: '],
+  chk_meds_post: ['（至少 7 天份）', ' (at least 7-day supply)'],
+  chk_allergy_pre: ['抗過敏藥（', 'Allergy medicine ('],
+  chk_allergy_mid: ['：', ': '],
+  chk_wheelchair: ['輪椅/助行器 備品及電池', 'Wheelchair/walker supplies and batteries'],
+  chk_infant_diapers: ['嬰兒尿布（至少 30 片，3 天份）', 'Baby diapers (at least 30, 3-day supply)'],
+  chk_infant_wipes: ['嬰兒濕紙巾（無酒精）', 'Alcohol-free baby wipes'],
+  chk_infant_bottles: ['奶瓶 2 支 + 奶瓶刷 + 瓶裝水（沖泡用）', '2 bottles + brush + bottled water (for mixing)'],
+  chk_infant_carrier: ['嬰兒背帶或揹巾（疏散時解放雙手）', 'Baby carrier or sling (hands-free evacuation)'],
+  chk_infant_pacifier: ['安撫奶嘴或安撫玩具', 'Pacifier or comfort toy'],
+  chk_diapers_optional: ['嬰兒尿布（如適用）', 'Baby diapers (if applicable)'],
+  chk_raincoat: ['雨衣', 'Raincoat'],
+  chk_raincoat_unit: ['件', 'pcs'],
+  chk_pet_carrier: ['寵物提籠 / 牽繩', 'Pet carrier / leash'],
+
+  // Earthquake scenario dynamic
+  eq_basement_up: ['你住地下樓層。走安全梯往上到 1 樓離開建築物（不搭電梯！）', 'You live underground. Take stairs up to 1F to exit building (NO elevator!)'],
+  eq_floor_down_pre: ['走安全梯下樓（不搭電梯！你住', 'Take stairs down (NO elevator! You live on floor'],
+  eq_floor_down_post: ['樓），到 1 樓離開建築物', '), exit at ground floor'],
+  eq_house_check: ['確認房屋結構沒有明顯裂縫後再移動，從最近出口離開', 'Check for structural cracks before moving, exit through nearest door'],
+  eq_go_meeting_pre: ['帶緊急背包，前往集合點：', 'Bring go-bag, go to meeting point: '],
+  eq_go_meeting_fallback: ['最近公園', 'Nearest park'],
+  eq_headcount: ['到達後清點家人，未到者打電話或等候', 'Do headcount on arrival, call or wait for those not present'],
+
+  // Fire scenario dynamic
+  fire_5_pre: ['離開後打 119：說明地址「', 'After exiting, call 119: state address "'],
+  fire_5_post: ['」、火源位置、是否有人受困', '", fire location, anyone trapped'],
+  fire_7_pre: ['前往集合點', 'Go to meeting point'],
+  fire_7_post: ['，確認所有家人到齊', ', confirm all family members present'],
+
+  // Air raid / fire footer
+  airfire_footer: ['防空 / 火災應對指南', 'Air Raid / Fire Guide'],
+
+  // Foreign nationals page
+  foreign_title: ['外籍人士專用資訊', 'Information for Foreign Nationals'],
+  foreign_shelter_open: ['災難時，所有避難所對所有人開放，不分國籍、不查身分證件。請安心前往避難。', 'During disasters, all shelters are open to everyone regardless of nationality. No ID check required.'],
+  foreign_shelter_open_en: ['During disasters, all shelters are open to everyone regardless of nationality. No ID check required.', 'During disasters, all shelters are open to everyone regardless of nationality. No ID check required.'],
+  foreign_hotlines: ['多語求助專線', 'Multilingual Hotlines'],
+  foreign_embassy_pre: ['母國駐台代表處', 'Representative Office'],
+  foreign_emergency: ['緊急電話', 'Emergency'],
+  foreign_employer: ['雇主 / 仲介', 'Employer / Broker'],
+  foreign_employer_label: ['雇主', 'Employer'],
+  foreign_broker_label: ['仲介', 'Broker'],
+  foreign_reminders: ['重要提醒', 'Important Reminders'],
+  foreign_tip_1: ['護照和居留證放在防水袋中，隨緊急背包一起帶走', 'Keep your passport and ARC in a waterproof bag with your emergency kit'],
+  foreign_tip_1_en: ['Keep your passport and ARC in a waterproof bag with your emergency kit', 'Keep your passport and ARC in a waterproof bag with your emergency kit'],
+  foreign_tip_2: ['災難期間就醫，健保卡可使用，外籍人士同樣適用', 'Your NHI card works during disasters — same coverage as citizens'],
+  foreign_tip_2_en: ['Your NHI card works during disasters — same coverage as citizens', 'Your NHI card works during disasters — same coverage as citizens'],
+  foreign_tip_3: ['不要因為身分問題而不敢去避難所。避難所不會查證件', 'Do not hesitate to go to a shelter. No ID verification required'],
+  foreign_tip_3_en: ['Do not hesitate to go to a shelter. No ID verification required', 'Do not hesitate to go to a shelter. No ID verification required'],
+  foreign_tip_4: ['撥打 1955 可用母語溝通（越/印/泰/英語服務）', 'Call 1955 for help in your language (Vietnamese/Indonesian/Thai/English)'],
+  foreign_tip_4_en: ['Call 1955 for help in your language (Vietnamese/Indonesian/Thai/English)', 'Call 1955 for help in your language (Vietnamese/Indonesian/Thai/English)'],
+
+  // Reminder checklist items
+  remind_chk_1: ['緊急物資有效期（食物、藥品、電池）', 'Check expiry dates (food, medicine, batteries)'],
+  remind_chk_2: ['飲用水更換（自來水存放不超過 6 個月）', 'Replace drinking water (tap water max 6 months)'],
+  remind_chk_3: ['行動電源充電', 'Charge power banks'],
+  remind_chk_4: ['滅火器壓力錶是否在綠色區域', 'Fire extinguisher pressure gauge in green zone'],
+  remind_chk_5: ['住警器電池是否需要更換', 'Smoke detector battery replacement needed'],
+  remind_chk_6: ['家人手機號碼是否有變動 → 更新本手冊', 'Any phone number changes → update this handbook'],
+  remind_chk_7: ['聯絡人電話是否有效 → 打一通確認', 'Contact phones still valid → call to confirm'],
+  remind_chk_8: ['緊急背包是否在玄關、容易拿取', 'Go-bag at entrance and easy to grab'],
+  remind_chk_9: ['與家人復習集合點位置', 'Review meeting point location with family'],
+  remind_chk_10: ['有搬家、換藥、新生兒 → 重新產生手冊', 'Moved, changed meds, new baby → regenerate handbook'],
+
+  // Reunion page - query fallback
+  reunion_query_office: ['請查詢里辦公室', 'Contact local village office'],
 }
 
 export type BiMode = 'zh' | 'bi' | 'en'
