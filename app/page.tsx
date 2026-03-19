@@ -2,13 +2,19 @@
 import { useState } from 'react'
 import MemberForm from '@/components/form/MemberForm'
 import ContactForm from '@/components/form/ContactForm'
+import LocaleSwitcher from '@/components/LocaleSwitcher'
 import { DISTRICTS } from '@/lib/districts'
+import { DISTRICTS_EN } from '@/lib/districts-en'
+import { CITIES } from '@/lib/cities'
+import { t, type Locale } from '@/lib/i18n'
+import { FOREIGN_RESOURCES } from '@/lib/foreign-resources'
 import type { HouseholdForm, Member, EmergencyContact, HandbookData } from '@/types'
 
 const defaultMember = (): Member => ({
   name: '', birthYear: '', bloodType: '不知道',
   isMobilityImpaired: false, hasChronic: false,
   medications: '', allergies: '', specialNeeds: '',
+  dailyLocation: '', dailyCity: '', dailyDistrict: '', dailyAddress: '',
   hasDifferentAddress: false, city: '', district: '', address: '',
 })
 
@@ -16,14 +22,11 @@ const defaultContact = (): EmergencyContact => ({
   name: '', relation: '', phone: '', phoneBackup: '', isOutOfCity: false,
 })
 
-const CITIES = [
-  '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市',
-  '基隆市', '新竹市', '嘉義市', '新竹縣', '苗栗縣', '彰化縣',
-  '南投縣', '雲林縣', '嘉義縣', '屏東縣', '宜蘭縣', '花蓮縣',
-  '臺東縣', '澎湖縣', '金門縣', '連江縣',
-]
+// CITIES imported from @/lib/cities
 
 export default function Home() {
+  const [locale, setLocale] = useState<Locale>('zh-TW')
+  const T = (key: Parameters<typeof t>[1], vars?: Record<string, string>) => t(locale, key, vars)
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [loadingMsg, setLoadingMsg] = useState('')
@@ -31,8 +34,12 @@ export default function Home() {
 
   const [form, setForm] = useState<HouseholdForm>({
     address: '', city: '臺北市', district: '',
-    housingType: 'apartment', floor: '',
+    housingType: 'apartment', floor: '' as string,
     hasPets: false, petInfo: '',
+    hasInfant: false, infantInfo: '',
+    isForeignNational: false, nationality: '',
+    employerName: '', employerPhone: '',
+    brokerName: '', brokerPhone: '',
     members: [defaultMember()],
     contacts: [defaultContact()],
   })
@@ -50,34 +57,23 @@ export default function Home() {
       const contacts = [...prev.contacts]; contacts[i] = c; return { ...prev, contacts }
     })
 
-  // 對單一地址進行 geocode + 查詢附近設施
-  const queryLocation = async (address: string, city: string) => {
+  // 對單一地址進行 geocode + 查詢附近設施（純前端，不經過 API）
+  const queryLocation = async (address: string, _city: string) => {
+    const { geocode, findNearby } = await import('@/lib/client-lookup')
     let geo = null
     let shelters: unknown[] = []
     let airRaid: unknown[] = []
     let medical: unknown[] = []
     try {
-      const geoRes = await fetch('/api/geocode', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address }),
-      })
-      if (geoRes.ok) geo = await geoRes.json()
+      geo = await geocode(address)
     } catch { /* geocoding 失敗，跳過 */ }
 
     if (geo?.lat && geo?.lng) {
       try {
-        const sRes = await fetch('/api/shelters', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lat: geo.lat, lng: geo.lng, city }),
-        })
-        if (sRes.ok) {
-          const d = await sRes.json()
-          shelters = d.shelters ?? []
-          airRaid = d.airRaid ?? []
-          medical = d.medical ?? []
-        }
+        const result = await findNearby(geo.lat, geo.lng)
+        shelters = result.shelters
+        airRaid = result.airRaid
+        medical = result.medical
       } catch { /* 查詢失敗，跳過 */ }
     }
     return { geo, shelters, airRaid, medical }
@@ -106,7 +102,18 @@ export default function Home() {
             city: m.city,
             district: m.district,
             housingType: undefined as 'apartment' | 'house' | 'rural' | undefined,
-            floor: undefined as number | '' | undefined,
+            floor: undefined as string | undefined,
+            memberName: m.name,
+          })),
+        ...form.members
+          .filter(m => m.name && m.dailyCity && m.dailyAddress)
+          .map(m => ({
+            label: `${m.name}${m.dailyLocation ? `（${m.dailyLocation}）` : ''} 白天地點`,
+            address: `${m.dailyCity}${m.dailyDistrict}${m.dailyAddress}`,
+            city: m.dailyCity,
+            district: m.dailyDistrict,
+            housingType: undefined as 'apartment' | 'house' | 'rural' | undefined,
+            floor: undefined as string | undefined,
             memberName: m.name,
           })),
       ]
@@ -137,23 +144,36 @@ export default function Home() {
         locations,
         generatedAt: new Date().toLocaleDateString('zh-TW'),
       }
-      sessionStorage.setItem('handbookData', JSON.stringify(handbookData))
+      try {
+        sessionStorage.setItem('handbookData', JSON.stringify(handbookData))
+      } catch {
+        // sessionStorage quota exceeded or not available - try clearing old data
+        sessionStorage.clear()
+        sessionStorage.setItem('handbookData', JSON.stringify(handbookData))
+      }
       window.location.href = '/handbook'
     } catch (e) {
-      setError(e instanceof Error ? e.message : '發生錯誤，請再試一次')
+      console.error('Generate error:', e)
+      setError(e instanceof Error ? e.message : '發生錯誤，請確認網路連線後再試一次')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/50">
       {/* 頁首 */}
-      <div className="bg-blue-600 text-white py-6 px-4">
+      <div className="bg-slate-700 text-white py-6 px-4">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-bold">台灣家庭防災手冊產生器</h1>
-          <p className="text-blue-200 mt-1 text-sm">
-            輸入您的家庭資訊，立即生成個人化防災手冊 PDF
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">{T('site_title')}</h1>
+            <LocaleSwitcher locale={locale} onChange={setLocale} />
+          </div>
+          <p className="text-slate-300 mt-1 text-sm">
+            {T('site_desc')}
+          </p>
+          <p className="text-slate-400 mt-2 text-xs">
+            {T('privacy_notice')}
           </p>
         </div>
       </div>
@@ -162,20 +182,20 @@ export default function Home() {
       <div className="max-w-2xl mx-auto px-4 py-4">
         <div className="flex gap-2">
           {[
-            { n: 1, label: '住家資訊' },
-            { n: 2, label: '家庭成員' },
-            { n: 3, label: '緊急聯絡' },
+            { n: 1, label: T('step1') },
+            { n: 2, label: T('step2') },
+            { n: 3, label: T('step3') },
           ].map(({ n, label }) => (
             <div
               key={n}
               className={`flex-1 flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                step === n ? 'bg-blue-500 text-white' :
-                step > n ? 'bg-green-100 text-green-700' : 'bg-white text-gray-400'
+                step === n ? 'bg-slate-600 text-white' :
+                step > n ? 'bg-emerald-50 text-emerald-600' : 'bg-white text-gray-400'
               }`}
             >
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === n ? 'bg-white text-blue-700' :
-                step > n ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+                step === n ? 'bg-white text-slate-700' :
+                step > n ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
               }`}>{n}</span>
               {label}
             </div>
@@ -187,67 +207,66 @@ export default function Home() {
         {/* Step 1: 住家資訊 */}
         {step === 1 && (
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">住家資訊</h2>
+            <h2 className="text-lg font-bold text-gray-800">{T('step1')}</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">縣市</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">{T('city')}</label>
               <select
                 value={form.city}
                 onChange={e => setForm(prev => ({ ...prev, city: e.target.value, district: '' }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
               >
-                {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {CITIES.map(([zh, en]) => <option key={zh} value={zh}>{locale === 'en' ? `${en} ${zh}` : zh}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">區/鄉/鎮市</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">{T('district')}</label>
               <select
                 value={form.district}
                 onChange={e => updateForm('district', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
               >
-                <option value="">請選擇</option>
+                <option value="">{T('select_please')}</option>
                 {(DISTRICTS[form.city] ?? []).map(d => (
-                  <option key={d} value={d}>{d}</option>
+                  <option key={d} value={d}>{locale === 'en' ? `${DISTRICTS_EN[d] || d} ${d}` : d}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">詳細地址</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">{T('address')}</label>
               <input
                 type="text"
                 value={form.address}
                 onChange={e => updateForm('address', e.target.value)}
-                placeholder="例：信義路四段 1 號"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder={T('address_placeholder')}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">住宅類型</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">{T('housing_type')}</label>
                 <select
                   value={form.housingType}
                   onChange={e => updateForm('housingType', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
                 >
-                  <option value="apartment">公寓/大樓</option>
-                  <option value="house">透天厝</option>
-                  <option value="rural">農村/山區</option>
+                  <option value="apartment">{T('apartment')}</option>
+                  <option value="house">{T('house')}</option>
+                  <option value="rural">{T('rural')}</option>
                 </select>
               </div>
               {form.housingType === 'apartment' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">居住樓層</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">{T('floor')}</label>
                   <input
-                    type="number"
+                    type="text"
                     value={form.floor}
-                    onChange={e => updateForm('floor', e.target.value ? parseInt(e.target.value) : '')}
-                    placeholder="例：8"
-                    min={1} max={50}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    onChange={e => updateForm('floor', e.target.value)}
+                    placeholder="例：8、B1、B2"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
                   />
                 </div>
               )}
@@ -261,7 +280,7 @@ export default function Home() {
                   onChange={e => updateForm('hasPets', e.target.checked)}
                   className="rounded"
                 />
-                家中有寵物
+                {T('has_pets')}
               </label>
               {form.hasPets && (
                 <input
@@ -269,17 +288,107 @@ export default function Home() {
                   value={form.petInfo}
                   onChange={e => updateForm('petInfo', e.target.value)}
                   placeholder="例：柯基犬 1 隻、貓 2 隻"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
                 />
+              )}
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.hasInfant}
+                  onChange={e => updateForm('hasInfant', e.target.checked)}
+                  className="rounded"
+                />
+                家中有嬰幼兒（3 歲以下）
+              </label>
+              {form.hasInfant && (
+                <input
+                  type="text"
+                  value={form.infantInfo}
+                  onChange={e => updateForm('infantInfo', e.target.value)}
+                  placeholder="例：1 歲男嬰、需要特殊配方奶"
+                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                />
+              )}
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.isForeignNational}
+                  onChange={e => updateForm('isForeignNational', e.target.checked)}
+                  className="rounded"
+                />
+                外籍人士 / Foreign National
+              </label>
+              {form.isForeignNational && (
+                <div className="mt-3 space-y-3 bg-blue-50 rounded-lg p-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">國籍 Nationality</label>
+                    <select
+                      value={form.nationality}
+                      onChange={e => updateForm('nationality', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                    >
+                      <option value="">請選擇 / Select</option>
+                      {FOREIGN_RESOURCES.map(r => (
+                        <option key={r.nationality} value={r.nationality}>{r.nameZh} {r.nameNative}</option>
+                      ))}
+                      <option value="OTHER">其他 / Other</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">雇主姓名 Employer</label>
+                      <input type="text" value={form.employerName}
+                        onChange={e => updateForm('employerName', e.target.value)}
+                        placeholder="選填 / Optional"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">雇主電話</label>
+                      <input type="tel" value={form.employerPhone}
+                        onChange={e => updateForm('employerPhone', e.target.value)}
+                        placeholder="選填 / Optional"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">仲介姓名 Broker</label>
+                      <input type="text" value={form.brokerName}
+                        onChange={e => updateForm('brokerName', e.target.value)}
+                        placeholder="選填 / Optional"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">仲介電話</label>
+                      <input type="tel" value={form.brokerPhone}
+                        onChange={e => updateForm('brokerPhone', e.target.value)}
+                        placeholder="選填 / Optional"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
             <button
               onClick={() => setStep(2)}
               disabled={!form.city || !form.address}
-              className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-blue-600 transition-colors"
+              className="w-full bg-slate-600 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
             >
-              下一步：家庭成員
+              {T('next_step_members')}
+            </button>
+            <button
+              onClick={generateHandbook}
+              disabled={loading || !form.city || !form.address}
+              className="w-full border border-slate-300 text-slate-500 py-2 rounded-xl text-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
+            >
+              {loading ? (loadingMsg || T('generating')) : T('skip_generate')}
             </button>
           </div>
         )}
@@ -287,8 +396,8 @@ export default function Home() {
         {/* Step 2: 家庭成員 */}
         {step === 2 && (
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">家庭成員</h2>
-            <p className="text-sm text-gray-500">每位成員的資訊將用於客製化物資清單與醫療建議。</p>
+            <h2 className="text-lg font-bold text-gray-800">{T('members_title')}</h2>
+            <p className="text-sm text-gray-500">{T('members_desc')}</p>
 
             <div className="space-y-3">
               {form.members.map((m, i) => (
@@ -302,6 +411,7 @@ export default function Home() {
                     members: prev.members.filter((_, idx) => idx !== i)
                   }))}
                   canRemove={form.members.length > 1}
+                  locale={locale}
                 />
               ))}
             </div>
@@ -309,7 +419,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setForm(prev => ({ ...prev, members: [...prev.members, defaultMember()] }))}
-              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-blue-400 hover:text-blue-500 transition-colors text-sm"
+              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-slate-400 hover:text-slate-500 transition-colors text-sm"
             >
               + 新增成員
             </button>
@@ -320,8 +430,8 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setStep(3)}
-                disabled={!form.members.some(m => m.name)}
-                className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-blue-600 transition-colors"
+                disabled={false}
+                className="flex-1 bg-slate-600 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
               >
                 下一步：緊急聯絡
               </button>
@@ -332,10 +442,8 @@ export default function Home() {
         {/* Step 3: 緊急聯絡人 */}
         {step === 3 && (
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">緊急聯絡人</h2>
-            <p className="text-sm text-gray-500">
-              建議至少填寫一位外縣市親友作為「訊息中繼人」，失聯時可透過他確認家人狀況。
-            </p>
+            <h2 className="text-lg font-bold text-gray-800">{T('contacts_title')}</h2>
+            <p className="text-sm text-gray-500">{T('contacts_desc')}</p>
 
             <div className="space-y-3">
               {form.contacts.map((c, i) => (
@@ -356,7 +464,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setForm(prev => ({ ...prev, contacts: [...prev.contacts, defaultContact()] }))}
-              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-blue-400 hover:text-blue-500 transition-colors text-sm"
+              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-slate-400 hover:text-slate-500 transition-colors text-sm"
             >
               + 新增聯絡人
             </button>
@@ -371,10 +479,10 @@ export default function Home() {
               </button>
               <button
                 onClick={generateHandbook}
-                disabled={loading || !form.contacts.some(c => c.name && c.phone)}
+                disabled={loading}
                 className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-emerald-600 transition-colors"
               >
-                {loading ? (loadingMsg || '生成中...') : '生成防災手冊'}
+                {loading ? (loadingMsg || T('generating')) : T('generate')}
               </button>
             </div>
           </div>

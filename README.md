@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 台灣家庭防災手冊產生器 🇹🇼
 
-## Getting Started
+**Taiwan Family Disaster Handbook Generator**
 
-First, run the development server:
+根據您的居住地點，自動產生個人化的家庭防災手冊，包含最近的避難場所、醫療設施及防災資訊。所有資料處理皆在瀏覽器端完成，不會上傳任何個人資訊。
+
+Generate a personalized family disaster preparedness handbook based on your location in Taiwan. Includes nearby shelters, medical facilities, and disaster preparedness information. All data processing happens client-side -- your personal information never leaves your browser.
+
+## Screenshot
+
+> TODO: Add screenshot here
+
+## Features | 功能特色
+
+- **雙語介面 | Bilingual Interface** -- Full support for Traditional Chinese and English
+- **個人化避難所 | Personalized Shelters** -- Automatically finds the nearest emergency shelters, air-raid shelters, and medical facilities based on your address
+- **PDF 手冊產生 | PDF Generation** -- Generate a print-ready disaster handbook customized for your household
+- **離線支援 | Offline Support** -- Works offline after initial load
+- **隱私優先 | Privacy First** -- All processing happens in your browser; no data is sent to any server
+
+## Tech Stack | 技術架構
+
+- [Next.js](https://nextjs.org/) -- React framework
+- [@react-pdf/renderer](https://react-pdf.org/) -- Client-side PDF generation
+- [Leaflet](https://leafletjs.com/) -- Interactive maps
+- [Tailwind CSS](https://tailwindcss.com/) -- Styling
+
+## Getting Started | 快速開始
 
 ```bash
+npm install --legacy-peer-deps
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing | 貢獻
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
-## Learn More
+- Reporting data errors (shelter locations, medical facilities)
+- Contributing translations
+- Contributing code
 
-To learn more about Next.js, take a look at the following resources:
+## Data Sources | 資料來源
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **避難場所 | Shelters** -- [內政部消防署開放資料](https://data.gov.tw/) (Ministry of the Interior open data)
+- **醫療設施 | Medical Facilities** -- [衛生福利部開放資料](https://data.gov.tw/) (Ministry of Health and Welfare open data)
+- **地圖 | Maps** -- [OpenStreetMap](https://www.openstreetmap.org/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License | 授權
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

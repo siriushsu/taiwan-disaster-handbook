@@ -1,0 +1,75 @@
+key	zh-TW	translation
+site_title	台灣家庭防災手冊產生器	Công cụ tạo sổ tay phòng chống thiên tai gia đình Đài Loan
+site_desc	輸入您的家庭資訊，立即生成個人化防災手冊 PDF	Nhập thông tin gia đình của bạn, tạo ngay sổ tay phòng chống thiên tai cá nhân hóa dạng PDF
+privacy_notice	所有資料僅在您的瀏覽器中處理，不會上傳至任何伺服器。關閉頁面後資料自動清除。	Tất cả dữ liệu chỉ được xử lý trên trình duyệt của bạn, không được tải lên bất kỳ máy chủ nào. Dữ liệu sẽ tự động xóa sau khi đóng trang.
+step1	住家資訊	Thông tin nhà ở
+step2	家庭成員	Thành viên gia đình
+step3	緊急聯絡	Liên lạc khẩn cấp
+city	縣市	Tỉnh/Thành phố
+district	區/鄉/鎮市	Quận/Huyện/Thị xã
+address	詳細地址	Địa chỉ chi tiết
+address_placeholder	例：信義路四段 1 號	Ví dụ: Số 1, Đoạn 4, Đường Tín Nghĩa
+housing_type	住宅類型	Loại nhà ở
+apartment	公寓/大樓	Chung cư/Tòa nhà
+house	透天厝	Nhà phố
+rural	農村/山區	Nông thôn/Vùng núi
+floor	居住樓層	Tầng ở
+has_pets	家中有寵物	Gia đình có thú cưng
+pet_placeholder	例：柯基犬 1 隻、貓 2 隻	Ví dụ: 1 chó Corgi, 2 mèo
+next_step_members	下一步：家庭成員（選填）	Bước tiếp: Thành viên gia đình (tùy chọn)
+skip_generate	跳過，直接用地址生成手冊	Bỏ qua, tạo sổ tay trực tiếp bằng địa chỉ
+members_title	家庭成員（選填）	Thành viên gia đình (tùy chọn)
+members_desc	填寫後可客製化物資清單與醫療建議。不填也可以直接生成手冊，列印後手寫。	Sau khi điền có thể tùy chỉnh danh sách vật tư và khuyến nghị y tế. Không điền cũng có thể tạo sổ tay, in ra rồi viết tay.
+member_n	成員	Thành viên
+name	姓名	Họ tên
+birth_year	出生年	Năm sinh
+blood_type	血型	Nhóm máu
+unknown	不知道	Không biết
+mobility_impaired	行動不便/輪椅	Hạn chế di chuyển/Xe lăn
+has_chronic	有慢性病	Có bệnh mãn tính
+medications	長期用藥（藥名）	Thuốc dùng lâu dài (tên thuốc)
+allergies	過敏資訊（選填）	Thông tin dị ứng (tùy chọn)
+different_address	此成員住址與主住家不同	Địa chỉ thành viên này khác với nhà chính
+select_please	請選擇	Vui lòng chọn
+add_member	+ 新增成員	+ Thêm thành viên
+remove	移除	Xóa
+prev_step	上一步	Bước trước
+next_step_contacts	下一步：緊急聯絡	Bước tiếp: Liên lạc khẩn cấp
+contacts_title	緊急聯絡人（選填）	Người liên lạc khẩn cấp (tùy chọn)
+contacts_desc	建議至少填寫一位外縣市親友。不填也可以生成手冊，列印後手寫。	Khuyến nghị điền ít nhất một người thân ở tỉnh/thành phố khác. Không điền cũng có thể tạo sổ tay, in ra rồi viết tay.
+contact_n	聯絡人	Người liên lạc
+relation	關係	Mối quan hệ
+phone	主要電話	Điện thoại chính
+phone_backup	備用電話	Điện thoại dự phòng
+out_of_city	外縣市聯絡人（災難時作為家人訊息中繼）	Người liên lạc ở tỉnh/thành phố khác (làm trung chuyển thông tin gia đình khi có thiên tai)
+add_contact	+ 新增聯絡人	+ Thêm người liên lạc
+generate	生成防災手冊	Tạo sổ tay phòng chống thiên tai
+generating	生成中...	Đang tạo...
+querying_address	查詢地址	Đang truy vấn địa chỉ
+of	/	/
+main_home	主住家	Nhà chính
+generating_handbook	正在生成手冊...	Đang tạo sổ tay...
+handbook_ready	您的防災手冊已準備好	Sổ tay phòng chống thiên tai của bạn đã sẵn sàng
+handbook_ready_desc	下載前可修改避難所資訊，確保內容正確	Có thể chỉnh sửa thông tin nơi trú ẩn trước khi tải xuống, đảm bảo nội dung chính xác
+download_pdf	下載 PDF 手冊	Tải xuống sổ tay PDF
+preparing_pdf	準備 PDF 中（首次需載入字型）...	Đang chuẩn bị PDF (lần đầu cần tải phông chữ)...
+share_line	分享到 LINE	Chia sẻ qua LINE
+copy_link	複製連結	Sao chép liên kết
+link_copied	已複製連結！	Đã sao chép liên kết!
+map_title	附近避難設施地圖	Bản đồ cơ sở trú ẩn gần đây
+shelters_editable	避難所資訊（可修改）	Thông tin nơi trú ẩn (có thể chỉnh sửa)
+click_to_edit	點擊名稱或地址即可編輯	Nhấp vào tên hoặc địa chỉ để chỉnh sửa
+disaster_shelters	避難收容所	Nơi trú ẩn thiên tai
+air_raid_shelters	防空避難所	Hầm trú ẩn phòng không
+medical_facilities	醫療院所	Cơ sở y tế
+no_shelters	未找到避難所資料，請向里辦公室確認	Không tìm thấy dữ liệu nơi trú ẩn, vui lòng xác nhận với văn phòng khu phố
+update_yearly	建議每年更新一次手冊	Khuyến nghị cập nhật sổ tay mỗi năm một lần
+update_yearly_desc	特別是聯絡電話、用藥、或搬家後請重新產生。	Đặc biệt khi thay đổi số điện thoại, thuốc dùng, hoặc sau khi chuyển nhà, vui lòng tạo lại.
+refill	重新填寫	Điền lại
+data_not_found	找不到手冊資料	Không tìm thấy dữ liệu sổ tay
+go_back	返回填寫	Quay lại điền
+line_share_text	我剛做好防災手冊！我家最近的避難所是「{shelter}」（{distance}）。你也可以做一份：	Tôi vừa hoàn thành sổ tay phòng chống thiên tai! Nơi trú ẩn gần nhà tôi nhất là "{shelter}" ({distance}). Bạn cũng có thể tạo một bản:
+error_title	發生錯誤	Đã xảy ra lỗi
+error_desc	很抱歉，頁面發生問題。請重新整理頁面或返回首頁。	Rất tiếc, trang đã gặp sự cố. Vui lòng tải lại trang hoặc quay về trang chủ.
+reload	重新整理	Tải lại
+home	返回首頁	Quay về trang chủ

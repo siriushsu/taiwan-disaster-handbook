@@ -1,24 +1,33 @@
 import type { GeoLocation } from '@/types'
 
-async function nominatimSearch(query: string): Promise<GeoLocation | null> {
+async function nominatimSearch(query: string, retries = 2): Promise<GeoLocation | null> {
   const encoded = encodeURIComponent(query)
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=tw&accept-language=zh`,
-    {
-      headers: {
-        'User-Agent': 'TaiwanDisasterHandbook/1.0 (public safety app)',
-        'Accept': 'application/json',
-      },
-      signal: AbortSignal.timeout(10000),
-    }
-  )
-  if (!res.ok) return null
-  const data = await res.json()
-  if (data?.[0]) {
-    return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon),
-      formattedAddress: data[0].display_name,
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 1000 * attempt))
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=tw&accept-language=zh`,
+        {
+          headers: {
+            'User-Agent': 'TaiwanDisasterHandbook/1.0 (public safety app)',
+            'Accept': 'application/json',
+          },
+          signal: AbortSignal.timeout(10000),
+        }
+      )
+      if (res.status === 429 && attempt < retries) continue
+      if (!res.ok) return null
+      const data = await res.json()
+      if (data?.[0]) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+          formattedAddress: data[0].display_name,
+        }
+      }
+      return null
+    } catch {
+      if (attempt === retries) return null
     }
   }
   return null

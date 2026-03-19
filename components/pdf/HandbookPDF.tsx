@@ -1,22 +1,27 @@
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer'
 import type { HandbookData, LocationInfo, Shelter, MedicalFacility, Member } from '@/types'
+import { FOREIGN_RESOURCES, FOREIGN_HOTLINES } from '@/lib/foreign-resources'
+import { pt, ptEn, type BiMode } from '@/lib/pdf-i18n'
 
 Font.register({
   family: 'NotoSansTC',
   fonts: [
-    { src: '/fonts/NotoSansTC-Regular.ttf', fontWeight: 'normal' },
-    { src: '/fonts/NotoSansTC-Bold.ttf', fontWeight: 'bold' },
+    { src: '/fonts/NotoSansTC-Regular-subset.ttf', fontWeight: 'normal' },
+    { src: '/fonts/NotoSansTC-Bold-subset.ttf', fontWeight: 'bold' },
   ],
 })
 
 /* ── helpers ───────────────────────────────────────── */
+let _lang: BiMode = 'zh'
 function distText(m?: number) {
   if (!m) return ''
+  if (_lang === 'en') return m < 1000 ? `${m}m` : `${(m / 1000).toFixed(1)}km`
   return m < 1000 ? `${m} 公尺` : `${(m / 1000).toFixed(1)} 公里`
 }
 function walkMin(m?: number) {
   if (!m) return ''
   const mins = Math.ceil(m / 80)
+  if (_lang === 'en') return mins <= 1 ? '~1 min walk' : `~${mins} min walk`
   return mins <= 1 ? '步行約 1 分鐘' : `步行約 ${mins} 分鐘`
 }
 function memberAddr(m: Member, householdAddr: string) {
@@ -61,8 +66,8 @@ const s = StyleSheet.create({
   // contact card
   contactCard: { backgroundColor: '#eff6ff', borderRadius: 6, padding: '8 12', marginBottom: 6, borderLeftWidth: 4, borderLeftColor: '#3b6fd4' },
   contactName: { fontWeight: 'bold', fontSize: 11 },
-  contactPhone: { fontSize: 16, fontWeight: 'bold', color: '#3b82f6', marginTop: 2 },
-  contactMeta: { fontSize: 8, color: '#6b7280', marginTop: 1 },
+  contactPhone: { fontSize: 16, fontWeight: 'bold', color: '#3b82f6', marginTop: 4, lineHeight: 1.2 },
+  contactMeta: { fontSize: 8, color: '#6b7280', marginTop: 4 },
   // reunion
   reunionBox: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 6, padding: '8 12', marginBottom: 6 },
   reunionName: { fontWeight: 'bold', fontSize: 10.5, color: '#3b82f6' },
@@ -117,9 +122,9 @@ const s = StyleSheet.create({
   noDataBox: { backgroundColor: '#fef9c3', borderRadius: 6, padding: '8 12', marginBottom: 6 },
 })
 
-function Footer({ label }: { label: string }) {
+function Footer({ label, biMode = 'zh' }: { label: string; biMode?: BiMode }) {
   return <View style={s.footer} fixed>
-    <Text style={s.footerText}>家庭防災手冊</Text>
+    <Text style={s.footerText}>{biMode === 'en' ? 'Taiwan Family Emergency Handbook' : '家庭防災手冊'}</Text>
     <Text style={s.footerText}>{label}</Text>
   </View>
 }
@@ -127,11 +132,71 @@ function Footer({ label }: { label: string }) {
 /* ══════════════════════════════════════════════════════
    PAGE: Location Evacuation Guide
    ══════════════════════════════════════════════════════ */
-function LocationPage({ loc }: { loc: LocationInfo }) {
+function DirItem({ item }: { item: { name: string; dir: string; dist: string; color: string; tag: string } }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+      <View style={{ width: 28, height: 16, borderRadius: 3, backgroundColor: item.color, marginRight: 5, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontSize: 6.5, color: '#fff', fontWeight: 'bold' }}>{item.dir}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 8, fontWeight: 'bold' }}>{item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name}</Text>
+        <Text style={{ fontSize: 7, color: '#6b7280' }}>{item.tag}　{item.dist}</Text>
+      </View>
+    </View>
+  )
+}
+
+function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: string; biMode?: BiMode }) {
+  if (!loc.geo) return null
+
+  // If we have a captured map image, show it
+  if (mapImg) {
+    return (
+      <View style={{ marginBottom: 8 }}>
+        <Image src={mapImg} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
+        <View style={{ flexDirection: 'row', marginTop: 3 }}>
+          <Text style={{ fontSize: 7, color: '#6b7280' }}>● {_lang === 'en' ? '● Red=Home ● Blue=Shelter ● Purple=Air Raid ● Green=Medical' : '● 紅=住家　● 藍=避難所　● 紫=防空　● 綠=醫療'}</Text>
+          <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map © OpenStreetMap</Text>
+        </View>
+      </View>
+    )
+  }
+  const shelters = loc.shelters.filter((sh: Shelter) => sh.type !== 'air_defense').slice(0, 3)
+  const airRaid = (loc.airRaid ?? []).slice(0, 2)
+  const medical = loc.medical.slice(0, 2)
+  const items: { name: string; dir: string; dist: string; color: string; tag: string }[] = []
+  for (const sh of shelters) {
+    if (sh.lat && sh.lng) items.push({ name: sh.name, dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng), dist: distText(sh.distance), color: '#3b82f6', tag: _lang === 'en' ? 'Shelter' : '避難所' })
+  }
+  for (const sh of airRaid) {
+    if (sh.lat && sh.lng) items.push({ name: sh.address || sh.name, dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng), dist: distText(sh.distance), color: '#8b5cf6', tag: _lang === 'en' ? 'Air Raid' : '防空' })
+  }
+  for (const m of medical) {
+    if (m.lat && m.lng) items.push({ name: m.name, dir: bearing(loc.geo.lat, loc.geo.lng, m.lat, m.lng), dist: distText(m.distance), color: '#059669', tag: m.hasER ? (_lang === 'en' ? 'ER' : '急診') : (_lang === 'en' ? 'Medical' : '醫療') })
+  }
+  if (items.length === 0) return null
+  return (
+    <View style={{ backgroundColor: '#f8fafc', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#374151', marginBottom: 5 }}>方位速查（從住家出發）</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ flex: 1, marginRight: 8 }}>
+          {items.filter((_, i) => i % 2 === 0).map((item, i) => <DirItem key={i} item={item} />)}
+        </View>
+        <View style={{ flex: 1 }}>
+          {items.filter((_, i) => i % 2 === 1).map((item, i) => <DirItem key={i} item={item} />)}
+        </View>
+      </View>
+      <Text style={{ fontSize: 6.5, color: '#9ca3af', marginTop: 3 }}>{_lang === 'en' ? 'Blue=Shelter Purple=Air Raid Green=Medical' : '藍=避難所　紫=防空　綠=醫療'}</Text>
+    </View>
+  )
+}
+
+function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: string; biMode?: BiMode }) {
   const natural = loc.shelters.filter((sh: Shelter) => sh.type !== 'air_defense')
   const air = loc.airRaid ?? []
   const mainShelter = natural[0]
   const backupShelter = natural[1]
+  const isBasement = /^[Bb]|地下/.test(loc.floor ?? '')
 
   return (
     <Page size="A4" style={s.page}>
@@ -143,20 +208,23 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
           : null}
       </View>
 
+      <DirMap loc={loc} mapImg={mapImg} biMode={biMode} />
+
       {/* Meeting Points */}
-      <Text style={s.sectionTitle}>家人集合點</Text>
+      <Text style={s.sectionTitle}>{pt(biMode, 'loc_meeting')}</Text>
+      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_meeting')}</Text>}
       <Text style={{ fontSize: 8.5, color: '#6b7280', marginBottom: 4 }}>
-        災難發生後，全家人應前往以下地點會合。到達後清點人數，未到者由外縣市聯絡人協調。
+        {pt(biMode, 'loc_meeting_desc')}
       </Text>
       <View style={s.meetBox}>
         <View style={[s.meetCard, { backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe' }]}>
-          <Text style={[s.meetLabel, { color: '#3b82f6' }]}>主要集合點</Text>
+          <Text style={[s.meetLabel, { color: '#3b82f6' }]}>{pt(biMode, 'loc_primary')}</Text>
           <Text style={s.meetValue}>{mainShelter?.name ?? '最近的公園或廣場'}</Text>
           {mainShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{mainShelter.address}</Text> : null}
           {mainShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）</Text> : null}
         </View>
         <View style={[s.meetCard, { backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa' }]}>
-          <Text style={[s.meetLabel, { color: '#c2410c' }]}>備用集合點</Text>
+          <Text style={[s.meetLabel, { color: '#c2410c' }]}>{pt(biMode, 'loc_backup')}</Text>
           <Text style={s.meetValue}>{backupShelter?.name ?? '里辦公室或區公所'}</Text>
           {backupShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{backupShelter.address}</Text> : null}
           {backupShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(backupShelter.distance)}（{walkMin(backupShelter.distance)}）</Text> : null}
@@ -164,7 +232,8 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
       </View>
 
       {/* Nearest shelters */}
-      <Text style={s.sectionTitle}>附近避難收容所（政府指定）</Text>
+      <Text style={s.sectionTitle}>{pt(biMode, 'loc_shelters')}</Text>
+      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_shelters')}</Text>}
       {natural.length > 0 ? natural.map((sh: Shelter, i: number) => (
         <View key={i} style={s.shelterCard}>
           <Text style={s.shelterNum}>{i + 1}</Text>
@@ -173,8 +242,8 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
             {sh.address ? <Text style={s.shelterAddr}>{sh.address}</Text> : null}
             <Text style={s.shelterDist}>
               {distText(sh.distance)}（{walkMin(sh.distance)}）
-              {sh.capacity ? `　可容納 ${sh.capacity.toLocaleString()} 人` : ''}
-              {sh.indoor ? '　室內' : ''}
+              {sh.capacity ? (_lang === 'en' ? ` Cap. ${sh.capacity.toLocaleString()}` : `　可容納 ${sh.capacity.toLocaleString()} 人`) : ''}
+              {sh.indoor ? (_lang === 'en' ? ' Indoor' : '　室內') : ''}
             </Text>
             {sh.disasterTypes ? <Text style={s.shelterAddr}>適用災害：{sh.disasterTypes}</Text> : null}
             {sh.phone ? <Text style={s.shelterAddr}>管理電話：{sh.phone}</Text> : null}
@@ -184,15 +253,16 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
       )) : (
         <View style={s.noDataBox}>
           <Text style={{ fontSize: 9, color: '#854d0e' }}>
-            查無附近收容所資料。請向里辦公室查詢，或撥打 0800-024-985。
+            {pt(biMode, 'loc_no_data')}
           </Text>
         </View>
       )}
-      <Text style={s.shelterTag}>資料來源：內政部消防署 避難收容處所開放資料</Text>
+      <Text style={s.shelterTag}>{pt(biMode, 'loc_shelters_src')}</Text>
 
       {/* Air defense shelters */}
       {air.length > 0 && (<>
-        <Text style={s.sectionTitle}>防空避難所（軍事衝突用）</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'loc_airraid')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_airraid')}</Text>}
         {air.slice(0, 3).map((sh: Shelter, i: number) => (
           <View key={i} style={s.shelterCard}>
             <Text style={[s.shelterNum, { backgroundColor: '#8b5cf6' }]}>{i + 1}</Text>
@@ -207,7 +277,8 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
 
       {/* Medical */}
       {loc.medical.length > 0 && (<>
-        <Text style={s.sectionTitle}>最近醫療院所</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'loc_medical')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_medical')}</Text>}
         {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
           <View key={i} style={s.medCard}>
             <Text style={[s.shelterNum, { backgroundColor: '#059669' }]}>{i + 1}</Text>
@@ -227,11 +298,16 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
 
       {/* Apartment-specific evacuation */}
       {loc.housingType === 'apartment' && (<>
-        <Text style={s.sectionTitle}>公寓大樓逃生重點</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'loc_apt_title')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_apt_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
-            `您住 ${loc.floor || '?'} 樓。地震後走安全梯下樓，絕對不搭電梯`,
-            '開門前先用手背感覺門溫。門燙＝外面有火，留在室內等救援',
+            isBasement
+              ? `您住地下 ${loc.floor} 樓。地震後立刻往地上樓層移動，走安全梯，絕對不搭電梯`
+              : `您住 ${loc.floor || '?'} 樓。地震後走安全梯下樓，絕對不搭電梯`,
+            isBasement
+              ? '地下室在水災時最危險！聽到豪雨警報或看到積水，立刻撤離到地上樓層'
+              : '開門前先用手背感覺門溫。門燙＝外面有火，留在室內等救援',
             '低姿勢沿牆移動，用濕毛巾掩住口鼻避免吸入濃煙',
             '到達 1 樓後立刻離開建築物，不要在門口停留',
             `直接前往集合點：${mainShelter?.name ?? '最近廣場'}`,
@@ -245,7 +321,8 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
       </>)}
 
       {loc.housingType === 'house' && (<>
-        <Text style={s.sectionTitle}>透天厝逃生重點</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'loc_house_title')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_house_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
             '地震時躲在堅固桌子下或承重牆旁。搖晃停止後再移動',
@@ -261,7 +338,7 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
         </View>
       </>)}
 
-      <Footer label={`${loc.label} 避難指南`} />
+      <Footer label={`${loc.label} ${biMode === "en" ? "Evacuation Guide" : "避難指南"}`} biMode={biMode} />
     </Page>
   )
 }
@@ -269,7 +346,100 @@ function LocationPage({ loc }: { loc: LocationInfo }) {
 /* ══════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════ */
-export default function HandbookPDF({ data }: { data: HandbookData }) {
+function qrUrl(text: string) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(text)}`
+}
+
+/* Bearing from home to a point, returns compass direction */
+function bearing(lat1: number, lng1: number, lat2: number, lng2: number): string {
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const y = Math.sin(dLng) * Math.cos(lat2 * Math.PI / 180)
+  const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+    Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLng)
+  const deg = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360
+  if (deg < 22.5 || deg >= 337.5) return '北'
+  if (deg < 67.5) return '東北'
+  if (deg < 112.5) return '東'
+  if (deg < 157.5) return '東南'
+  if (deg < 202.5) return '南'
+  if (deg < 247.5) return '西南'
+  if (deg < 292.5) return '西'
+  return '西北'
+}
+
+/* Direction map component: shows shelters relative to home */
+function DirectionMap({ loc }: { loc: LocationInfo }) {
+  if (!loc.geo) return null
+  const natural = loc.shelters.filter((sh: Shelter) => sh.type !== 'air_defense').slice(0, 3)
+  const air = (loc.airRaid ?? []).slice(0, 2)
+  const med = loc.medical.slice(0, 2)
+  const items: { name: string; dir: string; dist: string; color: string; tag: string }[] = []
+  natural.forEach(s => {
+    if (s.lat && s.lng) items.push({
+      name: s.name, dir: bearing(loc.geo!.lat, loc.geo!.lng, s.lat, s.lng),
+      dist: distText(s.distance), color: '#3b82f6', tag: _lang === 'en' ? 'Shelter' : '避難所'
+    })
+  })
+  air.forEach(s => {
+    if (s.lat && s.lng) items.push({
+      name: s.address || s.name, dir: bearing(loc.geo!.lat, loc.geo!.lng, s.lat, s.lng),
+      dist: distText(s.distance), color: '#8b5cf6', tag: _lang === 'en' ? 'Air Raid' : '防空'
+    })
+  })
+  med.forEach(m => {
+    if (m.lat && m.lng) items.push({
+      name: m.name, dir: bearing(loc.geo!.lat, loc.geo!.lng, m.lat, m.lng),
+      dist: distText(m.distance), color: '#059669', tag: m.hasER ? (_lang === 'en' ? 'ER' : '急診') : (_lang === 'en' ? 'Medical' : '醫療')
+    })
+  })
+  if (items.length === 0) return null
+
+  // Split into two columns manually
+  const left = items.filter((_, i) => i % 2 === 0)
+  const right = items.filter((_, i) => i % 2 === 1)
+
+  const renderItem = (item: typeof items[0], i: number) => (
+    <View key={i} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+      <View style={{ width: 28, height: 16, borderRadius: 3, backgroundColor: item.color, marginRight: 5, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontSize: 6.5, color: '#fff', fontWeight: 'bold' }}>{item.dir}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 8, fontWeight: 'bold' }}>{item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name}</Text>
+        <Text style={{ fontSize: 7, color: '#6b7280' }}>{item.tag}　{item.dist}</Text>
+      </View>
+    </View>
+  )
+
+  return (
+    <View style={{ backgroundColor: '#f8fafc', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#374151', marginBottom: 5 }}>方位速查（從住家出發）</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ flex: 1, marginRight: 8 }}>
+          {left.map((item, i) => renderItem(item, i))}
+        </View>
+        <View style={{ flex: 1 }}>
+          {right.map((item, i) => renderItem(item, i))}
+        </View>
+      </View>
+      <Text style={{ fontSize: 6.5, color: '#9ca3af', marginTop: 3 }}>{_lang === 'en' ? 'Blue=Shelter Purple=Air Raid Green=Medical' : '藍=避難所　紫=防空　綠=醫療'}　方位為從住家出發的方向</Text>
+    </View>
+  )
+}
+
+/** Bilingual text: shows Chinese + English subtitle when bi mode */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function Bi({ mode, k, style }: { mode: BiMode; k: string; style?: any }) {
+  if (mode === 'zh') return <Text style={style}>{pt(mode, k)}</Text>
+  return (
+    <View>
+      <Text style={style}>{pt(mode, k)}</Text>
+      <Text style={{ fontSize: 7.5, color: '#6b7280', marginTop: 1 }}>{ptEn(k)}</Text>
+    </View>
+  )
+}
+
+export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: HandbookData; mapImages?: Record<number, string>; biMode?: BiMode }) {
+  _lang = biMode
   const { household } = data
   const allMembers = household.members.filter(m => m.name)
   const allContacts = household.contacts.filter(c => c.name && c.phone)
@@ -285,19 +455,21 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
       {/* ─── PAGE 1: COVER ─── */}
       <Page size="A4" style={s.coverPage}>
         <View style={s.coverTop}>
-          <Text style={s.coverTitle}>家庭防災手冊</Text>
-          <Text style={s.coverSub}>緊急時請依本手冊指示行動</Text>
+          <Text style={s.coverTitle}>{pt(biMode, 'cover_title')}</Text>
+          {biMode === 'bi' && <Text style={[s.coverSub, { fontSize: 18, fontWeight: 'bold', marginBottom: 4 }]}>Family Disaster Handbook</Text>}
+          <Text style={s.coverSub}>{pt(biMode, 'cover_sub')}</Text>
+          {biMode === 'bi' && <Text style={[s.coverSub, { fontSize: 10 }]}>{ptEn('cover_sub')}</Text>}
           <View style={s.coverBox}>
-            <Text style={s.coverBoxLabel}>主住家地址</Text>
+            <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_addr')}{biMode === 'bi' ? ' / Home Address' : ''}</Text>
             <Text style={s.coverBoxValue}>{fullAddr}</Text>
           </View>
           <View style={s.coverBox}>
-            <Text style={s.coverBoxLabel}>家庭成員</Text>
+            <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_members')}{biMode === 'bi' ? ' / Family Members' : ''}</Text>
             <Text style={s.coverBoxValue}>{allMembers.map(m => m.name).join('、') || '—'}</Text>
           </View>
           {mainShelter && (
             <View style={s.coverBox}>
-              <Text style={s.coverBoxLabel}>災後集合點</Text>
+              <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_meeting')}{biMode === 'bi' ? ' / Meeting Point' : ''}</Text>
               <Text style={s.coverBoxValue}>{mainShelter.name}</Text>
               <Text style={{ color: '#93c5fd', fontSize: 9, marginTop: 2 }}>
                 {distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）
@@ -311,29 +483,35 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
             </View>
           )}
           <View style={[s.coverBox, { marginTop: 12 }]}>
-            <Text style={s.coverBoxLabel}>製作日期</Text>
+            <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_date')}{biMode === 'bi' ? ' / Created' : ''}</Text>
             <Text style={{ color: '#ffffff', fontSize: 11 }}>{data.generatedAt}　建議每年更新</Text>
           </View>
         </View>
         <View style={s.coverFooter}>
-          <Text>列印後放在家中顯眼位置（冰箱旁或玄關）。每位家人都要知道這本手冊放在哪裡。</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flex: 1 }}>
+              <Text>{biMode === 'en' ? 'Print and keep visible at home (fridge or entrance).' : '列印後放在家中顯眼位置（冰箱旁或玄關）。'}</Text>
+              <Text style={{ marginTop: 3 }}>{biMode === 'en' ? 'Scan QR Code to regenerate or share.' : '掃描 QR Code 可重新產生或分享給家人。'}</Text>
+            </View>
+            <Image src={qrUrl(`https://disaster-handbook.vercel.app/?city=${encodeURIComponent(household.city)}&district=${encodeURIComponent(household.district)}`)} style={{ width: 56, height: 56 }} />
+          </View>
         </View>
       </Page>
 
       {/* ─── PAGE 2: EMERGENCY ACTION CARD ─── */}
       <Page size="A4" style={s.actionPage}>
         <View style={s.actionBanner}>
-          <Text style={s.actionBannerText}>緊急行動卡 — 撕下此頁貼在冰箱上</Text>
-          <Text style={s.actionBannerSub}>任何災難的前 3 分鐘決定生死。看完這頁你就知道該怎麼做。</Text>
+          <Text style={s.actionBannerText}>{pt(biMode, 'action_title')}</Text>
+          <Text style={s.actionBannerSub}>{pt(biMode, 'action_sub')}</Text>
         </View>
 
         {/* Earthquake */}
         <View style={[s.actionRow, { borderColor: '#e04545' }]}>
           <Text style={s.actionEmoji}>1</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#e04545' }]}>地震</Text>
+            <Text style={[s.actionLabel, { color: '#e04545' }]}>{pt(biMode, 'eq_title')}</Text>
             <Text style={s.actionBody}>
-              趴下 → 躲桌下或靠牆蹲 → 護頭 → 搖停後穿鞋關瓦斯 → 走樓梯（不搭電梯）→ 前往集合點
+              {pt(biMode, 'eq_action')}
             </Text>
           </View>
         </View>
@@ -353,10 +531,12 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
         <View style={[s.actionRow, { borderColor: '#d4882a' }]}>
           <Text style={s.actionEmoji}>3</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#d4882a' }]}>火災</Text>
+            <Text style={[s.actionLabel, { color: '#d4882a' }]}>{pt(biMode, 'fire_title')}</Text>
             <Text style={s.actionBody}>
               {household.housingType === 'apartment'
-                ? `低姿勢爬行 → 摸門把不燙才開門 → 走安全梯下${household.floor ? ` ${household.floor} 樓` : '樓'} → 打 119`
+                ? /^[Bb]|地下/.test(household.floor)
+                  ? '低姿勢爬行 → 摸門把不燙才開門 → 走安全梯往地上樓層移動 → 打 119'
+                  : `低姿勢爬行 → 摸門把不燙才開門 → 走安全梯下${household.floor ? ` ${household.floor} 樓` : '樓'} → 打 119`
                 : '蹲低移動 → 從最近出口離開 → 不要回頭拿東西 → 打 119'}
             </Text>
           </View>
@@ -368,18 +548,37 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: '#3b6fd4' }]}>颱風 / 水災</Text>
             <Text style={s.actionBody}>
-              警報發布 → 備妥 72 小時物資 → 收室外物品 → 關窗 → 低窪地區提前撤離 → 停電就關總開關
+              {pt(biMode, 'typhoon_action')}
             </Text>
           </View>
         </View>
 
+        {/* Infant Warning */}
+        {household.hasInfant && (
+          <View style={[s.warningBox, { backgroundColor: '#fef3c7', borderWidth: 1, borderColor: '#fcd34d', marginBottom: 6 }]}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#92400e', marginBottom: 3 }}>家中有嬰幼兒 — 特別注意</Text>
+            {[
+              pt(biMode, 'infant_1'),
+              pt(biMode, 'infant_2'),
+              pt(biMode, 'infant_3'),
+              pt(biMode, 'infant_4'),
+              pt(biMode, 'infant_5'),
+            ].map((t, i) => (
+              <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
+                <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>▶</Text>
+                <Text style={{ flex: 1, fontSize: 9, color: '#78350f' }}>{t}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* MAIN MEETING POINT */}
         <View style={s.actionMeet}>
-          <Text style={s.actionMeetLabel}>災後全家集合地點</Text>
+          <Text style={s.actionMeetLabel}>{pt(biMode, 'meeting_label')}</Text>
           <Text style={s.actionMeetValue}>{mainShelter?.name ?? '最近公園或廣場'}</Text>
           {mainShelter?.distance && (
             <Text style={s.actionMeetDist}>
-              距離住家 {distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）
+              {biMode === 'en' ? '' : '距離住家 '}{distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）
             </Text>
           )}
           {mainShelter?.address && <Text style={s.actionMeetDist}>{mainShelter.address}</Text>}
@@ -389,9 +588,9 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
         <View style={s.twoCol}>
           <View style={s.col}>
             {([
-              ['119', '消防救護'],
-              ['110', '警察'],
-              ['166', '防空警報'],
+              ['119', pt(biMode, 'num_fire')],
+              ['110', pt(biMode, 'num_police')],
+              ['166', pt(biMode, 'num_air')],
             ] as [string, string][]).map(([n, l]) => (
               <View key={n} style={s.numRow}>
                 <Text style={s.numBig}>{n}</Text>
@@ -401,9 +600,9 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
           <View style={s.col}>
             {([
-              ['1991', '災害留言板'],
-              ['1925', '安心專線'],
-              ['0800-024-985', '災防專線'],
+              ['1991', pt(biMode, 'num_msg')],
+              ['1925', pt(biMode, 'num_mental')],
+              ['0800-024-985', pt(biMode, 'num_disaster')],
             ] as [string, string][]).map(([n, l]) => (
               <View key={n} style={s.numRow}>
                 <Text style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}>{n}</Text>
@@ -413,16 +612,16 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         </View>
 
-        <Footer label="緊急行動卡（請貼冰箱）" />
+        <Footer label={biMode === "en" ? "Emergency Action Card (stick on fridge)" : "緊急行動卡（請貼冰箱）"} biMode={biMode} />
       </Page>
 
       {/* ─── PAGE 3: FAMILY REUNION & COMMUNICATION PLAN ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#3b82f6' }]}>
-          家人集合與通訊計畫
+          {pt(biMode, 'reunion_title')}
         </Text>
         <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
-          災難後手機可能不通。事先約好集合點和聯絡順序，是找到家人最可靠的方法。
+          {pt(biMode, 'reunion_desc')}
         </Text>
 
         {/* Each member's location and nearest shelter */}
@@ -467,13 +666,13 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
         <Text style={s.sectionTitle}>通訊順序（手機能通時）</Text>
         <View style={[s.tipBox]}>
           {[
-            '1. 先確認自身安全，離開危險區域',
+            pt(biMode, 'comm_1'),
             '2. 發一則簡訊或 LINE 給家庭群組：「我在 [地點]，[安全/受傷]」',
-            '3. 簡訊比電話更容易在網路壅塞時送出',
+            pt(biMode, 'comm_3'),
             outOfCityContact
               ? `4. 若聯繫不上家人，打給外縣市聯絡人 ${outOfCityContact.name}（${outOfCityContact.phone}），請他統一回報`
               : '4. 若聯繫不上家人，前往約定集合點等候',
-            '5. 前往集合點，到達後清點家人',
+            pt(biMode, 'comm_5'),
           ].map((t, i) => (
             <Text key={i} style={[s.tipText, { marginBottom: 2 }]}>{t}</Text>
           ))}
@@ -505,27 +704,27 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
             {c.phoneBackup ? <Text style={s.contactMeta}>備用：{c.phoneBackup}</Text> : null}
             {c.isOutOfCity && (
               <Text style={[s.contactMeta, { color: '#d4882a', fontWeight: 'bold' }]}>
-                外縣市聯絡人 — 失聯時全家各自打這支，由他確認大家狀況
+                {biMode === 'en' ? 'Out-of-city contact — call this person when disconnected from family' : '外縣市聯絡人 — 失聯時全家各自打這支，由他確認大家狀況'}
               </Text>
             )}
           </View>
         ))}
 
-        <Footer label="家人集合與通訊計畫" />
+        <Footer label={pt(biMode, "reunion_title")} biMode={biMode} />
       </Page>
 
       {/* ─── PAGES 4+: LOCATION EVACUATION GUIDES ─── */}
       {data.locations.map((loc, i) => (
-        <LocationPage key={i} loc={loc} />
+        <LocationPage key={i} loc={loc} mapImg={mapImages?.[i]} biMode={biMode} />
       ))}
 
-      {/* ─── PERSONAL CARRY CARDS ─── */}
+      {/* ─── COMBINED: MEMBER OVERVIEW ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#3b82f6' }]}>
-          個人隨身卡 — 沿虛線剪下，放進皮夾
+          {pt(biMode, 'member_title')}
         </Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 10 }}>
-          每位家人各剪一張隨身攜帶。受傷昏迷時，救護人員可以看到你的關鍵資訊。
+        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 6 }}>
+          每位成員的避難、健康、聯絡資訊。急救時請出示此頁給醫護人員。沿虛線剪下隨身卡放進皮夾。
         </Text>
 
         {allMembers.map((m, i) => {
@@ -539,143 +738,185 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
             <View key={i} style={s.pCard}>
               <View style={s.pCardHeader}>
                 <Text style={s.pCardName}>{m.name}</Text>
-                <Text style={s.pCardBlood}>血型 {m.bloodType}</Text>
+                <Text style={s.pCardBlood}>{pt(biMode, 'label_blood_type')} {m.bloodType}</Text>
               </View>
-              <View style={s.pCardRow}>
-                <Text style={s.pCardLabel}>住址</Text>
-                <Text style={s.pCardValue}>{addr}</Text>
+              <View style={{ flexDirection: 'row', marginTop: 2 }}>
+                <View style={{ flex: 1 }}>
+                  <View style={s.pCardRow}>
+                    <Text style={s.pCardLabel}>{pt(biMode, 'label_addr')}</Text>
+                    <Text style={s.pCardValue}>{addr}</Text>
+                  </View>
+                  <View style={s.pCardRow}>
+                    <Text style={s.pCardLabel}>{pt(biMode, 'label_meeting_point')}</Text>
+                    <Text style={[s.pCardValue, { fontWeight: 'bold' }]}>{shelter?.name ?? '—'}{shelter?.distance ? `（${distText(shelter.distance)}）` : ''}</Text>
+                  </View>
+                  {m.birthYear ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_age')}</Text>
+                      <Text style={s.pCardValue}>{m.birthYear} 年生（{new Date().getFullYear() - Number(m.birthYear)} 歲）</Text>
+                    </View>
+                  ) : null}
+                </View>
+                <View style={{ flex: 1 }}>
+                  {m.medications ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_medication')}</Text>
+                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#e04545' }]}>{m.medications}</Text>
+                    </View>
+                  ) : null}
+                  {m.allergies ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_allergy')}</Text>
+                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#e04545' }]}>{m.allergies}</Text>
+                    </View>
+                  ) : null}
+                  {m.hasChronic ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_chronic')}</Text>
+                      <Text style={[s.pCardValue, { color: '#e04545' }]}>{pt(biMode, 'label_has_yes')}</Text>
+                    </View>
+                  ) : null}
+                  {m.isMobilityImpaired ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_mobility')}</Text>
+                      <Text style={[s.pCardValue, { color: '#e04545' }]}>{pt(biMode, 'label_mobility_impaired')}</Text>
+                    </View>
+                  ) : null}
+                  {m.specialNeeds ? (
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>{pt(biMode, 'label_needs')}</Text>
+                      <Text style={s.pCardValue}>{m.specialNeeds}</Text>
+                    </View>
+                  ) : null}
+                </View>
               </View>
-              <View style={s.pCardRow}>
-                <Text style={s.pCardLabel}>集合點</Text>
-                <Text style={[s.pCardValue, { fontWeight: 'bold' }]}>{shelter?.name ?? '—'}</Text>
-              </View>
-              {m.allergies && (
+              <View style={{ borderTopWidth: 1, borderTopColor: '#e5e7eb', marginTop: 3, paddingTop: 3 }}>
                 <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>過敏</Text>
-                  <Text style={[s.pCardValue, { color: '#e04545', fontWeight: 'bold' }]}>{m.allergies}</Text>
+                  <Text style={s.pCardLabel}>{pt(biMode, 'label_emergency_contact')}</Text>
+                  <Text style={[s.pCardValue, { fontWeight: 'bold' }]}>{emergContact ? `${emergContact.name} ${emergContact.phone}` : '＿＿＿＿＿＿'}</Text>
                 </View>
-              )}
-              {m.medications && (
                 <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>用藥</Text>
-                  <Text style={s.pCardValue}>{m.medications}</Text>
+                  <Text style={s.pCardLabel}>{pt(biMode, 'label_emergency_phone')}</Text>
+                  <Text style={s.pCardValue}>119消防 110警察 166防空 1991留言板</Text>
                 </View>
-              )}
-              {m.isMobilityImpaired && (
-                <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>特殊</Text>
-                  <Text style={[s.pCardValue, { color: '#e04545' }]}>行動不便，需協助撤離</Text>
-                </View>
-              )}
-              {emergContact && (
-                <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>緊急聯絡</Text>
-                  <Text style={[s.pCardValue, { fontWeight: 'bold' }]}>{emergContact.name} {emergContact.phone}</Text>
-                </View>
-              )}
-              <View style={s.pCardRow}>
-                <Text style={s.pCardLabel}>119 消防</Text>
-                <Text style={s.pCardValue}>110 警察　166 防空　1991 留言板</Text>
               </View>
             </View>
           )
         })}
 
-        <Footer label="個人隨身卡" />
-      </Page>
-
-      {/* ─── HEALTH DATA ─── */}
-      <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#059669', color: '#059669' }]}>
-          家庭成員健康資料
-        </Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
-          急救或送醫時，請出示此頁給醫護人員。可加快診斷與用藥判斷。
-        </Text>
-        {allMembers.map((m, i) => (
-          <View key={i} style={s.memberCard}>
-            <Text style={s.memberName}>{m.name}</Text>
-            <View style={s.twoCol}>
-              <View style={s.col}>
-                {m.birthYear ? (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>出生年 / 年齡</Text>
-                    <Text style={s.infoValue}>{m.birthYear} 年（{new Date().getFullYear() - Number(m.birthYear)} 歲）</Text>
-                  </View>
-                ) : null}
-                <View style={s.infoRow}>
-                  <Text style={s.infoLabel}>血型</Text>
-                  <Text style={[s.infoValue, { fontWeight: 'bold', fontSize: 12 }]}>{m.bloodType}</Text>
-                </View>
-                {m.hasDifferentAddress && m.address ? (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>居住地址</Text>
-                    <Text style={s.infoValue}>{m.city}{m.district}{m.address}</Text>
-                  </View>
-                ) : null}
-              </View>
-              <View style={s.col}>
-                {m.hasChronic && (
-                  <View style={[s.alertBadge, { backgroundColor: '#fef2f2' }]}>
-                    <Text style={s.alertText}>有慢性病</Text>
-                  </View>
-                )}
-                {m.medications ? (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>長期用藥</Text>
-                    <Text style={[s.infoValue, { fontWeight: 'bold' }]}>{m.medications}</Text>
-                  </View>
-                ) : null}
-                {m.allergies ? (
-                  <View style={[s.alertBadge, { backgroundColor: '#fef2f2', marginTop: 4 }]}>
-                    <Text style={[s.alertText, { fontWeight: 'bold' }]}>過敏：{m.allergies}</Text>
-                  </View>
-                ) : null}
-                {m.isMobilityImpaired ? (
-                  <View style={[s.alertBadge, { backgroundColor: '#fff7ed', marginTop: 4 }]}>
-                    <Text style={[s.alertText, { color: '#c2410c' }]}>行動不便，疏散需協助</Text>
-                  </View>
-                ) : null}
-                {m.specialNeeds ? (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>特殊需求</Text>
-                    <Text style={s.infoValue}>{m.specialNeeds}</Text>
-                  </View>
-                ) : null}
-              </View>
-            </View>
-          </View>
-        ))}
         {mainHospital && (
-          <View style={[s.tipBox, { marginTop: 6 }]}>
+          <View style={[s.tipBox, { marginTop: 4 }]}>
             <Text style={s.tipText}>
-              最近醫療機構：{mainHospital.name}
+              {biMode === 'en' ? 'Nearest: ' : '最近醫療機構：'}{mainHospital.name}
               {mainHospital.hasER ? '（有急診）' : ''}
               {mainHospital.distance ? `　${distText(mainHospital.distance)}` : ''}
               {mainHospital.phone ? `　${mainHospital.phone}` : ''}
             </Text>
           </View>
         )}
-        <Footer label="健康資料（出示給醫護人員）" />
+        <Footer label={biMode === "en" ? "Family Data (show to paramedics)" : "家人資料（急救時出示給醫護人員）"} biMode={biMode} />
       </Page>
+
+      {/* ─── FOREIGN NATIONAL INFO ─── */}
+      {household.isForeignNational && (() => {
+        const res = FOREIGN_RESOURCES.find(r => r.nationality === household.nationality)
+        return (
+          <Page size="A4" style={s.page}>
+            <Text style={[s.scenarioTitle, { borderBottomColor: '#0ea5e9', color: '#0ea5e9' }]}>
+              外籍人士專用資訊 Information for Foreign Nationals
+            </Text>
+            <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
+              災難時，所有避難所對所有人開放，不分國籍、不查身分證件。請安心前往避難。
+            </Text>
+            <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
+              During disasters, all shelters are open to everyone regardless of nationality. No ID check required.
+            </Text>
+
+            <Text style={s.sectionTitle}>多語求助專線 Multilingual Hotlines</Text>
+            {FOREIGN_HOTLINES.map((h, i) => (
+              <View key={i} style={s.numRow}>
+                <Text style={[s.numBig, { fontSize: h.number.length > 4 ? 14 : 20 }]}>{h.number}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.numLabel, { fontWeight: 'bold' }]}>{h.name}</Text>
+                  <Text style={{ fontSize: 8, color: '#6b7280' }}>{h.nameEn}　{h.note}</Text>
+                </View>
+              </View>
+            ))}
+
+            {res && (<>
+              <Text style={s.sectionTitle}>母國駐台代表處 Representative Office ({res.nameNative})</Text>
+              <View style={s.contactCard}>
+                <Text style={s.contactName}>{res.embassy}</Text>
+                <Text style={s.contactPhone}>{res.embassyPhone}</Text>
+                <Text style={[s.contactMeta, { marginTop: 2 }]}>{res.embassyAddress}</Text>
+                {res.emergencyPhone && (
+                  <Text style={[s.contactMeta, { color: '#e04545', fontWeight: 'bold', marginTop: 2 }]}>
+                    緊急電話 Emergency: {res.emergencyPhone}
+                  </Text>
+                )}
+              </View>
+            </>)}
+
+            {(household.employerName || household.brokerName) && (
+              <>
+                <Text style={s.sectionTitle}>雇主 / 仲介 Employer / Broker</Text>
+                {household.employerName && (
+                  <View style={s.contactCard}>
+                    <Text style={s.contactName}>雇主 Employer：{household.employerName}</Text>
+                    {household.employerPhone && <Text style={s.contactPhone}>{household.employerPhone}</Text>}
+                  </View>
+                )}
+                {household.brokerName && (
+                  <View style={s.contactCard}>
+                    <Text style={s.contactName}>仲介 Broker：{household.brokerName}</Text>
+                    {household.brokerPhone && <Text style={s.contactPhone}>{household.brokerPhone}</Text>}
+                  </View>
+                )}
+              </>
+            )}
+
+            <Text style={s.sectionTitle}>重要提醒 Important Reminders</Text>
+            <View style={[s.warningBox, { backgroundColor: '#f0f9ff', borderWidth: 1, borderColor: '#bae6fd' }]}>
+              {[
+                '護照和居留證放在防水袋中，隨緊急背包一起帶走',
+                'Keep your passport and ARC in a waterproof bag with your emergency kit',
+                '災難期間就醫，健保卡可使用，外籍人士同樣適用',
+                'Your NHI card works during disasters — same coverage as citizens',
+                '不要因為身分問題而不敢去避難所。避難所不會查證件',
+                'Do not hesitate to go to a shelter. No ID verification required',
+                '撥打 1955 可用母語溝通（越/印/泰/英語服務）',
+                'Call 1955 for help in your language (Vietnamese/Indonesian/Thai/English)',
+              ].map((t, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
+                  <Text style={{ color: '#0369a1', marginRight: 5, fontSize: 9 }}>{i % 2 === 0 ? '▶' : '　'}</Text>
+                  <Text style={{ flex: 1, fontSize: i % 2 === 0 ? 9 : 8, color: i % 2 === 0 ? '#1e293b' : '#64748b' }}>{t}</Text>
+                </View>
+              ))}
+            </View>
+
+            <Footer label="Foreign Nationals Info" biMode={biMode} />
+          </Page>
+        )
+      })()}
 
       {/* ─── 72-HOUR SUPPLY CHECKLIST ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#16a34a', color: '#15803d' }]}>
-          72 小時緊急物資清單
+          {pt(biMode, 'supply_title')}
         </Text>
         <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 2 }}>
-          大型災難後可能 3 天沒有外援。以下物資請平時備妥，每半年檢查有效期。勾選已備妥項目。
+          {pt(biMode, 'supply_desc')}
         </Text>
         <View style={s.twoCol}>
           <View style={s.col}>
-            <Text style={s.checkCat}>飲水與食物（{allMembers.length} 人份）</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_food')}（{allMembers.length} 人份）</Text>
             {([
               `飲用水 ${allMembers.length * 6} 公升（每人 2L/天 × 3 天）`,
-              '即食食品（罐頭、餅乾、能量棒、巧克力）',
-              '即食米飯或泡麵（不需開火可食用的）',
-              '奶粉/副食品（如有嬰幼兒）',
-              '免洗餐具和開罐器',
+              pt(biMode, 'chk_food_instant'),
+              pt(biMode, 'chk_food_rice'),
+              household.hasInfant ? `嬰幼兒奶粉/配方奶 3 天份（${household.infantInfo || '嬰幼兒'}）` : '奶粉/副食品（如有嬰幼兒）',
+              household.hasInfant ? '嬰兒副食品（米精、果泥罐頭）' : null,
+              pt(biMode, 'chk_utensils'),
               household.hasPets ? `寵物：${household.petInfo || '飼料'} 3 天份 + 飲水` : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
@@ -684,15 +925,15 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
               </View>
             ))}
 
-            <Text style={s.checkCat}>急救與藥品</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_medical')}</Text>
             {([
-              '急救包（OK 繃、紗布、消毒液、剪刀）',
-              '止痛退燒藥、腸胃藥',
+              pt(biMode, 'chk_firstaid'),
+              pt(biMode, 'chk_painkillers'),
               ...allMembers.filter(m => m.medications).map(m => `${m.name} 的藥：${m.medications}（至少 7 天份）`),
               ...allMembers.filter(m => m.allergies).map(m => `抗過敏藥（${m.name}：${m.allergies}）`),
-              '體溫計',
-              '口罩（每人 10 片以上）',
-              '生理食鹽水',
+              pt(biMode, 'chk_thermometer'),
+              pt(biMode, 'chk_masks'),
+              pt(biMode, 'chk_saline'),
               allMembers.some(m => m.isMobilityImpaired) ? '輪椅/助行器 備品及電池' : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
@@ -701,13 +942,18 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
               </View>
             ))}
 
-            <Text style={s.checkCat}>衛生用品</Text>
-            {[
-              '濕紙巾、衛生紙',
-              '垃圾袋（大型，可當臨時馬桶）',
-              '個人衛生用品',
-              '嬰兒尿布（如適用）',
-            ].map((item, i) => (
+            <Text style={s.checkCat}>{pt(biMode, 'supply_hygiene')}</Text>
+            {([
+              pt(biMode, 'chk_wipes'),
+              pt(biMode, 'chk_bags'),
+              pt(biMode, 'chk_hygiene'),
+              household.hasInfant ? '嬰兒尿布（至少 30 片，3 天份）' : null,
+              household.hasInfant ? '嬰兒濕紙巾（無酒精）' : null,
+              household.hasInfant ? '奶瓶 2 支 + 奶瓶刷 + 瓶裝水（沖泡用）' : null,
+              household.hasInfant ? '嬰兒背帶或揹巾（疏散時解放雙手）' : null,
+              household.hasInfant ? '安撫奶嘴或安撫玩具' : null,
+              !household.hasInfant ? '嬰兒尿布（如適用）' : null,
+            ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
                 <Text style={s.checkText}>{item}</Text>
@@ -716,13 +962,13 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
 
           <View style={s.col}>
-            <Text style={s.checkCat}>通訊與照明</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_comm')}</Text>
             {[
-              '手搖式或太陽能收音機（收聽 FM 廣播）',
-              '手電筒 + 備用電池 × 2 組',
-              '行動電源（已充飽，10000mAh 以上）',
-              '哨子（每人一個，被困時求救）',
-              '螢光棒（夜間標示位置）',
+              pt(biMode, 'chk_radio'),
+              pt(biMode, 'chk_flashlight'),
+              pt(biMode, 'chk_powerbank'),
+              pt(biMode, 'chk_whistle'),
+              pt(biMode, 'chk_glowstick'),
             ].map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -730,13 +976,13 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
               </View>
             ))}
 
-            <Text style={s.checkCat}>文件與現金</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_docs')}</Text>
             {[
-              '身分證 / 健保卡影本（每人）',
-              '存摺、保險單影本',
-              '本手冊影本（特別是隨身卡頁）',
-              '現金小鈔 至少 NT$ 5,000',
-              '防水夾鏈袋（裝文件）',
+              pt(biMode, 'chk_id'),
+              pt(biMode, 'chk_bank'),
+              pt(biMode, 'chk_handbook'),
+              pt(biMode, 'chk_cash'),
+              pt(biMode, 'chk_waterproof'),
             ].map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -744,15 +990,15 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
               </View>
             ))}
 
-            <Text style={s.checkCat}>衣物與工具</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_clothes')}</Text>
             {([
               `雨衣 ${allMembers.length} 件`,
-              '換洗衣物（每人 3 天份）',
-              '保暖外套或毛毯',
-              '工作手套 + 厚底鞋',
-              '瑞士刀或多功能工具',
-              '繩索 5 公尺',
-              '打火機或防水火柴',
+              pt(biMode, 'chk_clothes'),
+              pt(biMode, 'chk_jacket'),
+              pt(biMode, 'chk_gloves'),
+              pt(biMode, 'chk_knife'),
+              pt(biMode, 'chk_rope'),
+              pt(biMode, 'chk_fire'),
               household.hasPets ? `寵物提籠 / 牽繩` : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
@@ -764,26 +1010,29 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
         </View>
         <View style={[s.tipBox, { marginTop: 4 }]}>
           <Text style={s.tipText}>
-            建議準備一個「緊急背包」放在玄關。災難來臨時抓了就走，不要花時間找東西。
+            {pt(biMode, 'supply_tip')}
           </Text>
         </View>
-        <Footer label="72 小時物資清單" />
+        <Footer label={pt(biMode, "supply_title")} biMode={biMode} />
       </Page>
 
       {/* ─── SCENARIO: EARTHQUAKE ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#e04545', color: '#e04545' }]}>
-          地震完整應對指南
+          {pt(biMode, 'eq_full_title')}
         </Text>
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>在家中</Text>
+        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_at_home')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_at_home')}</Text>}
         {[
-          '立刻「趴下、掩護、抓緊」— 鑽到堅固桌子下，雙手護住頭頸',
-          '遠離窗戶、書架、吊燈、電視等易倒物品',
-          '搖晃停止後，穿鞋（地上有碎玻璃），確認家人安全',
-          '關閉瓦斯總開關，檢查電器是否損壞',
+          pt(biMode, 'eq_home_1'),
+          pt(biMode, 'eq_home_2'),
+          pt(biMode, 'eq_home_3'),
+          pt(biMode, 'eq_home_4'),
           household.housingType === 'apartment'
-            ? `走安全梯下樓（不搭電梯！你住 ${household.floor || '?'} 樓），到 1 樓離開建築物`
+            ? /^[Bb]|地下/.test(household.floor)
+              ? '你住地下樓層。走安全梯往上到 1 樓離開建築物（不搭電梯！）'
+              : `走安全梯下樓（不搭電梯！你住 ${household.floor || '?'} 樓），到 1 樓離開建築物`
             : '確認房屋結構沒有明顯裂縫後再移動，從最近出口離開',
           `帶緊急背包，前往集合點：${mainShelter?.name ?? '最近公園'}`,
           '到達後清點家人，未到者打電話或等候',
@@ -794,12 +1043,13 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>在戶外</Text>
+        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_outdoor')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_outdoor')}</Text>}
         {[
-          '遠離建築物、電線桿、招牌。蹲在空曠處護頭',
-          '若在開車：慢慢靠邊停車，留在車內等搖晃停止',
-          '若在山區：遠離山壁和懸崖，注意落石和土石流',
-          '搖晃停止後前往最近避難所或家庭集合點',
+          pt(biMode, 'eq_out_1'),
+          pt(biMode, 'eq_out_2'),
+          pt(biMode, 'eq_out_3'),
+          pt(biMode, 'eq_out_4'),
         ].map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#e04545' }]}>{i + 1}</Text>
@@ -807,14 +1057,15 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>地震後注意事項</Text>
+        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_after')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_after')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
-            '注意餘震！大地震後數小時內可能有強烈餘震',
-            '不要進入受損建築物，即使是自己的家',
-            '如果聞到瓦斯味，立刻離開、打開窗戶，到戶外再打電話',
-            '收聽 FM 廣播獲取政府最新指示（手機可能不通）',
-            '不要散播未經證實的消息',
+            pt(biMode, 'eq_after_1'),
+            pt(biMode, 'eq_after_2'),
+            pt(biMode, 'eq_after_3'),
+            pt(biMode, 'eq_after_4'),
+            pt(biMode, 'eq_after_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
               <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>▶</Text>
@@ -822,29 +1073,30 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
             </View>
           ))}
         </View>
-        <Footer label="地震應對指南" />
+        <Footer label={pt(biMode, "eq_full_title")} biMode={biMode} />
       </Page>
 
       {/* ─── SCENARIO: AIR RAID + FIRE ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#8b5cf6', color: '#8b5cf6' }]}>
-          防空警報應對指南
+          {pt(biMode, 'air_full_title')}
         </Text>
         <View style={[s.warningBox, { backgroundColor: '#faf5ff', borderWidth: 1, borderColor: '#d8b4fe', marginBottom: 6 }]}>
           <Text style={{ fontSize: 9, color: '#8b5cf6', fontWeight: 'bold' }}>
-            警報聲音辨識：連續長音 90 秒 ＝ 防空警報（立刻躲避）｜連續短音 30 秒 ＝ 解除警報
+            {pt(biMode, 'air_sound')}
           </Text>
         </View>
 
-        <Text style={[s.sectionTitle, { color: '#8b5cf6', borderBottomColor: '#d8b4fe' }]}>聽到警報後</Text>
+        <Text style={[s.sectionTitle, { color: '#8b5cf6', borderBottomColor: '#d8b4fe' }]}>{pt(biMode, 'air_after')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('air_after')}</Text>}
         {[
-          '立刻進入地下室、地下停車場、捷運站、或任何地下空間',
-          '若沒有地下空間：進入堅固建築低樓層（避開玻璃帷幕大樓），遠離窗戶',
-          '若在家中：到廁所或走廊（最內側無窗房間），坐在地上背靠牆',
-          '關閉門窗，拉上窗簾（減少玻璃碎片飛濺）',
-          '打開收音機收聽官方廣播',
-          '聽到「解除警報」（短音 30 秒）才能離開掩蔽處',
-          '不要相信社群媒體謠言，只信任政府官方管道',
+          pt(biMode, 'air_1'),
+          pt(biMode, 'air_2'),
+          pt(biMode, 'air_3'),
+          pt(biMode, 'air_4'),
+          pt(biMode, 'air_5'),
+          pt(biMode, 'air_6'),
+          pt(biMode, 'air_7'),
         ].map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#8b5cf6' }]}>{i + 1}</Text>
@@ -853,23 +1105,24 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
         ))}
         <View style={[s.tipBox, { borderColor: '#d8b4fe' }]}>
           <Text style={[s.tipText, { color: '#8b5cf6' }]}>
-            平時就要記住：住家附近的地下停車場入口、最近的捷運站、堅固地下室在哪裡。
+            {pt(biMode, 'air_tip')}
           </Text>
         </View>
 
         <Text style={[s.scenarioTitle, { borderBottomColor: '#d4882a', color: '#d4882a', marginTop: 12 }]}>
-          火災應對指南
+          {pt(biMode, 'fire_full_title')}
         </Text>
-        <Text style={[s.sectionTitle, { color: '#d4882a', borderBottomColor: '#fed7aa' }]}>發現火災時</Text>
+        <Text style={[s.sectionTitle, { color: '#d4882a', borderBottomColor: '#fed7aa' }]}>{pt(biMode, 'fire_when')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('fire_when')}</Text>}
         {([
-          '大喊「失火了！」通知同住者，同時按下住警器（如有）',
+          pt(biMode, 'fire_1'),
           household.housingType === 'apartment'
-            ? '摸門把：不燙 → 低姿勢開門逃生；門燙 → 不要開門，用濕毛巾塞門縫，到窗邊等救援'
-            : '立刻從最近出口逃離，不嘗試滅火（除非極小範圍）',
-          '低姿勢移動（煙在上方），用濕毛巾遮口鼻',
-          '不搭電梯，走安全梯。下樓時沿右側靠牆',
+            ? pt(biMode, 'fire_2_apt')
+            : pt(biMode, 'fire_2_house'),
+          pt(biMode, 'fire_3'),
+          pt(biMode, 'fire_4'),
           '離開後打 119：說明地址「' + fullAddr + '」、火源位置、是否有人受困',
-          '絕對不要回頭拿東西。人出來就好',
+          pt(biMode, 'fire_6'),
           `前往集合點 ${mainShelter?.name ?? '最近廣場'}，確認所有家人到齊`,
         ] as string[]).map((text, i) => (
           <View key={i} style={s.step}>
@@ -877,23 +1130,24 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
             <Text style={s.stepText}>{text}</Text>
           </View>
         ))}
-        <Footer label="防空 / 火災應對指南" />
+        <Footer label={biMode === "en" ? "Air Raid / Fire Guide" : "防空 / 火災應對指南"} biMode={biMode} />
       </Page>
 
       {/* ─── SCENARIO: TYPHOON + FLOOD ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#3b6fd4', color: '#3b6fd4' }]}>
-          颱風與水災應對指南
+          {pt(biMode, 'typhoon_full_title')}
         </Text>
 
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>颱風來臨前 24 小時</Text>
+        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_before')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_before')}</Text>}
         {[
-          '確認 72 小時緊急物資已備妥，特別是飲用水和手電筒',
-          '把陽台、頂樓的所有物品移入室內（花盆會變致命武器）',
-          '用膠帶在窗戶貼「米」字型，減少碎裂飛散（或拉上鐵捲門）',
-          '充飽行動電源和所有手機',
-          '將重要文件放入防水袋',
-          '低窪地區：陸上警報發布後就撤離，不要等到水漲才走',
+          pt(biMode, 'ty_before_1'),
+          pt(biMode, 'ty_before_2'),
+          pt(biMode, 'ty_before_3'),
+          pt(biMode, 'ty_before_4'),
+          pt(biMode, 'ty_before_5'),
+          pt(biMode, 'ty_before_6'),
         ].map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#3b6fd4' }]}>{i + 1}</Text>
@@ -901,13 +1155,14 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>颱風期間</Text>
+        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_during')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_during')}</Text>}
         {[
-          '待在室內，遠離窗戶。不要外出看風雨',
-          '如果窗戶破裂：立刻離開那個房間，關上房門擋風',
-          '停電後：關閉所有電器的電源開關，防止回電時損壞',
-          '如果開始淹水：切斷電源總開關（防觸電），往高處移動',
-          '準備好緊急背包，隨時可能需要撤離到避難所',
+          pt(biMode, 'ty_during_1'),
+          pt(biMode, 'ty_during_2'),
+          pt(biMode, 'ty_during_3'),
+          pt(biMode, 'ty_during_4'),
+          pt(biMode, 'ty_during_5'),
         ].map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#3b6fd4' }]}>{i + 1}</Text>
@@ -915,14 +1170,15 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>颱風過後</Text>
+        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_after')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_after')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe' }]}>
           {[
-            '確認房屋結構安全才進入。注意天花板是否有水痕',
-            '不要碰觸掉落的電線，通報 1911 台電服務專線',
-            '避開淹水區域（水中可能有漏電或汙水）',
-            '清理積水防止登革熱孳生',
-            '拍照記錄房屋損壞情形，作為保險理賠依據',
+            pt(biMode, 'ty_after_1'),
+            pt(biMode, 'ty_after_2'),
+            pt(biMode, 'ty_after_3'),
+            pt(biMode, 'ty_after_4'),
+            pt(biMode, 'ty_after_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
               <Text style={{ color: '#3b6fd4', marginRight: 5, fontSize: 9 }}>▶</Text>
@@ -931,29 +1187,31 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           ))}
         </View>
 
-        <Footer label="颱風水災應對指南" />
+        <Footer label={pt(biMode, "typhoon_full_title")} biMode={biMode} />
       </Page>
 
       {/* ─── IMPORTANT REMINDERS ─── */}
       <Page size="A4" style={s.page}>
         <Text style={[s.scenarioTitle, { borderBottomColor: '#374151', color: '#374151' }]}>
-          重要備忘與定期檢查
+          {pt(biMode, 'remind_title')}
         </Text>
 
-        <Text style={s.sectionTitle}>住家安全設備位置（請手寫填入）</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'remind_equip')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_equip')}</Text>}
         {[
-          '瓦斯總開關位置：＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '電源總開關位置：＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '水表位置：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '滅火器位置：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '逃生出口（安全梯）位置：＿＿＿＿＿＿＿＿＿＿',
-          '大樓管理員電話：＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
+          `${pt(biMode, 'rem_gas')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_power')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_water')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_extinguisher')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_exit')}：＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_manager')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
         ].map((t, i) => (
           <Text key={i} style={{ fontSize: 10, marginBottom: 6 }}>{t}</Text>
         ))}
 
-        <Text style={s.sectionTitle}>半年一次定期檢查</Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 4 }}>建議每年 3 月和 9 月各做一次。</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'remind_check')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_check')}</Text>}
+        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 4 }}>{pt(biMode, 'remind_check_desc')}</Text>
         {[
           '緊急物資有效期（食物、藥品、電池）',
           '飲用水更換（自來水存放不超過 6 個月）',
@@ -972,25 +1230,25 @@ export default function HandbookPDF({ data }: { data: HandbookData }) {
           </View>
         ))}
 
-        <Text style={s.sectionTitle}>重要資訊備忘（請手寫填入）</Text>
+        <Text style={s.sectionTitle}>{pt(biMode, 'remind_memo')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_memo')}</Text>}
         {[
-          '家庭醫師姓名 / 電話：＿＿＿＿＿＿＿＿＿＿＿',
-          '保險公司 / 保單號碼：＿＿＿＿＿＿＿＿＿＿＿',
-          '車牌號碼：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '寵物晶片號碼：＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
-          '其他：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿',
+          `${pt(biMode, 'rem_doctor')}：＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_insurance')}：＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_plate')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_pet_chip')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
+          `${pt(biMode, 'rem_other')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
         ].map((t, i) => (
           <Text key={i} style={{ fontSize: 10, marginBottom: 6 }}>{t}</Text>
         ))}
 
         <View style={[s.tipBox, { marginTop: 8 }]}>
           <Text style={s.tipText}>
-            這本手冊只有在你讀過、你的家人也知道的情況下才有用。
-            今天就和家人一起翻一遍，確認每個人都知道集合點在哪裡。
+            {pt(biMode, 'remind_final')}
           </Text>
         </View>
 
-        <Footer label="備忘與定期檢查" />
+        <Footer label={pt(biMode, "remind_title")} biMode={biMode} />
       </Page>
 
     </Document>

@@ -36,7 +36,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.name}
             onChange={e => update('name', e.target.value)}
             placeholder="例：王大明"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
         <div>
@@ -46,7 +46,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.relation}
             onChange={e => update('relation', e.target.value)}
             placeholder="例：父親、鄰居"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
       </div>
@@ -59,7 +59,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.phone}
             onChange={e => update('phone', e.target.value)}
             placeholder="0912-345-678"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
         <div>
@@ -69,7 +69,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.phoneBackup}
             onChange={e => update('phoneBackup', e.target.value)}
             placeholder="02-1234-5678"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
         </div>
       </div>

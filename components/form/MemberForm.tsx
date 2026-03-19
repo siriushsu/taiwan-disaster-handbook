@@ -1,15 +1,10 @@
 'use client'
 import type { Member } from '@/types'
 import { DISTRICTS } from '@/lib/districts'
+import { DISTRICTS_EN } from '@/lib/districts-en'
+import { CITIES } from '@/lib/cities'
 
-const CITIES = [
-  '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市',
-  '基隆市', '新竹市', '嘉義市', '新竹縣', '苗栗縣', '彰化縣',
-  '南投縣', '雲林縣', '嘉義縣', '屏東縣', '宜蘭縣', '花蓮縣',
-  '臺東縣', '澎湖縣', '金門縣', '連江縣',
-]
-
-const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
 
 interface Props {
   index: number
@@ -17,9 +12,11 @@ interface Props {
   onChange: (index: number, updated: Member) => void
   onRemove: (index: number) => void
   canRemove: boolean
+  locale?: string
 }
 
-export default function MemberForm({ index, member, onChange, onRemove, canRemove }: Props) {
+export default function MemberForm({ index, member, onChange, onRemove, canRemove, locale = 'zh-TW' }: Props) {
+  const isEn = locale === 'en'
   const update = (field: keyof Member, value: unknown) =>
     onChange(index, { ...member, [field]: value })
 
@@ -51,7 +48,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">血型</label>
         <select value={member.bloodType} onChange={e => update('bloodType', e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300">
           {['A', 'B', 'AB', 'O', '不知道'].map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
@@ -85,6 +82,33 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
           placeholder="例：青黴素過敏、花生過敏" className={INPUT} />
       </div>
 
+      {/* 白天地點 */}
+      <div className="border-t border-gray-200 pt-3 space-y-2">
+        <label className="block text-sm font-medium text-gray-600">白天通常在哪裡？（選填，例如上班或上學地址）</label>
+        <div className="grid grid-cols-3 gap-2">
+          <input type="text" value={member.dailyLocation}
+            onChange={e => update('dailyLocation', e.target.value)}
+            placeholder="例：上班" className={INPUT} />
+          <select value={member.dailyCity}
+            onChange={e => onChange(index, { ...member, dailyCity: e.target.value, dailyDistrict: '' })}
+            className={INPUT}>
+            <option value="">縣市</option>
+            {CITIES.map(([zh, en]) => <option key={zh} value={zh}>{isEn ? `${en} ${zh}` : zh}</option>)}
+          </select>
+          <select value={member.dailyDistrict}
+            onChange={e => update('dailyDistrict', e.target.value)}
+            className={INPUT}>
+            <option value="">區</option>
+            {(DISTRICTS[member.dailyCity] ?? []).map(d => <option key={d} value={d}>{isEn ? `${DISTRICTS_EN[d] || d} ${d}` : d}</option>)}
+          </select>
+        </div>
+        {member.dailyCity && (
+          <input type="text" value={member.dailyAddress}
+            onChange={e => update('dailyAddress', e.target.value)}
+            placeholder="詳細地址（選填，填了會多查一組避難所）" className={INPUT} />
+        )}
+      </div>
+
       {/* 不同住址 */}
       <div className="border-t border-gray-200 pt-3">
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -102,7 +126,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
                   onChange={e => onChange(index, { ...member, city: e.target.value, district: '' })}
                   className={INPUT}>
                   <option value="">請選擇</option>
-                  {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {CITIES.map(([zh, en]) => <option key={zh} value={zh}>{isEn ? `${en} ${zh}` : zh}</option>)}
                 </select>
               </div>
               <div>
@@ -110,7 +134,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
                 <select value={member.district} onChange={e => update('district', e.target.value)}
                   className={INPUT}>
                   <option value="">請選擇</option>
-                  {(DISTRICTS[member.city] ?? []).map(d => <option key={d} value={d}>{d}</option>)}
+                  {(DISTRICTS[member.city] ?? []).map(d => <option key={d} value={d}>{isEn ? `${DISTRICTS_EN[d] || d} ${d}` : d}</option>)}
                 </select>
               </div>
             </div>

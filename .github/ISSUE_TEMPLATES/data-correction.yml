@@ -1,0 +1,56 @@
+name: Data Correction | 資料更正
+description: Report incorrect shelter, air-raid shelter, or medical facility data | 回報錯誤的避難場所或醫療設施資料
+title: "[Data] "
+labels: ["data-correction"]
+body:
+  - type: dropdown
+    id: location-type
+    attributes:
+      label: Location Type | 地點類型
+      description: What type of location has incorrect data? | 哪種類型的地點資料有誤？
+      options:
+        - Emergency Shelter | 避難收容處所
+        - Air-Raid Shelter | 防空避難設施
+        - Medical Facility | 醫療設施
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Location Name | 地點名稱
+      description: The name of the shelter or facility | 避難場所或設施的名稱
+      placeholder: e.g., 台北市中山區公所
+    validations:
+      required: true
+
+  - type: input
+    id: address
+    attributes:
+      label: Address | 地址
+      description: The address shown in the app | 應用程式中顯示的地址
+      placeholder: e.g., 台北市中山區松江路367號
+    validations:
+      required: true
+
+  - type: textarea
+    id: whats-wrong
+    attributes:
+      label: What's Wrong | 問題描述
+      description: Describe what information is incorrect | 說明哪些資訊有誤
+      placeholder: |
+        e.g., The address is outdated, the facility has moved to a new location.
+        例如：地址已過時，設施已搬遷至新地點。
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct-info
+    attributes:
+      label: Correct Information | 正確資訊
+      description: Provide the correct data if you know it, with a source if possible | 如果您知道正確資訊，請提供，並盡量附上來源
+      placeholder: |
+        e.g., The new address is 台北市中山區南京東路一段1號
+        Source: https://...
+    validations:
+      required: false

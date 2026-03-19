@@ -1,0 +1,75 @@
+key	zh-TW	translation
+site_title	台灣家庭防災手冊產生器	Generator Buku Panduan Kesiapsiagaan Bencana Keluarga Taiwan
+site_desc	輸入您的家庭資訊，立即生成個人化防災手冊 PDF	Masukkan informasi keluarga Anda, langsung buat buku panduan kesiapsiagaan bencana personal dalam format PDF
+privacy_notice	所有資料僅在您的瀏覽器中處理，不會上傳至任何伺服器。關閉頁面後資料自動清除。	Semua data hanya diproses di browser Anda, tidak diunggah ke server mana pun. Data akan otomatis dihapus setelah halaman ditutup.
+step1	住家資訊	Informasi Tempat Tinggal
+step2	家庭成員	Anggota Keluarga
+step3	緊急聯絡	Kontak Darurat
+city	縣市	Kabupaten/Kota
+district	區/鄉/鎮市	Kecamatan/Kelurahan
+address	詳細地址	Alamat lengkap
+address_placeholder	例：信義路四段 1 號	Contoh: Jl. Xinyi Seksi 4 No. 1
+housing_type	住宅類型	Jenis hunian
+apartment	公寓/大樓	Apartemen/Gedung
+house	透天厝	Rumah tapak
+rural	農村/山區	Pedesaan/Pegunungan
+floor	居住樓層	Lantai tempat tinggal
+has_pets	家中有寵物	Rumah memiliki hewan peliharaan
+pet_placeholder	例：柯基犬 1 隻、貓 2 隻	Contoh: 1 anjing Corgi, 2 kucing
+next_step_members	下一步：家庭成員（選填）	Langkah berikutnya: Anggota Keluarga (opsional)
+skip_generate	跳過，直接用地址生成手冊	Lewati, langsung buat buku panduan berdasarkan alamat
+members_title	家庭成員（選填）	Anggota Keluarga (opsional)
+members_desc	填寫後可客製化物資清單與醫療建議。不填也可以直接生成手冊，列印後手寫。	Setelah diisi dapat menyesuaikan daftar perlengkapan dan saran medis. Tanpa diisi juga bisa langsung membuat buku panduan, cetak lalu tulis tangan.
+member_n	成員	Anggota
+name	姓名	Nama
+birth_year	出生年	Tahun lahir
+blood_type	血型	Golongan darah
+unknown	不知道	Tidak tahu
+mobility_impaired	行動不便/輪椅	Keterbatasan gerak/Kursi roda
+has_chronic	有慢性病	Memiliki penyakit kronis
+medications	長期用藥（藥名）	Obat jangka panjang (nama obat)
+allergies	過敏資訊（選填）	Informasi alergi (opsional)
+different_address	此成員住址與主住家不同	Alamat anggota ini berbeda dari rumah utama
+select_please	請選擇	Silakan pilih
+add_member	+ 新增成員	+ Tambah anggota
+remove	移除	Hapus
+prev_step	上一步	Langkah sebelumnya
+next_step_contacts	下一步：緊急聯絡	Langkah berikutnya: Kontak Darurat
+contacts_title	緊急聯絡人（選填）	Kontak Darurat (opsional)
+contacts_desc	建議至少填寫一位外縣市親友。不填也可以生成手冊，列印後手寫。	Disarankan mengisi minimal satu kerabat di kota/kabupaten lain. Tanpa diisi juga bisa membuat buku panduan, cetak lalu tulis tangan.
+contact_n	聯絡人	Kontak
+relation	關係	Hubungan
+phone	主要電話	Telepon utama
+phone_backup	備用電話	Telepon cadangan
+out_of_city	外縣市聯絡人（災難時作為家人訊息中繼）	Kontak di kota/kabupaten lain (sebagai penghubung informasi keluarga saat bencana)
+add_contact	+ 新增聯絡人	+ Tambah kontak
+generate	生成防災手冊	Buat Buku Panduan Kesiapsiagaan Bencana
+generating	生成中...	Sedang membuat...
+querying_address	查詢地址	Mencari alamat
+of	/	/
+main_home	主住家	Rumah utama
+generating_handbook	正在生成手冊...	Sedang membuat buku panduan...
+handbook_ready	您的防災手冊已準備好	Buku panduan kesiapsiagaan bencana Anda sudah siap
+handbook_ready_desc	下載前可修改避難所資訊，確保內容正確	Anda dapat mengedit informasi tempat pengungsian sebelum mengunduh, pastikan isinya benar
+download_pdf	下載 PDF 手冊	Unduh buku panduan PDF
+preparing_pdf	準備 PDF 中（首次需載入字型）...	Menyiapkan PDF (perlu memuat font untuk pertama kali)...
+share_line	分享到 LINE	Bagikan ke LINE
+copy_link	複製連結	Salin tautan
+link_copied	已複製連結！	Tautan telah disalin!
+map_title	附近避難設施地圖	Peta fasilitas pengungsian terdekat
+shelters_editable	避難所資訊（可修改）	Informasi tempat pengungsian (dapat diedit)
+click_to_edit	點擊名稱或地址即可編輯	Klik nama atau alamat untuk mengedit
+disaster_shelters	避難收容所	Tempat pengungsian bencana
+air_raid_shelters	防空避難所	Tempat perlindungan serangan udara
+medical_facilities	醫療院所	Fasilitas kesehatan
+no_shelters	未找到避難所資料，請向里辦公室確認	Data tempat pengungsian tidak ditemukan, silakan konfirmasi ke kantor kelurahan
+update_yearly	建議每年更新一次手冊	Disarankan memperbarui buku panduan setahun sekali
+update_yearly_desc	特別是聯絡電話、用藥、或搬家後請重新產生。	Terutama saat nomor telepon, obat-obatan berubah, atau setelah pindah rumah, silakan buat ulang.
+refill	重新填寫	Isi ulang
+data_not_found	找不到手冊資料	Data buku panduan tidak ditemukan
+go_back	返回填寫	Kembali mengisi
+line_share_text	我剛做好防災手冊！我家最近的避難所是「{shelter}」（{distance}）。你也可以做一份：	Saya baru saja membuat buku panduan kesiapsiagaan bencana! Tempat pengungsian terdekat dari rumah saya adalah "{shelter}" ({distance}). Kamu juga bisa membuat satu:
+error_title	發生錯誤	Terjadi kesalahan
+error_desc	很抱歉，頁面發生問題。請重新整理頁面或返回首頁。	Maaf, halaman mengalami masalah. Silakan muat ulang halaman atau kembali ke beranda.
+reload	重新整理	Muat ulang
+home	返回首頁	Kembali ke beranda

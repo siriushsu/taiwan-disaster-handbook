@@ -33,14 +33,18 @@ function findNearestAirRaid(lat: number, lng: number, limit = 3): Shelter[] {
     s.g > lng - delta && s.g < lng + delta
   )
 
-  const shelters: Shelter[] = candidates.map(s => ({
-    name: s.a,
-    address: s.a,
-    lat: s.t,
-    lng: s.g,
-    capacity: s.c ?? undefined,
-    type: 'air_defense' as const,
-  }))
+  const shelters: Shelter[] = candidates.map(s => {
+    // Extract a short name from address (e.g. "新北市永和區民本里成功路二段193號" → "成功路二段193號")
+    const shortName = s.a.replace(/^.+?[區鎮鄉市](.+?里)?/, '').trim() || s.a
+    return {
+      name: shortName,
+      address: s.a,
+      lat: s.t,
+      lng: s.g,
+      capacity: s.c ?? undefined,
+      type: 'air_defense' as const,
+    }
+  })
 
   return findNearest(shelters, lat, lng, limit)
 }

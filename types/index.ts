@@ -8,6 +8,11 @@ export interface Member {
   medications: string
   allergies: string
   specialNeeds: string
+  // 白天通常在哪裡（選填）
+  dailyLocation: string  // e.g. "信義區上班" "大安區上學"
+  dailyCity: string
+  dailyDistrict: string
+  dailyAddress: string
   // 不同住址（選填）
   hasDifferentAddress: boolean
   city: string
@@ -30,9 +35,17 @@ export interface HouseholdForm {
   city: string
   district: string
   housingType: 'apartment' | 'house' | 'rural'
-  floor: number | ''
+  floor: string  // e.g. "8", "B1", "B2", "1.5"
   hasPets: boolean
   petInfo: string
+  hasInfant: boolean
+  infantInfo: string
+  isForeignNational: boolean
+  nationality: string  // 'VN' | 'ID' | 'PH' | 'TH' | 'JP' | 'US' | ''
+  employerName: string
+  employerPhone: string
+  brokerName: string
+  brokerPhone: string
   members: Member[]
   contacts: EmergencyContact[]
 }
@@ -81,7 +94,7 @@ export interface LocationInfo {
   city: string
   district: string
   housingType?: 'apartment' | 'house' | 'rural'
-  floor?: number | ''
+  floor?: string
   geo: GeoLocation | null
   shelters: Shelter[]
   airRaid: Shelter[]
