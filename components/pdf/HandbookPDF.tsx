@@ -3,11 +3,13 @@ import type { HandbookData, LocationInfo, Shelter, MedicalFacility, Member } fro
 import { FOREIGN_RESOURCES, FOREIGN_HOTLINES } from '@/lib/foreign-resources'
 import { pt, ptEn, type BiMode } from '@/lib/pdf-i18n'
 
+// Fonts served from jsDelivr CDN (free, unlimited bandwidth)
+const CDN_FONTS = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@main/public/fonts'
 Font.register({
   family: 'NotoSansTC',
   fonts: [
-    { src: '/fonts/NotoSansTC-Regular-subset.ttf', fontWeight: 'normal' },
-    { src: '/fonts/NotoSansTC-Bold-subset.ttf', fontWeight: 'bold' },
+    { src: `${CDN_FONTS}/NotoSansTC-Regular-subset.ttf`, fontWeight: 'normal' },
+    { src: `${CDN_FONTS}/NotoSansTC-Bold-subset.ttf`, fontWeight: 'bold' },
   ],
 })
 
