@@ -84,6 +84,40 @@ export default function HandbookPage() {
     })
   }
 
+  // Recalculate distance after editing a shelter address
+  const recalcShelterDistance = async (locIdx: number, shelterIdx: number, type: 'shelters' | 'airRaid' | 'medical') => {
+    if (!data) return
+    const loc = data.locations[locIdx]
+    const list = type === 'airRaid' ? (loc.airRaid ?? []) : type === 'medical' ? loc.medical : loc.shelters
+    const item = list[shelterIdx]
+    if (!item || !loc.geo) return
+
+    // Try geocoding the shelter's address to get new coordinates
+    const { geocode } = await import('@/lib/client-lookup')
+    const geo = await geocode(item.address || item.name)
+    if (geo) {
+      const R = 6371000
+      const dLat = ((geo.lat - loc.geo.lat) * Math.PI) / 180
+      const dLng = ((geo.lng - loc.geo.lng) * Math.PI) / 180
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos((loc.geo.lat * Math.PI) / 180) * Math.cos((geo.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+      const dist = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
+
+      setData(prev => {
+        if (!prev) return prev
+        const locs = [...prev.locations]
+        const arr = [...(type === 'airRaid' ? (locs[locIdx].airRaid ?? []) : type === 'medical' ? locs[locIdx].medical : locs[locIdx].shelters)]
+        arr[shelterIdx] = { ...arr[shelterIdx], lat: geo.lat, lng: geo.lng, distance: dist }
+        locs[locIdx] = { ...locs[locIdx], [type]: arr }
+        const updated = { ...prev, locations: locs }
+        sessionStorage.setItem('handbookData', JSON.stringify(updated))
+        return updated
+      })
+      alert(`已更新座標與距離：${dist} 公尺`)
+    } else {
+      alert('找不到此地址的座標，請確認地址正確')
+    }
+  }
+
   const memberName = data.household.members[0]?.name || '我的家庭'
   const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, '-')}.pdf`
   const pageCount = 3 + data.locations.length + 5
@@ -241,11 +275,15 @@ export default function HandbookPage() {
                           </button>
                         )}
                       </div>
-                      {sh.distance && (
-                        <span className="text-xs text-emerald-600 whitespace-nowrap flex-shrink-0">
-                          {sh.distance < 1000 ? `${sh.distance}m` : `${(sh.distance/1000).toFixed(1)}km`}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {sh.distance && (
+                          <span className="text-xs text-emerald-600 whitespace-nowrap">
+                            {sh.distance < 1000 ? `${sh.distance}m` : `${(sh.distance/1000).toFixed(1)}km`}
+                          </span>
+                        )}
+                        <button onClick={() => recalcShelterDistance(locIdx, si, 'shelters')}
+                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -284,11 +322,15 @@ export default function HandbookPage() {
                           </button>
                         )}
                       </div>
-                      {sh.distance && (
-                        <span className="text-xs text-emerald-600 whitespace-nowrap flex-shrink-0">
-                          {sh.distance < 1000 ? `${sh.distance}m` : `${(sh.distance/1000).toFixed(1)}km`}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {sh.distance && (
+                          <span className="text-xs text-emerald-600 whitespace-nowrap">
+                            {sh.distance < 1000 ? `${sh.distance}m` : `${(sh.distance/1000).toFixed(1)}km`}
+                          </span>
+                        )}
+                        <button onClick={() => recalcShelterDistance(locIdx, si, 'airRaid')}
+                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -315,11 +357,15 @@ export default function HandbookPage() {
                           </button>
                         )}
                       </div>
-                      {m.distance && (
-                        <span className="text-xs text-emerald-600 whitespace-nowrap flex-shrink-0">
-                          {m.distance < 1000 ? `${m.distance}m` : `${(m.distance/1000).toFixed(1)}km`}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {m.distance && (
+                          <span className="text-xs text-emerald-600 whitespace-nowrap">
+                            {m.distance < 1000 ? `${m.distance}m` : `${(m.distance/1000).toFixed(1)}km`}
+                          </span>
+                        )}
+                        <button onClick={() => recalcShelterDistance(locIdx, mi, 'medical')}
+                          title="重新計算距離" className="text-xs text-slate-300 hover:text-blue-500 transition-colors">↻</button>
+                      </div>
                     </div>
                   ))}
                 </div>
