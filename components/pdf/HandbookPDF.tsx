@@ -4,7 +4,8 @@ import { FOREIGN_RESOURCES, FOREIGN_HOTLINES } from '@/lib/foreign-resources'
 import { pt, ptEn, type BiMode } from '@/lib/pdf-i18n'
 
 // Fonts served from jsDelivr CDN (free, unlimited bandwidth)
-const CDN_FONTS = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@main/public/fonts'
+// Pin to commit hash to bust jsDelivr cache after font re-subset
+const CDN_FONTS = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@71b728b/public/fonts'
 Font.register({
   family: 'NotoSansTC',
   fonts: [
