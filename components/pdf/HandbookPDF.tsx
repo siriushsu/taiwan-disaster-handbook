@@ -16,6 +16,32 @@ Font.register({
 
 /* ── helpers ───────────────────────────────────────── */
 let _lang: BiMode = 'zh'
+let _origin = ''
+
+function staticMapUrl(loc: LocationInfo): string | null {
+  if (!loc.geo || !_origin) return null
+  const { lat, lng } = loc.geo
+  const params = new URLSearchParams({
+    center: `${lat},${lng}`,
+    zoom: '15',
+    size: '600x300',
+  })
+  // Home: red
+  params.append('m', `${lat},${lng},ol-marker-red`)
+  // Shelters: blue (top 3)
+  loc.shelters.slice(0, 3).forEach((s: Shelter) => {
+    if (s.lat && s.lng) params.append('m', `${s.lat},${s.lng},ol-marker`)
+  })
+  // Air raid: gold (top 2)
+  ;(loc.airRaid ?? []).slice(0, 2).forEach((s: Shelter) => {
+    if (s.lat && s.lng) params.append('m', `${s.lat},${s.lng},ol-marker-gold`)
+  })
+  // Medical: green (top 2)
+  loc.medical.slice(0, 2).forEach((m: MedicalFacility) => {
+    if (m.lat && m.lng) params.append('m', `${m.lat},${m.lng},ol-marker-green`)
+  })
+  return `${_origin}/api/staticmap?${params.toString()}`
+}
 function distText(m?: number) {
   if (!m) return ''
   if (_lang === 'en') return m < 1000 ? `${m}m` : `${(m / 1000).toFixed(1)}km`
@@ -149,14 +175,15 @@ function DirItem({ item }: { item: { name: string; dir: string; dist: string; co
   )
 }
 
-function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: string; biMode?: BiMode }) {
+function DirMap({ loc, biMode = 'zh' }: { loc: LocationInfo; biMode?: BiMode }) {
   if (!loc.geo) return null
 
-  // If we have a captured map image, show it
-  if (mapImg) {
+  // Prefer static map URL via proxy (avoids CORS issues)
+  const mapUrl = staticMapUrl(loc)
+  if (mapUrl) {
     return (
       <View style={{ marginBottom: 8 }}>
-        <Image src={mapImg} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
+        <Image src={mapUrl} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
         <View style={{ flexDirection: 'row', marginTop: 3 }}>
           <Text style={{ fontSize: 7, color: '#6b7280' }}>• {pt(_lang, 'map_legend_full')}</Text>
           <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map © OpenStreetMap</Text>
@@ -211,7 +238,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
           : null}
       </View>
 
-      <DirMap loc={loc} mapImg={mapImg} biMode={biMode} />
+      <DirMap loc={loc} biMode={biMode} />
 
       {/* Meeting Points */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_meeting')}</Text>
@@ -460,8 +487,9 @@ function Bi({ mode, k, style }: { mode: BiMode; k: string; style?: any }) {
   )
 }
 
-export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: HandbookData; mapImages?: Record<number, string>; biMode?: BiMode }) {
+export default function HandbookPDF({ data, mapImages, biMode = 'zh', origin = '' }: { data: HandbookData; mapImages?: Record<number, string>; biMode?: BiMode; origin?: string }) {
   _lang = biMode
+  _origin = origin
   const { household } = data
   const allMembers = household.members.filter(m => m.name)
   const allContacts = household.contacts.filter(c => c.name && c.phone)
