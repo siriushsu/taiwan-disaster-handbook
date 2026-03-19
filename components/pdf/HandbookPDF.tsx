@@ -456,7 +456,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
       <Page size="A4" style={s.coverPage}>
         <View style={s.coverTop}>
           <Text style={s.coverTitle}>{pt(biMode, 'cover_title')}</Text>
-          {biMode === 'bi' && <Text style={[s.coverSub, { fontSize: 18, fontWeight: 'bold', marginBottom: 4 }]}>Family Disaster Handbook</Text>}
+          {biMode === 'bi' && <Text style={[s.coverSub, { fontSize: 18, fontWeight: 'bold', marginBottom: 4 }]}>Family Emergency Handbook</Text>}
           <Text style={s.coverSub}>{pt(biMode, 'cover_sub')}</Text>
           {biMode === 'bi' && <Text style={[s.coverSub, { fontSize: 10 }]}>{ptEn('cover_sub')}</Text>}
           <View style={s.coverBox}>

@@ -10,11 +10,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 const siteUrl = "https://disaster-handbook.vercel.app";
 
 export const metadata: Metadata = {
-  title: "台灣家庭防災手冊產生器 | Taiwan Disaster Handbook",
+  title: "台灣家庭防災手冊產生器 | Taiwan Family Emergency Handbook",
   description:
     "免費產生個人化防災手冊 PDF。包含最近避難所、防空避難處、醫療院所、緊急聯絡、物資清單與情境應對指南。所有資料在瀏覽器中處理，不會上傳。",
   keywords: ["防災", "避難所", "防空避難", "台灣", "地震", "颱風", "緊急準備", "disaster preparedness", "Taiwan"],
-  authors: [{ name: "Taiwan Disaster Handbook" }],
+  authors: [{ name: "Taiwan Family Emergency Handbook" }],
   openGraph: {
     title: "台灣家庭防災手冊產生器",
     description: "輸入地址，立即產生你家專屬的防災手冊 PDF — 最近避難所、集合點、緊急電話、物資清單一次搞定。",

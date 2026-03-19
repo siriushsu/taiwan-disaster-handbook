@@ -1,5 +1,5 @@
 {
-  "site_title": "Taiwan Family Disaster Handbook Generator",
+  "site_title": "Taiwan Family Emergency Handbook Generator",
   "site_desc": "Enter your family information to generate a personalized disaster preparedness handbook PDF",
   "privacy_notice": "All data is processed only in your browser. Nothing is uploaded to any server. Data is cleared when you close the page.",
   "step1": "Home Info",
@@ -43,7 +43,7 @@
   "phone_backup": "Backup Phone",
   "out_of_city": "Out-of-city contact (message relay during disasters)",
   "add_contact": "+ Add contact",
-  "generate": "Generate Disaster Handbook",
+  "generate": "Generate Emergency Handbook",
   "generating": "Generating...",
   "querying_address": "Looking up address",
   "of": "/",

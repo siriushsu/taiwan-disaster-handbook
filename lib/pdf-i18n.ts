@@ -256,7 +256,7 @@ const TEXT: Record<string, [string, string]> = {
   label_footer_handbook: ['家庭防災手冊', 'Family Emergency Handbook'],
 
   // Cover bilingual
-  cover_bi_title: ['Family Disaster Handbook', 'Taiwan Family Emergency Handbook'],
+  cover_bi_title: ['Family Emergency Handbook', 'Taiwan Family Emergency Handbook'],
 }
 
 export type BiMode = 'zh' | 'bi' | 'en'

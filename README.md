@@ -1,6 +1,6 @@
 # 台灣家庭防災手冊產生器
 
-**Taiwan Family Disaster Handbook Generator**
+**Taiwan Family Emergency Handbook Generator**
 
 根據您的居住地點，自動產生個人化的家庭防災手冊，包含最近的避難場所、醫療設施及防災資訊。所有資料處理皆在瀏覽器端完成，不會上傳任何個人資訊。
 
