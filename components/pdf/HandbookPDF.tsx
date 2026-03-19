@@ -158,7 +158,7 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
       <View style={{ marginBottom: 8 }}>
         <Image src={mapImg} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
         <View style={{ flexDirection: 'row', marginTop: 3 }}>
-          <Text style={{ fontSize: 7, color: '#6b7280' }}>● {pt(_lang, 'map_legend_full')}</Text>
+          <Text style={{ fontSize: 7, color: '#6b7280' }}>• {pt(_lang, 'map_legend_full')}</Text>
           <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map © OpenStreetMap</Text>
         </View>
       </View>
@@ -316,7 +316,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             `${pt(biMode, 'apt_go_to_meeting')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>▶</Text>
+              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
@@ -334,7 +334,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             `${pt(biMode, 'house_4_prefix')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>▶</Text>
+              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
@@ -569,7 +569,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
               pt(biMode, 'infant_5'),
             ].map((t, i) => (
               <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
-                <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>▶</Text>
+                <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>•</Text>
                 <Text style={{ flex: 1, fontSize: 9, color: '#78350f' }}>{t}</Text>
               </View>
             ))}
@@ -693,7 +693,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             pt(biMode, 'nophone_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>▶</Text>
+              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
@@ -1072,7 +1072,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             pt(biMode, 'eq_after_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>▶</Text>
+              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
@@ -1185,7 +1185,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             pt(biMode, 'ty_after_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#3b6fd4', marginRight: 5, fontSize: 9 }}>▶</Text>
+              <Text style={{ color: '#3b6fd4', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
