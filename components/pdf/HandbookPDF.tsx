@@ -9,8 +9,8 @@ const CDN_FONTS = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handboo
 Font.register({
   family: 'NotoSansTC',
   fonts: [
-    { src: `${CDN_FONTS}/NotoSansTC-Regular-subset.ttf`, fontWeight: 'normal' },
-    { src: `${CDN_FONTS}/NotoSansTC-Bold-subset.ttf`, fontWeight: 'bold' },
+    { src: `${CDN_FONTS}/NotoSansTC-Regular-subset.ttf?v=2`, fontWeight: 'normal' },
+    { src: `${CDN_FONTS}/NotoSansTC-Bold-subset.ttf?v=2`, fontWeight: 'bold' },
   ],
 })
 
