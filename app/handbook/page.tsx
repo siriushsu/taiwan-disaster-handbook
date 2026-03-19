@@ -379,17 +379,17 @@ export default function HandbookPage() {
         {/* Feedback & contribute */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-2">
           <p className="text-xs font-semibold text-slate-500 mb-1">資料有誤？幫助我們改善</p>
-          <a href="https://github.com/SiriusKoan/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
             target="_blank" rel="noopener noreferrer"
             className="block text-center border border-amber-200 bg-amber-50 text-amber-700 py-2 rounded-lg text-sm hover:bg-amber-100 transition-colors">
             📍 回報避難所 / 醫療資料錯誤
           </a>
-          <a href="https://github.com/SiriusKoan/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
             target="_blank" rel="noopener noreferrer"
             className="block text-center border border-slate-200 text-slate-600 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors">
             💡 功能建議
           </a>
-          <a href="https://github.com/SiriusKoan/taiwan-disaster-handbook"
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
             target="_blank" rel="noopener noreferrer"
             className="block text-center text-slate-400 text-xs py-1 hover:underline">
             ⭐ 開源專案 — 歡迎貢獻
