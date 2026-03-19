@@ -13,10 +13,10 @@ export default function LocaleSwitcher({ locale, onChange }: Props) {
         <button
           key={l}
           onClick={() => onChange(l)}
-          className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center ${
             locale === l
               ? 'bg-white text-slate-700'
-              : 'text-slate-400 hover:text-white'
+              : 'text-slate-300 hover:text-white hover:bg-white/10'
           }`}
         >
           {LOCALE_NAMES[l]}

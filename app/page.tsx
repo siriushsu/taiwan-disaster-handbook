@@ -172,7 +172,7 @@ export default function Home() {
           <p className="text-slate-300 mt-1 text-sm">
             {T('site_desc')}
           </p>
-          <p className="text-slate-400 mt-2 text-xs">
+          <p className="text-slate-300/80 mt-2 text-xs">
             {T('privacy_notice')}
           </p>
         </div>
