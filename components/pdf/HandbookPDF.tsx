@@ -452,7 +452,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
   const fullAddr = `${household.city}${household.district}${household.address}`
 
   return (
-    <Document title={`防災手冊 - ${allMembers[0]?.name ?? '家庭'}`} language="zh-TW">
+    <Document title={`${pt(biMode, 'cover_title')} - ${allMembers[0]?.name ?? '—'}`} language={biMode === 'en' ? 'en' : 'zh-TW'}>
 
       {/* ─── PAGE 1: COVER ─── */}
       <Page size="A4" style={s.coverPage}>
@@ -756,7 +756,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                   {m.birthYear ? (
                     <View style={s.pCardRow}>
                       <Text style={s.pCardLabel}>{pt(biMode, 'label_age')}</Text>
-                      <Text style={s.pCardValue}>{m.birthYear} 年生（{new Date().getFullYear() - Number(m.birthYear)} 歲）</Text>
+                      <Text style={s.pCardValue}>{m.birthYear} {pt(biMode, 'label_born')}（{new Date().getFullYear() - Number(m.birthYear)} {pt(biMode, 'label_years_old')}）</Text>
                     </View>
                   ) : null}
                 </View>
@@ -800,7 +800,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 </View>
                 <View style={s.pCardRow}>
                   <Text style={s.pCardLabel}>{pt(biMode, 'label_emergency_phone')}</Text>
-                  <Text style={s.pCardValue}>119消防 110警察 166防空 1991留言板</Text>
+                  <Text style={s.pCardValue}>{pt(biMode, 'member_emerg_numbers')}</Text>
                 </View>
               </View>
             </View>
@@ -810,14 +810,14 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         {mainHospital && (
           <View style={[s.tipBox, { marginTop: 4 }]}>
             <Text style={s.tipText}>
-              {biMode === 'en' ? 'Nearest: ' : '最近醫療機構：'}{mainHospital.name}
-              {mainHospital.hasER ? '（有急診）' : ''}
+              {pt(biMode, 'label_nearest_medical')}：{mainHospital.name}
+              {mainHospital.hasER ? pt(biMode, 'label_has_er_paren') : ''}
               {mainHospital.distance ? `　${distText(mainHospital.distance)}` : ''}
               {mainHospital.phone ? `　${mainHospital.phone}` : ''}
             </Text>
           </View>
         )}
-        <Footer label={biMode === "en" ? "Family Data (show to paramedics)" : "家人資料（急救時出示給醫護人員）"} biMode={biMode} />
+        <Footer label={pt(biMode, 'member_footer')} biMode={biMode} />
       </Page>
 
       {/* ─── FOREIGN NATIONAL INFO ─── */}
@@ -826,16 +826,16 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         return (
           <Page size="A4" style={s.page}>
             <Text style={[s.scenarioTitle, { borderBottomColor: '#0ea5e9', color: '#0ea5e9' }]}>
-              外籍人士專用資訊 Information for Foreign Nationals
+              {pt(biMode, 'foreign_title')} Information for Foreign Nationals
             </Text>
             <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
-              災難時，所有避難所對所有人開放，不分國籍、不查身分證件。請安心前往避難。
+              {pt(biMode, 'foreign_shelter_open')}
             </Text>
             <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
-              During disasters, all shelters are open to everyone regardless of nationality. No ID check required.
+              {ptEn('foreign_shelter_open')}
             </Text>
 
-            <Text style={s.sectionTitle}>多語求助專線 Multilingual Hotlines</Text>
+            <Text style={s.sectionTitle}>{pt(biMode, 'foreign_hotlines')} Multilingual Hotlines</Text>
             {FOREIGN_HOTLINES.map((h, i) => (
               <View key={i} style={s.numRow}>
                 <Text style={[s.numBig, { fontSize: h.number.length > 4 ? 14 : 20 }]}>{h.number}</Text>
@@ -847,14 +847,14 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             ))}
 
             {res && (<>
-              <Text style={s.sectionTitle}>母國駐台代表處 Representative Office ({res.nameNative})</Text>
+              <Text style={s.sectionTitle}>{pt(biMode, 'foreign_embassy_pre')} Representative Office ({res.nameNative})</Text>
               <View style={s.contactCard}>
                 <Text style={s.contactName}>{res.embassy}</Text>
                 <Text style={s.contactPhone}>{res.embassyPhone}</Text>
                 <Text style={[s.contactMeta, { marginTop: 2 }]}>{res.embassyAddress}</Text>
                 {res.emergencyPhone && (
                   <Text style={[s.contactMeta, { color: '#e04545', fontWeight: 'bold', marginTop: 2 }]}>
-                    緊急電話 Emergency: {res.emergencyPhone}
+                    {pt(biMode, 'foreign_emergency')} Emergency: {res.emergencyPhone}
                   </Text>
                 )}
               </View>
@@ -862,33 +862,33 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
             {(household.employerName || household.brokerName) && (
               <>
-                <Text style={s.sectionTitle}>雇主 / 仲介 Employer / Broker</Text>
+                <Text style={s.sectionTitle}>{pt(biMode, 'foreign_employer')} Employer / Broker</Text>
                 {household.employerName && (
                   <View style={s.contactCard}>
-                    <Text style={s.contactName}>雇主 Employer：{household.employerName}</Text>
+                    <Text style={s.contactName}>{pt(biMode, 'foreign_employer_label')} Employer：{household.employerName}</Text>
                     {household.employerPhone && <Text style={s.contactPhone}>{household.employerPhone}</Text>}
                   </View>
                 )}
                 {household.brokerName && (
                   <View style={s.contactCard}>
-                    <Text style={s.contactName}>仲介 Broker：{household.brokerName}</Text>
+                    <Text style={s.contactName}>{pt(biMode, 'foreign_broker_label')} Broker：{household.brokerName}</Text>
                     {household.brokerPhone && <Text style={s.contactPhone}>{household.brokerPhone}</Text>}
                   </View>
                 )}
               </>
             )}
 
-            <Text style={s.sectionTitle}>重要提醒 Important Reminders</Text>
+            <Text style={s.sectionTitle}>{pt(biMode, 'foreign_reminders')} Important Reminders</Text>
             <View style={[s.warningBox, { backgroundColor: '#f0f9ff', borderWidth: 1, borderColor: '#bae6fd' }]}>
               {[
-                '護照和居留證放在防水袋中，隨緊急背包一起帶走',
-                'Keep your passport and ARC in a waterproof bag with your emergency kit',
-                '災難期間就醫，健保卡可使用，外籍人士同樣適用',
-                'Your NHI card works during disasters — same coverage as citizens',
-                '不要因為身分問題而不敢去避難所。避難所不會查證件',
-                'Do not hesitate to go to a shelter. No ID verification required',
-                '撥打 1955 可用母語溝通（越/印/泰/英語服務）',
-                'Call 1955 for help in your language (Vietnamese/Indonesian/Thai/English)',
+                pt(biMode, 'foreign_tip_1'),
+                ptEn('foreign_tip_1'),
+                pt(biMode, 'foreign_tip_2'),
+                ptEn('foreign_tip_2'),
+                pt(biMode, 'foreign_tip_3'),
+                ptEn('foreign_tip_3'),
+                pt(biMode, 'foreign_tip_4'),
+                ptEn('foreign_tip_4'),
               ].map((t, i) => (
                 <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
                   <Text style={{ color: '#0369a1', marginRight: 5, fontSize: 9 }}>{i % 2 === 0 ? '▶' : '　'}</Text>
@@ -912,15 +912,15 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         </Text>
         <View style={s.twoCol}>
           <View style={s.col}>
-            <Text style={s.checkCat}>{pt(biMode, 'supply_food')}（{allMembers.length} 人份）</Text>
+            <Text style={s.checkCat}>{pt(biMode, 'supply_food')}（{allMembers.length} {pt(biMode, 'supply_food_count')}）</Text>
             {([
-              `飲用水 ${allMembers.length * 6} 公升（每人 2L/天 × 3 天）`,
+              `${pt(biMode, 'chk_water_dynamic_pre')} ${allMembers.length * 6} ${pt(biMode, 'chk_water_dynamic_unit')}`,
               pt(biMode, 'chk_food_instant'),
               pt(biMode, 'chk_food_rice'),
-              household.hasInfant ? `嬰幼兒奶粉/配方奶 3 天份（${household.infantInfo || '嬰幼兒'}）` : '奶粉/副食品（如有嬰幼兒）',
-              household.hasInfant ? '嬰兒副食品（米精、果泥罐頭）' : null,
+              household.hasInfant ? `${pt(biMode, 'chk_infant_formula_pre')}${household.infantInfo || pt(biMode, 'infant_title').split(' —')[0]}${pt(biMode, 'chk_infant_formula_post')}` : pt(biMode, 'chk_infant_formula_default'),
+              household.hasInfant ? pt(biMode, 'chk_infant_baby_food') : null,
               pt(biMode, 'chk_utensils'),
-              household.hasPets ? `寵物：${household.petInfo || '飼料'} 3 天份 + 飲水` : null,
+              household.hasPets ? `${pt(biMode, 'chk_pet_supply_pre')}${household.petInfo || pt(biMode, 'chk_pet_supply_default')}${pt(biMode, 'chk_pet_supply_post')}` : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -932,12 +932,12 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             {([
               pt(biMode, 'chk_firstaid'),
               pt(biMode, 'chk_painkillers'),
-              ...allMembers.filter(m => m.medications).map(m => `${m.name} 的藥：${m.medications}（至少 7 天份）`),
-              ...allMembers.filter(m => m.allergies).map(m => `抗過敏藥（${m.name}：${m.allergies}）`),
+              ...allMembers.filter(m => m.medications).map(m => `${m.name}${pt(biMode, 'chk_meds_pre')}${m.medications}${pt(biMode, 'chk_meds_post')}`),
+              ...allMembers.filter(m => m.allergies).map(m => `${pt(biMode, 'chk_allergy_pre')}${m.name}${pt(biMode, 'chk_allergy_mid')}${m.allergies}）`),
               pt(biMode, 'chk_thermometer'),
               pt(biMode, 'chk_masks'),
               pt(biMode, 'chk_saline'),
-              allMembers.some(m => m.isMobilityImpaired) ? '輪椅/助行器 備品及電池' : null,
+              allMembers.some(m => m.isMobilityImpaired) ? pt(biMode, 'chk_wheelchair') : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -950,12 +950,12 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
               pt(biMode, 'chk_wipes'),
               pt(biMode, 'chk_bags'),
               pt(biMode, 'chk_hygiene'),
-              household.hasInfant ? '嬰兒尿布（至少 30 片，3 天份）' : null,
-              household.hasInfant ? '嬰兒濕紙巾（無酒精）' : null,
-              household.hasInfant ? '奶瓶 2 支 + 奶瓶刷 + 瓶裝水（沖泡用）' : null,
-              household.hasInfant ? '嬰兒背帶或揹巾（疏散時解放雙手）' : null,
-              household.hasInfant ? '安撫奶嘴或安撫玩具' : null,
-              !household.hasInfant ? '嬰兒尿布（如適用）' : null,
+              household.hasInfant ? pt(biMode, 'chk_infant_diapers') : null,
+              household.hasInfant ? pt(biMode, 'chk_infant_wipes') : null,
+              household.hasInfant ? pt(biMode, 'chk_infant_bottles') : null,
+              household.hasInfant ? pt(biMode, 'chk_infant_carrier') : null,
+              household.hasInfant ? pt(biMode, 'chk_infant_pacifier') : null,
+              !household.hasInfant ? pt(biMode, 'chk_diapers_optional') : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -995,14 +995,14 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
             <Text style={s.checkCat}>{pt(biMode, 'supply_clothes')}</Text>
             {([
-              `雨衣 ${allMembers.length} 件`,
+              `${pt(biMode, 'chk_raincoat')} ${allMembers.length} ${pt(biMode, 'chk_raincoat_unit')}`,
               pt(biMode, 'chk_clothes'),
               pt(biMode, 'chk_jacket'),
               pt(biMode, 'chk_gloves'),
               pt(biMode, 'chk_knife'),
               pt(biMode, 'chk_rope'),
               pt(biMode, 'chk_fire'),
-              household.hasPets ? `寵物提籠 / 牽繩` : null,
+              household.hasPets ? pt(biMode, 'chk_pet_carrier') : null,
             ] as (string|null)[]).filter(Boolean).map((item, i) => (
               <View key={i} style={s.checkItem}>
                 <View style={s.checkbox} />
@@ -1034,11 +1034,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           pt(biMode, 'eq_home_4'),
           household.housingType === 'apartment'
             ? /^[Bb]|地下/.test(household.floor)
-              ? '你住地下樓層。走安全梯往上到 1 樓離開建築物（不搭電梯！）'
-              : `走安全梯下樓（不搭電梯！你住 ${household.floor || '?'} 樓），到 1 樓離開建築物`
-            : '確認房屋結構沒有明顯裂縫後再移動，從最近出口離開',
-          `帶緊急背包，前往集合點：${mainShelter?.name ?? '最近公園'}`,
-          '到達後清點家人，未到者打電話或等候',
+              ? pt(biMode, 'eq_basement_up')
+              : `${pt(biMode, 'eq_floor_down_pre')} ${household.floor || '?'} ${pt(biMode, 'eq_floor_down_post')}`
+            : pt(biMode, 'eq_house_check'),
+          `${pt(biMode, 'eq_go_meeting_pre')}${mainShelter?.name ?? pt(biMode, 'eq_go_meeting_fallback')}`,
+          pt(biMode, 'eq_headcount'),
         ].map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#e04545' }]}>{i + 1}</Text>
@@ -1124,16 +1124,16 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             : pt(biMode, 'fire_2_house'),
           pt(biMode, 'fire_3'),
           pt(biMode, 'fire_4'),
-          '離開後打 119：說明地址「' + fullAddr + '」、火源位置、是否有人受困',
+          `${pt(biMode, 'fire_5_pre')}${fullAddr}${pt(biMode, 'fire_5_post')}`,
           pt(biMode, 'fire_6'),
-          `前往集合點 ${mainShelter?.name ?? '最近廣場'}，確認所有家人到齊`,
+          `${pt(biMode, 'fire_7_pre')} ${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}${pt(biMode, 'fire_7_post')}`,
         ] as string[]).map((text, i) => (
           <View key={i} style={s.step}>
             <Text style={[s.stepNum, { backgroundColor: '#d4882a' }]}>{i + 1}</Text>
             <Text style={s.stepText}>{text}</Text>
           </View>
         ))}
-        <Footer label={biMode === "en" ? "Air Raid / Fire Guide" : "防空 / 火災應對指南"} biMode={biMode} />
+        <Footer label={pt(biMode, 'airfire_footer')} biMode={biMode} />
       </Page>
 
       {/* ─── SCENARIO: TYPHOON + FLOOD ─── */}
@@ -1216,16 +1216,16 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_check')}</Text>}
         <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 4 }}>{pt(biMode, 'remind_check_desc')}</Text>
         {[
-          '緊急物資有效期（食物、藥品、電池）',
-          '飲用水更換（自來水存放不超過 6 個月）',
-          '行動電源充電',
-          '滅火器壓力錶是否在綠色區域',
-          '住警器電池是否需要更換',
-          '家人手機號碼是否有變動 → 更新本手冊',
-          '聯絡人電話是否有效 → 打一通確認',
-          '緊急背包是否在玄關、容易拿取',
-          '與家人復習集合點位置',
-          '有搬家、換藥、新生兒 → 重新產生手冊',
+          pt(biMode, 'remind_chk_1'),
+          pt(biMode, 'remind_chk_2'),
+          pt(biMode, 'remind_chk_3'),
+          pt(biMode, 'remind_chk_4'),
+          pt(biMode, 'remind_chk_5'),
+          pt(biMode, 'remind_chk_6'),
+          pt(biMode, 'remind_chk_7'),
+          pt(biMode, 'remind_chk_8'),
+          pt(biMode, 'remind_chk_9'),
+          pt(biMode, 'remind_chk_10'),
         ].map((item, i) => (
           <View key={i} style={s.checkItem}>
             <View style={s.checkbox} />
