@@ -1,4 +1,4 @@
-# 台灣家庭防災手冊產生器 🇹🇼
+# 台灣家庭防災手冊產生器
 
 **Taiwan Family Disaster Handbook Generator**
 
