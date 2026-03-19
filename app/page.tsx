@@ -489,13 +489,27 @@ export default function Home() {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
-          target="_blank" rel="noopener noreferrer"
-          className="text-xs text-gray-400 hover:text-gray-500 hover:underline">
-          {locale === 'en' ? 'Open source project — contributions welcome' : '開源專案 — 歡迎貢獻'}
-        </a>
+      {/* Feedback & Footer */}
+      <div className="mt-8 max-w-xl mx-auto space-y-2 px-4">
+        <div className="flex gap-2">
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
+            target="_blank" rel="noopener noreferrer"
+            className="flex-1 text-center border border-amber-200 bg-amber-50 text-amber-700 py-2 rounded-lg text-xs hover:bg-amber-100 transition-colors">
+            {locale === 'en' ? '📍 Report data error' : '📍 回報資料錯誤'}
+          </a>
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
+            target="_blank" rel="noopener noreferrer"
+            className="flex-1 text-center border border-slate-200 text-slate-600 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors">
+            {locale === 'en' ? '💡 Feature request' : '💡 功能建議'}
+          </a>
+        </div>
+        <div className="text-center">
+          <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
+            target="_blank" rel="noopener noreferrer"
+            className="text-xs text-gray-400 hover:text-gray-500 hover:underline">
+            {locale === 'en' ? '⭐ Open source project — contributions welcome' : '⭐ 開源專案 — 歡迎貢獻'}
+          </a>
+        </div>
       </div>
     </main>
   )
