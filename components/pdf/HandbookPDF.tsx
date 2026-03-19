@@ -204,10 +204,10 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
   return (
     <Page size="A4" style={s.page}>
       <View style={s.locHeader}>
-        <Text style={s.locTitle}>{loc.label}　{pt(biMode, 'loc_evac_guide_suffix')}</Text>
+        <Text style={s.locTitle}>{loc.label}　{pt(biMode, 'loc_evac_guide_suffix')}{biMode !== 'zh' ? ' / ' + ptEn('loc_evac_guide_suffix') : ''}</Text>
         <Text style={s.locAddr}>{loc.address}</Text>
         {loc.housingType === 'apartment' && loc.floor
-          ? <Text style={s.locAddr}>{pt(biMode, 'loc_apt_building')} {loc.floor} {pt(biMode, 'loc_floor_suffix')}</Text>
+          ? <Text style={s.locAddr}>{pt(biMode, 'loc_apt_building')} {loc.floor} {pt(biMode, 'loc_floor_suffix')}{biMode !== 'zh' ? ' / Apt Bldg' : ''}</Text>
           : null}
       </View>
 
@@ -216,18 +216,19 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Meeting Points */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_meeting')}</Text>
       {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_meeting')}</Text>}
-      <Text style={{ fontSize: 8.5, color: '#6b7280', marginBottom: 4 }}>
+      <Text style={{ fontSize: 8.5, color: '#6b7280', marginBottom: biMode !== 'zh' ? 1 : 4 }}>
         {pt(biMode, 'loc_meeting_desc')}
       </Text>
+      {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280', marginBottom: 4 }}>{ptEn('loc_meeting_desc')}</Text>}
       <View style={s.meetBox}>
         <View style={[s.meetCard, { backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe' }]}>
-          <Text style={[s.meetLabel, { color: '#3b82f6' }]}>{pt(biMode, 'loc_primary')}</Text>
+          <Text style={[s.meetLabel, { color: '#3b82f6' }]}>{pt(biMode, 'loc_primary')}{biMode !== 'zh' ? ' / ' + ptEn('loc_primary') : ''}</Text>
           <Text style={s.meetValue}>{mainShelter?.name ?? pt(biMode, 'loc_fallback_primary')}</Text>
           {mainShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{mainShelter.address}</Text> : null}
           {mainShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）</Text> : null}
         </View>
         <View style={[s.meetCard, { backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa' }]}>
-          <Text style={[s.meetLabel, { color: '#c2410c' }]}>{pt(biMode, 'loc_backup')}</Text>
+          <Text style={[s.meetLabel, { color: '#c2410c' }]}>{pt(biMode, 'loc_backup')}{biMode !== 'zh' ? ' / ' + ptEn('loc_backup') : ''}</Text>
           <Text style={s.meetValue}>{backupShelter?.name ?? pt(biMode, 'loc_fallback_backup')}</Text>
           {backupShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{backupShelter.address}</Text> : null}
           {backupShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(backupShelter.distance)}（{walkMin(backupShelter.distance)}）</Text> : null}
@@ -305,19 +306,31 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_apt_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
-            isBasement
-              ? `${pt(biMode, 'apt_basement_prefix')} ${loc.floor} ${pt(biMode, 'loc_floor_suffix')}。${pt(biMode, 'apt_basement_eq')}`
-              : `${pt(biMode, 'apt_1_pre')} ${loc.floor || '?'} ${pt(biMode, 'apt_1_post')}`,
-            isBasement
-              ? pt(biMode, 'apt_basement_flood')
-              : pt(biMode, 'apt_2'),
-            pt(biMode, 'apt_3'),
-            pt(biMode, 'apt_4'),
-            `${pt(biMode, 'apt_go_to_meeting')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
-          ].map((t, i) => (
+            [
+              isBasement
+                ? `${pt(biMode, 'apt_basement_prefix')} ${loc.floor} ${pt(biMode, 'loc_floor_suffix')}。${pt(biMode, 'apt_basement_eq')}`
+                : `${pt(biMode, 'apt_1_pre')} ${loc.floor || '?'} ${pt(biMode, 'apt_1_post')}`,
+              isBasement
+                ? `${ptEn('apt_basement_prefix')} ${loc.floor} ${ptEn('loc_floor_suffix')}. ${ptEn('apt_basement_eq')}`
+                : `${ptEn('apt_1_pre')} ${loc.floor || '?'} ${ptEn('apt_1_post')}`,
+            ],
+            [
+              isBasement ? pt(biMode, 'apt_basement_flood') : pt(biMode, 'apt_2'),
+              isBasement ? ptEn('apt_basement_flood') : ptEn('apt_2'),
+            ],
+            [pt(biMode, 'apt_3'), ptEn('apt_3')],
+            [pt(biMode, 'apt_4'), ptEn('apt_4')],
+            [
+              `${pt(biMode, 'apt_go_to_meeting')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
+              `${ptEn('apt_go_to_meeting')}${mainShelter?.name ?? ptEn('loc_fallback_plaza')}`,
+            ],
+          ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
               <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
-              <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 9 }}>{zh}</Text>
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{en}</Text>}
+              </View>
             </View>
           ))}
         </View>
@@ -328,14 +341,20 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_house_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
-            pt(biMode, 'house_1'),
-            pt(biMode, 'house_2'),
-            pt(biMode, 'house_3'),
-            `${pt(biMode, 'house_4_prefix')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
-          ].map((t, i) => (
+            [pt(biMode, 'house_1'), ptEn('house_1')],
+            [pt(biMode, 'house_2'), ptEn('house_2')],
+            [pt(biMode, 'house_3'), ptEn('house_3')],
+            [
+              `${pt(biMode, 'house_4_prefix')}${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}`,
+              `${ptEn('house_4_prefix')}${mainShelter?.name ?? ptEn('loc_fallback_plaza')}`,
+            ],
+          ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
               <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
-              <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 9 }}>{zh}</Text>
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{en}</Text>}
+              </View>
             </View>
           ))}
         </View>
@@ -488,14 +507,16 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           )}
           <View style={[s.coverBox, { marginTop: 12 }]}>
             <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_date')}{biMode === 'bi' ? ' / Created' : ''}</Text>
-            <Text style={{ color: '#ffffff', fontSize: 11 }}>{data.generatedAt}　{pt(biMode, 'cover_update')}</Text>
+            <Text style={{ color: '#ffffff', fontSize: 11 }}>{data.generatedAt}　{pt(biMode, 'cover_update')}{biMode !== 'zh' ? ' / ' + ptEn('cover_update') : ''}</Text>
           </View>
         </View>
         <View style={s.coverFooter}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
               <Text>{pt(biMode, 'cover_footer')}</Text>
+              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#bfdbfe', marginTop: 1 }}>{ptEn('cover_footer')}</Text>}
               <Text style={{ marginTop: 3 }}>{pt(biMode, 'cover_qr')}</Text>
+              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#bfdbfe', marginTop: 1 }}>{ptEn('cover_qr')}</Text>}
             </View>
             <Image src={qrUrl(`https://disaster-handbook.vercel.app/?city=${encodeURIComponent(household.city)}&district=${encodeURIComponent(household.district)}`)} style={{ width: 56, height: 56 }} />
           </View>
@@ -506,17 +527,20 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
       <Page size="A4" style={s.actionPage}>
         <View style={s.actionBanner}>
           <Text style={s.actionBannerText}>{pt(biMode, 'action_title')}</Text>
+          {biMode !== 'zh' && <Text style={[s.actionBannerText, { fontSize: 9, marginTop: 2 }]}>{ptEn('action_title')}</Text>}
           <Text style={s.actionBannerSub}>{pt(biMode, 'action_sub')}</Text>
+          {biMode !== 'zh' && <Text style={[s.actionBannerSub, { fontSize: 7.5 }]}>{ptEn('action_sub')}</Text>}
         </View>
 
         {/* Earthquake */}
         <View style={[s.actionRow, { borderColor: '#e04545' }]}>
           <Text style={s.actionEmoji}>1</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#e04545' }]}>{pt(biMode, 'eq_title')}</Text>
+            <Text style={[s.actionLabel, { color: '#e04545' }]}>{pt(biMode, 'eq_title')}{biMode !== 'zh' ? ' / ' + ptEn('eq_title') : ''}</Text>
             <Text style={s.actionBody}>
               {pt(biMode, 'eq_action')}
             </Text>
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('eq_action')}</Text>}
           </View>
         </View>
 
@@ -524,10 +548,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.actionRow, { borderColor: '#8b5cf6' }]}>
           <Text style={s.actionEmoji}>2</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#8b5cf6' }]}>{pt(biMode, 'air_title')}</Text>
+            <Text style={[s.actionLabel, { color: '#8b5cf6' }]}>{pt(biMode, 'air_title')}{biMode !== 'zh' ? ' / ' + ptEn('air_title') : ''}</Text>
             <Text style={s.actionBody}>
               {pt(biMode, 'air_action')}
             </Text>
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('air_action')}</Text>}
           </View>
         </View>
 
@@ -535,7 +560,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.actionRow, { borderColor: '#d4882a' }]}>
           <Text style={s.actionEmoji}>3</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#d4882a' }]}>{pt(biMode, 'fire_title')}</Text>
+            <Text style={[s.actionLabel, { color: '#d4882a' }]}>{pt(biMode, 'fire_title')}{biMode !== 'zh' ? ' / ' + ptEn('fire_title') : ''}</Text>
             <Text style={s.actionBody}>
               {household.housingType === 'apartment'
                 ? /^[Bb]|地下/.test(household.floor)
@@ -543,6 +568,15 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                   : `${pt(biMode, 'fire_apt_floor_pre')}${household.floor ? ` ${household.floor} ${pt(biMode, 'loc_floor_suffix')}` : pt(biMode, 'loc_floor_suffix')} ${pt(biMode, 'fire_apt_floor_post')}`
                 : pt(biMode, 'fire_action_house')}
             </Text>
+            {biMode !== 'zh' && (
+              <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>
+                {household.housingType === 'apartment'
+                  ? /^[Bb]|地下/.test(household.floor)
+                    ? ptEn('fire_apt_basement')
+                    : `${ptEn('fire_apt_floor_pre')}${household.floor ? ` ${household.floor} ${ptEn('loc_floor_suffix')}` : ptEn('loc_floor_suffix')} ${ptEn('fire_apt_floor_post')}`
+                  : ptEn('fire_action_house')}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -550,27 +584,25 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.actionRow, { borderColor: '#3b6fd4' }]}>
           <Text style={s.actionEmoji}>4</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#3b6fd4' }]}>{pt(biMode, 'typhoon_title')}</Text>
+            <Text style={[s.actionLabel, { color: '#3b6fd4' }]}>{pt(biMode, 'typhoon_title')}{biMode !== 'zh' ? ' / ' + ptEn('typhoon_title') : ''}</Text>
             <Text style={s.actionBody}>
               {pt(biMode, 'typhoon_action')}
             </Text>
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('typhoon_action')}</Text>}
           </View>
         </View>
 
         {/* Infant Warning */}
         {household.hasInfant && (
           <View style={[s.warningBox, { backgroundColor: '#fef3c7', borderWidth: 1, borderColor: '#fcd34d', marginBottom: 6 }]}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#92400e', marginBottom: 3 }}>{pt(biMode, 'infant_title')}</Text>
-            {[
-              pt(biMode, 'infant_1'),
-              pt(biMode, 'infant_2'),
-              pt(biMode, 'infant_3'),
-              pt(biMode, 'infant_4'),
-              pt(biMode, 'infant_5'),
-            ].map((t, i) => (
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#92400e', marginBottom: 3 }}>{pt(biMode, 'infant_title')}{biMode !== 'zh' ? ' / ' + ptEn('infant_title') : ''}</Text>
+            {(['infant_1', 'infant_2', 'infant_3', 'infant_4', 'infant_5'] as const).map((key, i) => (
               <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
                 <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>•</Text>
-                <Text style={{ flex: 1, fontSize: 9, color: '#78350f' }}>{t}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9, color: '#78350f' }}>{pt(biMode, key)}</Text>
+                  {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#92400e' }}>{ptEn(key)}</Text>}
+                </View>
               </View>
             ))}
           </View>
@@ -578,7 +610,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* MAIN MEETING POINT */}
         <View style={s.actionMeet}>
-          <Text style={s.actionMeetLabel}>{pt(biMode, 'meeting_label')}</Text>
+          <Text style={s.actionMeetLabel}>{pt(biMode, 'meeting_label')}{biMode !== 'zh' ? ' / ' + ptEn('meeting_label') : ''}</Text>
           <Text style={s.actionMeetValue}>{mainShelter?.name ?? pt(biMode, 'meeting_fallback')}</Text>
           {mainShelter?.distance && (
             <Text style={s.actionMeetDist}>
@@ -591,28 +623,34 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         {/* Key numbers */}
         <View style={s.twoCol}>
           <View style={s.col}>
-            {([
-              ['119', pt(biMode, 'num_fire')],
-              ['110', pt(biMode, 'num_police')],
-              ['166', pt(biMode, 'num_air')],
-            ] as [string, string][]).map(([n, l]) => (
-              <View key={n} style={s.numRow}>
-                <Text style={s.numBig}>{n}</Text>
-                <Text style={s.numLabel}>{l}</Text>
-              </View>
-            ))}
+            {(['num_fire', 'num_police', 'num_air'] as const).map((key, ni) => {
+              const nums = ['119', '110', '166']
+              const n = nums[ni]
+              return (
+                <View key={n} style={s.numRow}>
+                  <Text style={s.numBig}>{n}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.numLabel}>{pt(biMode, key)}</Text>
+                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280' }}>{ptEn(key)}</Text>}
+                  </View>
+                </View>
+              )
+            })}
           </View>
           <View style={s.col}>
-            {([
-              ['1991', pt(biMode, 'num_msg')],
-              ['1925', pt(biMode, 'num_mental')],
-              ['0800-024-985', pt(biMode, 'num_disaster')],
-            ] as [string, string][]).map(([n, l]) => (
-              <View key={n} style={s.numRow}>
-                <Text style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}>{n}</Text>
-                <Text style={s.numLabel}>{l}</Text>
-              </View>
-            ))}
+            {(['num_msg', 'num_mental', 'num_disaster'] as const).map((key, ni) => {
+              const nums = ['1991', '1925', '0800-024-985']
+              const n = nums[ni]
+              return (
+                <View key={n} style={s.numRow}>
+                  <Text style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}>{n}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.numLabel}>{pt(biMode, key)}</Text>
+                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280' }}>{ptEn(key)}</Text>}
+                  </View>
+                </View>
+              )
+            })}
           </View>
         </View>
 
@@ -624,12 +662,15 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#3b82f6' }]}>
           {pt(biMode, 'reunion_title')}
         </Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
+        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#3b82f6', marginBottom: 2 }}>{ptEn('reunion_title')}</Text>}
+        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: biMode !== 'zh' ? 2 : 8 }}>
           {pt(biMode, 'reunion_desc')}
         </Text>
+        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 6 }}>{ptEn('reunion_desc')}</Text>}
 
         {/* Each member's location and nearest shelter */}
         <Text style={s.sectionTitle}>{pt(biMode, 'reunion_members')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('reunion_members')}</Text>}
         {allMembers.map((m, i) => {
           const addr = memberAddr(m, fullAddr)
           const loc = m.hasDifferentAddress
@@ -640,11 +681,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <View key={i} style={s.reunionBox}>
               <Text style={s.reunionName}>{m.name}</Text>
               <View style={s.reunionRow}>
-                <Text style={s.reunionLabel}>{pt(biMode, 'reunion_addr')}</Text>
+                <Text style={s.reunionLabel}>{pt(biMode, 'reunion_addr')}{biMode !== 'zh' ? '/' + ptEn('reunion_addr') : ''}</Text>
                 <Text style={s.reunionValue}>{addr}</Text>
               </View>
               <View style={s.reunionRow}>
-                <Text style={s.reunionLabel}>{pt(biMode, 'reunion_shelter')}</Text>
+                <Text style={s.reunionLabel}>{pt(biMode, 'reunion_shelter')}{biMode !== 'zh' ? '/' + ptEn('reunion_shelter') : ''}</Text>
                 <Text style={[s.reunionValue, { fontWeight: 'bold' }]}>
                   {nearestShelter?.name ?? pt(biMode, 'reunion_query_office')}
                   {nearestShelter?.distance ? ` （${distText(nearestShelter.distance)}）` : ''}
@@ -652,13 +693,16 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
               </View>
               {m.isMobilityImpaired && (
                 <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>{pt(biMode, 'reunion_special_needs')}</Text>
-                  <Text style={[s.reunionValue, { color: '#e04545', fontWeight: 'bold' }]}>{pt(biMode, 'reunion_mobility')}</Text>
+                  <Text style={s.reunionLabel}>{pt(biMode, 'reunion_special_needs')}{biMode !== 'zh' ? '/' + ptEn('reunion_special_needs') : ''}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[s.reunionValue, { color: '#e04545', fontWeight: 'bold' }]}>{pt(biMode, 'reunion_mobility')}</Text>
+                    {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#e04545' }}>{ptEn('reunion_mobility')}</Text>}
+                  </View>
                 </View>
               )}
               {m.medications && (
                 <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>{pt(biMode, 'reunion_meds')}</Text>
+                  <Text style={s.reunionLabel}>{pt(biMode, 'reunion_meds')}{biMode !== 'zh' ? '/' + ptEn('reunion_meds') : ''}</Text>
                   <Text style={s.reunionValue}>{m.medications}</Text>
                 </View>
               )}
@@ -668,48 +712,64 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* Communication Plan */}
         <Text style={s.sectionTitle}>{pt(biMode, 'comm_title')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('comm_title')}</Text>}
         <View style={[s.tipBox]}>
-          {[
-            pt(biMode, 'comm_1'),
-            pt(biMode, 'comm_2_text'),
-            pt(biMode, 'comm_3'),
-            outOfCityContact
-              ? `${pt(biMode, 'comm_4_with_contact_pre')} ${outOfCityContact.name}（${outOfCityContact.phone}）${pt(biMode, 'comm_4_with_contact_post')}`
-              : pt(biMode, 'comm_4_no_contact'),
-            pt(biMode, 'comm_5'),
-          ].map((t, i) => (
-            <Text key={i} style={[s.tipText, { marginBottom: 2 }]}>{t}</Text>
-          ))}
+          {([
+            'comm_1',
+            'comm_2_text',
+            'comm_3',
+            outOfCityContact ? 'comm_4_with_contact_pre' : 'comm_4_no_contact',
+            'comm_5',
+          ] as string[]).map((key, i) => {
+            const zhText = i === 3
+              ? outOfCityContact
+                ? `${pt(biMode, 'comm_4_with_contact_pre')} ${outOfCityContact.name}（${outOfCityContact.phone}）${pt(biMode, 'comm_4_with_contact_post')}`
+                : pt(biMode, 'comm_4_no_contact')
+              : pt(biMode, key)
+            const enText = i === 3
+              ? outOfCityContact
+                ? `${ptEn('comm_4_with_contact_pre')} ${outOfCityContact.name} (${outOfCityContact.phone})${ptEn('comm_4_with_contact_post')}`
+                : ptEn('comm_4_no_contact')
+              : ptEn(key)
+            return (
+              <View key={i} style={{ marginBottom: 2 }}>
+                <Text style={s.tipText}>{zhText}</Text>
+                {biMode !== 'zh' && <Text style={[s.tipText, { fontSize: 7.5, color: '#6b7280' }]}>{enText}</Text>}
+              </View>
+            )
+          })}
         </View>
 
         {/* When phone doesn't work */}
         <Text style={s.sectionTitle}>{pt(biMode, 'nophone_title')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('nophone_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
-          {[
-            pt(biMode, 'nophone_1'),
-            pt(biMode, 'nophone_2'),
-            pt(biMode, 'nophone_3'),
-            pt(biMode, 'nophone_4'),
-            pt(biMode, 'nophone_5'),
-          ].map((t, i) => (
+          {(['nophone_1', 'nophone_2', 'nophone_3', 'nophone_4', 'nophone_5'] as const).map((key, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
               <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
-              <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{ptEn(key)}</Text>}
+              </View>
             </View>
           ))}
         </View>
 
         {/* Emergency Contacts */}
         <Text style={s.sectionTitle}>{pt(biMode, 'contacts_title')}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('contacts_title')}</Text>}
         {allContacts.map((c, i) => (
           <View key={i} style={s.contactCard}>
             <Text style={s.contactName}>{c.name}{pt(biMode, 'label_contact_relation_wrap')}{c.relation}{pt(biMode, 'label_contact_relation_wrap_end')}</Text>
             <Text style={s.contactPhone}>{c.phone}</Text>
-            {c.phoneBackup ? <Text style={s.contactMeta}>{pt(biMode, 'reunion_contact_backup')}：{c.phoneBackup}</Text> : null}
+            {c.phoneBackup ? <Text style={s.contactMeta}>{pt(biMode, 'reunion_contact_backup')}{biMode !== 'zh' ? '/' + ptEn('reunion_contact_backup') : ''}：{c.phoneBackup}</Text> : null}
             {c.isOutOfCity && (
-              <Text style={[s.contactMeta, { color: '#d4882a', fontWeight: 'bold' }]}>
-                {pt(biMode, 'reunion_out_of_city')}
-              </Text>
+              <View>
+                <Text style={[s.contactMeta, { color: '#d4882a', fontWeight: 'bold' }]}>
+                  {pt(biMode, 'reunion_out_of_city')}
+                </Text>
+                {biMode !== 'zh' && <Text style={[s.contactMeta, { color: '#d4882a', fontSize: 7.5 }]}>{ptEn('reunion_out_of_city')}</Text>}
+              </View>
             )}
           </View>
         ))}
