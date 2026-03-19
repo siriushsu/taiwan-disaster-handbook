@@ -31,6 +31,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [loadingMsg, setLoadingMsg] = useState('')
   const [error, setError] = useState('')
+  const [showSupport, setShowSupport] = useState(false)
 
   const [form, setForm] = useState<HouseholdForm>({
     address: '', city: '臺北市', district: '',
@@ -490,29 +491,57 @@ export default function Home() {
       </div>
 
       {/* Feedback & Footer */}
-      <div className="mt-8 max-w-xl mx-auto space-y-2 px-4">
-        <div className="flex gap-2">
+      <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-2">
+          <p className="text-xs font-semibold text-slate-500 mb-1">
+            {locale === 'en' ? 'Help us improve' : '資料有誤？幫助我們改善'}
+          </p>
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
             target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-center border border-amber-200 bg-amber-50 text-amber-700 py-2 rounded-lg text-xs hover:bg-amber-100 transition-colors">
+            className="block text-center border border-amber-200 bg-amber-50 text-amber-700 py-2 rounded-lg text-sm hover:bg-amber-100 transition-colors">
             {locale === 'en' ? '📍 Report data error' : '📍 回報資料錯誤'}
           </a>
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
             target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-center border border-slate-200 text-slate-600 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors">
+            className="block text-center border border-slate-200 text-slate-600 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors">
             {locale === 'en' ? '💡 Feature request' : '💡 功能建議'}
           </a>
-        </div>
-        <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
-          className="block text-center text-xs text-amber-600 hover:text-amber-700 font-medium transition-colors">
-          {locale === 'en' ? '☕ Buy the developer a coffee' : '☕ 請開發者喝杯咖啡'}
-        </a>
-        <div className="text-center">
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
             target="_blank" rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-500 hover:underline">
+            className="block text-center text-slate-400 text-xs py-1 hover:underline">
             {locale === 'en' ? '⭐ Open source project — contributions welcome' : '⭐ 開源專案 — 歡迎貢獻'}
           </a>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+          {!showSupport ? (
+            <button onClick={() => setShowSupport(true)}
+              className="w-full text-center text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors">
+              {locale === 'en' ? '☕ Enjoying this? Buy the developer a coffee' : '☕ 覺得有幫助？請開發者喝杯咖啡'}
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm font-semibold text-slate-600 text-center">
+                {locale === 'en' ? 'Thank you for your support!' : '感謝你的支持！'}
+              </p>
+              <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
+                className="block text-center bg-amber-500 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors">
+                ☕ Ko-fi（信用卡 / PayPal）
+              </a>
+              <div className="text-center">
+                <p className="text-xs text-slate-400 mb-1">或銀行轉帳</p>
+                <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <span className="text-sm text-slate-600">玉山銀行 (808)</span>
+                  <span className="text-sm font-mono font-semibold text-slate-800">0521979118500</span>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText('0521979118500'); alert('已複製帳號') }}
+                    className="text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-2 py-0.5 rounded transition-colors"
+                  >複製</button>
+                </div>
+              </div>
+              <p className="text-center text-xs text-slate-400">本專案為開源免費工具，您的支持幫助我們維護伺服器與持續改善內容</p>
+            </div>
+          )}
         </div>
       </div>
     </main>
