@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     siteName: "台灣家庭防災手冊",
     locale: "zh_TW",
     type: "website",
+    images: [
+      {
+        url: `${siteUrl}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: "台灣家庭防災手冊",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -36,6 +44,23 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "台灣家庭防災手冊產生器",
+  description:
+    "免費線上工具：輸入地址即可產生個人化防災手冊 PDF，包含最近避難所、防空避難處、醫療院所、緊急聯絡資訊與物資清單。",
+  url: siteUrl,
+  applicationCategory: "UtilityApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "TWD",
+  },
+  inLanguage: "zh-TW",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -45,6 +70,12 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#334155" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Plausible Analytics — privacy-friendly, no cookies, 1KB script */}
+        <script defer data-domain="disaster-handbook.vercel.app" src="https://plausible.io/js/script.js" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>

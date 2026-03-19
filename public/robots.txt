@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://disaster-handbook.vercel.app/sitemap.xml
