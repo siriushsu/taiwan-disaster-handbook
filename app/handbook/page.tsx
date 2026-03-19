@@ -163,7 +163,7 @@ export default function HandbookPage() {
             </div>
           ) : (
             <PDFDownloadLink
-              key={biMode}
+              key={`${biMode}-${Object.keys(mapImages).length}`}
               document={<HandbookPDF data={data} mapImages={mapImages} biMode={biMode} />}
               fileName={fileName}
               className="inline-block bg-slate-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-slate-700 transition-colors text-base"
