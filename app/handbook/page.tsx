@@ -401,7 +401,7 @@ export default function HandbookPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
           {!showSupport ? (
             <button onClick={() => setShowSupport(true)}
-              className="w-full text-center text-sm text-slate-500 hover:text-slate-700 transition-colors">
+              className="w-full text-center text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors">
               ☕ 覺得有幫助？請開發者喝杯咖啡
             </button>
           ) : (
