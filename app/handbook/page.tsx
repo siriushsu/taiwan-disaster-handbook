@@ -408,7 +408,7 @@ export default function HandbookPage() {
             <div className="space-y-3">
               <p className="text-sm font-semibold text-slate-600 text-center">感謝你的支持！</p>
               <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
-                className="block text-center bg-slate-700 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
+                className="block text-center bg-amber-500 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors">
                 ☕ Ko-fi（信用卡 / PayPal）
               </a>
               <div className="text-center">
