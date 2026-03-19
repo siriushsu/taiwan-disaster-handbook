@@ -186,7 +186,7 @@ function DirMap({ loc, biMode = 'zh' }: { loc: LocationInfo; biMode?: BiMode }) 
         <Image src={mapUrl} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
         <View style={{ flexDirection: 'row', marginTop: 3 }}>
           <Text style={{ fontSize: 7, color: '#6b7280' }}>• {pt(_lang, 'map_legend_full')}</Text>
-          <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map © OpenStreetMap</Text>
+          <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map (c) OpenStreetMap</Text>
         </View>
       </View>
     )

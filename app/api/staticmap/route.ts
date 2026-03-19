@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 /**
  * Proxy to staticmap.openstreetmap.de to avoid CORS issues in react-pdf Image.
  * Usage: /api/staticmap?center=lat,lng&zoom=15&size=600x300&m=lat,lng,ol-marker-red&m=...
+ *
+ * NOTE: We build the upstream URL manually (not via URLSearchParams) so that
+ * commas in center/marker coordinates are NOT percent-encoded — the upstream
+ * server requires literal commas in "lat,lng,icon" strings.
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -17,14 +19,15 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Missing center', { status: 400 })
   }
 
-  const params = new URLSearchParams({ center, zoom, size })
-  markers.forEach(m => params.append('markers', m))
-
-  const url = `https://staticmap.openstreetmap.de/staticmap.php?${params.toString()}`
+  // Build URL manually — do NOT use URLSearchParams here because it
+  // percent-encodes commas, breaking the upstream "lat,lng,icon" format.
+  const markerParts = markers.map(m => `markers=${m}`).join('&')
+  const base = `https://staticmap.openstreetmap.de/staticmap.php?center=${center}&zoom=${zoom}&size=${size}`
+  const url = markerParts ? `${base}&${markerParts}` : base
 
   try {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 10000)
+    const timeout = setTimeout(() => controller.abort(), 12000)
 
     const res = await fetch(url, {
       signal: controller.signal,
