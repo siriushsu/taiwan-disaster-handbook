@@ -137,7 +137,7 @@ export default function HandbookPage() {
           <h2 className="text-lg font-bold text-gray-800 mb-2">{memberName} 家庭防災手冊</h2>
           <p className="text-sm text-gray-500 mb-6">製作日期：{data.generatedAt} · 共 {pageCount} 頁</p>
           <div className="flex gap-2 justify-center mb-4">
-            {([['zh', '中文版'], ['bi', '中英雙語'], ['en', 'English']] as const).map(([mode, label]) => (
+            {([['zh', '中文版'], ['en', 'English']] as const).map(([mode, label]) => (
               <button key={mode} onClick={() => setBiMode(mode)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${biMode === mode ? 'bg-slate-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                 {label}
