@@ -503,6 +503,10 @@ export default function Home() {
             {locale === 'en' ? '💡 Feature request' : '💡 功能建議'}
           </a>
         </div>
+        <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
+          className="block text-center text-xs text-amber-600 hover:text-amber-700 font-medium transition-colors">
+          {locale === 'en' ? '☕ Buy the developer a coffee' : '☕ 請開發者喝杯咖啡'}
+        </a>
         <div className="text-center">
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
             target="_blank" rel="noopener noreferrer"
