@@ -480,8 +480,9 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           )}
           {outOfCityContact && (
             <View style={s.coverBox}>
-              <Text style={s.coverBoxLabel}>外縣市聯絡人（失聯時打這支）</Text>
-              <Text style={s.coverBoxValue}>{outOfCityContact.name}　{outOfCityContact.phone}</Text>
+              <Text style={s.coverBoxLabel}>外縣市聯絡人（失聯時打這支）{biMode === 'bi' ? ' / Out-of-City Contact' : ''}</Text>
+              <Text style={s.coverBoxValue}>{outOfCityContact.name}</Text>
+              <Text style={{ color: '#ffffff', fontSize: 15, fontWeight: 'bold', letterSpacing: 1 }}>{outOfCityContact.phone}</Text>
             </View>
           )}
           <View style={[s.coverBox, { marginTop: 12 }]}>

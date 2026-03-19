@@ -10,7 +10,7 @@ export const CITY_DISASTER_LINKS: Record<string, { name: string; url: string; ty
     { name: '桃園市防災資訊網', url: 'https://disaster.tycg.gov.tw/', type: 'web' },
   ],
   '臺中市': [
-    { name: '臺中市防災資訊網', url: 'https://eoc.taichung.gov.tw/', type: 'web' },
+    { name: '臺中市政府消防局', url: 'https://www.fire.taichung.gov.tw/', type: 'web' },
   ],
   '臺南市': [
     { name: '臺南市防災資訊網', url: 'https://disaster.tainan.gov.tw/', type: 'web' },
