@@ -20,28 +20,40 @@ function findNearest<T extends { lat: number; lng: number; distance?: number }>(
     .slice(0, limit)
 }
 
+// CDN base URL (jsDelivr serves from GitHub with free unlimited bandwidth)
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@main/public/data'
+
 // In-memory cache
 let shelterCache: Shelter[] | null = null
 let medicalCache: MedicalFacility[] | null = null
 let airRaidCache: { a: string; t: number; g: number; c: number | null }[] | null = null
 
+/** Fetch with fallback: try CDN first, fall back to local /data/ */
+async function fetchData(filename: string): Promise<Response> {
+  try {
+    const res = await fetch(`${CDN_BASE}/${filename}`)
+    if (res.ok) return res
+  } catch { /* CDN failed, try local */ }
+  return fetch(`/data/${filename}`)
+}
+
 async function loadShelters(): Promise<Shelter[]> {
   if (shelterCache) return shelterCache
-  const res = await fetch('/data/taiwan-shelters.json')
+  const res = await fetchData('taiwan-shelters.json')
   shelterCache = await res.json()
   return shelterCache!
 }
 
 async function loadMedical(): Promise<MedicalFacility[]> {
   if (medicalCache) return medicalCache
-  const res = await fetch('/data/taiwan-medical.json')
+  const res = await fetchData('taiwan-medical.json')
   medicalCache = await res.json()
   return medicalCache!
 }
 
 async function loadAirRaid() {
   if (airRaidCache) return airRaidCache
-  const res = await fetch('/data/taiwan-air-raid.json')
+  const res = await fetchData('taiwan-air-raid.json')
   airRaidCache = await res.json()
   return airRaidCache!
 }
