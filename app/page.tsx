@@ -488,6 +488,15 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
+          target="_blank" rel="noopener noreferrer"
+          className="text-xs text-gray-400 hover:text-gray-500 hover:underline">
+          {locale === 'en' ? 'Open source project — contributions welcome' : '開源專案 — 歡迎貢獻'}
+        </a>
+      </div>
     </main>
   )
 }
