@@ -68,7 +68,8 @@ export default function RootLayout({
     <html lang="zh-TW">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#334155" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#003764" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         {/* Plausible Analytics — privacy-friendly, no cookies, 1KB script */}
         <script defer data-domain="disaster-handbook.vercel.app" src="https://plausible.io/js/script.js" />
