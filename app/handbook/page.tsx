@@ -18,6 +18,7 @@ export default function HandbookPage() {
   const [mapImages, setMapImages] = useState<Record<number, string>>({})
   const [biMode, setBiMode] = useState<BiMode>('zh')
   const [isLineApp, setIsLineApp] = useState(false)
+  const [showSupport, setShowSupport] = useState(false)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('handbookData')
@@ -396,25 +397,34 @@ export default function HandbookPage() {
           </a>
         </div>
 
-        {/* Support */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
-          <p className="text-sm font-semibold text-slate-600 text-center">覺得有幫助？支持本專案繼續營運</p>
-          <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
-            className="block text-center bg-slate-700 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
-            ☕ 請開發者喝杯咖啡（Ko-fi）
-          </a>
-          <div className="text-center">
-            <p className="text-xs text-slate-400 mb-1">或銀行轉帳</p>
-            <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-              <span className="text-sm text-slate-600">玉山銀行 (808)</span>
-              <span className="text-sm font-mono font-semibold text-slate-800">0521979118500</span>
-              <button
-                onClick={() => { navigator.clipboard.writeText('0521979118500'); alert('已複製帳號') }}
-                className="text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-2 py-0.5 rounded transition-colors"
-              >複製</button>
+        {/* Support - collapsed by default */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+          {!showSupport ? (
+            <button onClick={() => setShowSupport(true)}
+              className="w-full text-center text-sm text-slate-500 hover:text-slate-700 transition-colors">
+              ☕ 覺得有幫助？請開發者喝杯咖啡
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm font-semibold text-slate-600 text-center">感謝你的支持！</p>
+              <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
+                className="block text-center bg-slate-700 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">
+                ☕ Ko-fi（信用卡 / PayPal）
+              </a>
+              <div className="text-center">
+                <p className="text-xs text-slate-400 mb-1">或銀行轉帳</p>
+                <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <span className="text-sm text-slate-600">玉山銀行 (808)</span>
+                  <span className="text-sm font-mono font-semibold text-slate-800">0521979118500</span>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText('0521979118500'); alert('已複製帳號') }}
+                    className="text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-2 py-0.5 rounded transition-colors"
+                  >複製</button>
+                </div>
+              </div>
+              <p className="text-center text-xs text-slate-400">本專案為開源免費工具，您的支持幫助我們維護伺服器與持續改善內容</p>
             </div>
-          </div>
-          <p className="text-center text-xs text-slate-400">本專案為開源免費工具，您的支持幫助我們維護伺服器與持續改善內容</p>
+          )}
         </div>
 
         <a href="/" className="block text-center text-slate-500 text-sm py-2 hover:underline">重新填寫</a>
