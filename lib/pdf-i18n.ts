@@ -276,7 +276,7 @@ const TEXT: Record<string, [string, string]> = {
   compass_nw: ['西北', 'NW'],
 
   // Map legend
-  map_legend_full: ['• 紅=住家 • 藍=避難所 • 金=防空 • 綠=醫療', '• Red=Home • Blue=Shelter • Gold=Air Raid • Green=Medical'],
+  map_legend_full: ['紅=住家 • 藍=避難所 • 金=防空 • 綠=醫療', 'Red=Home • Blue=Shelter • Gold=Air Raid • Green=Medical'],
   map_legend_short: ['藍=避難所　紫=防空　綠=醫療', 'Blue=Shelter Purple=Air Raid Green=Medical'],
   map_dir_from_home: ['方位為從住家出發的方向', 'Directions from home'],
   label_shelter: ['避難所', 'Shelter'],
