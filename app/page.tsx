@@ -64,14 +64,16 @@ export default function Home() {
     })
 
   // 對單一地址進行 geocode + 查詢附近設施（純前端，不經過 API）
-  const queryLocation = async (address: string, _city: string) => {
+  const queryLocation = async (address: string, city: string, district?: string) => {
     const { geocode, findNearby } = await import('@/lib/client-lookup')
     let geo = null
     let shelters: unknown[] = []
     let airRaid: unknown[] = []
     let medical: unknown[] = []
+    let aed: unknown[] = []
+    let erHospital: unknown[] = []
     try {
-      geo = await geocode(address)
+      geo = await geocode(address, { city, district })
     } catch { /* geocoding 失敗，跳過 */ }
 
     if (geo?.lat && geo?.lng) {
@@ -80,9 +82,11 @@ export default function Home() {
         shelters = result.shelters
         airRaid = result.airRaid
         medical = result.medical
+        aed = result.aed || []
+        erHospital = result.erHospital || []
       } catch { /* 查詢失敗，跳過 */ }
     }
-    return { geo, shelters, airRaid, medical }
+    return { geo, shelters, airRaid, medical, aed, erHospital }
   }
 
   const generateHandbook = async () => {
@@ -128,7 +132,7 @@ export default function Home() {
       for (let i = 0; i < addressTargets.length; i++) {
         const t = addressTargets[i]
         setLoadingMsg(`查詢地址 ${i + 1}/${addressTargets.length}：${t.label}...`)
-        const { geo, shelters, airRaid, medical } = await queryLocation(t.address, t.city)
+        const { geo, shelters, airRaid, medical, aed, erHospital } = await queryLocation(t.address, t.city, t.district)
         locations.push({
           label: t.label,
           memberName: t.memberName,
@@ -141,6 +145,8 @@ export default function Home() {
           shelters: shelters as import('@/types').Shelter[],
           airRaid: airRaid as import('@/types').Shelter[],
           medical: medical as import('@/types').MedicalFacility[],
+          aed: aed as { name: string; address: string; lat: number; lng: number; location: string; phone: string; distance?: number }[],
+          erHospital: erHospital as import('@/types').MedicalFacility[],
         })
       }
 
@@ -519,6 +525,51 @@ export default function Home() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Updates & Footer */}
+      <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
+        <details className="bg-white rounded-xl shadow-sm border border-border">
+          <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
+            <span>{locale === 'en' ? 'Recent Updates' : '近期更新'}</span>
+            <span className="text-xs font-normal text-text-faint">
+              {locale === 'en' ? 'Data: 2026/3/20' : '資料更新：2026/3/20'}
+            </span>
+          </summary>
+          <div className="px-4 pb-4 pt-1 border-t border-border/50">
+            <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/20</span>
+                <span>{locale === 'en'
+                  ? 'Added 83,000+ shelter/air raid/medical data points covering all of Taiwan; MRT stations as air raid shelters'
+                  : '全台避難收容、防空避難、醫療院所資料突破 83,000 筆；捷運站納入防空避難選項'}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/20</span>
+                <span>{locale === 'en'
+                  ? 'Improved address geocoding accuracy — dual geocoder with building-level precision'
+                  : '地址定位精度大幅提升 — 雙 geocoder 交叉比對，可定位至門牌等級'}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/20</span>
+                <span>{locale === 'en'
+                  ? 'New compact Quick Response Card in PDF — 4 disaster scenarios on 1 page'
+                  : 'PDF 新增精簡版緊急行動卡 — 4 種災害應變一頁搞定'}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/20</span>
+                <span>{locale === 'en'
+                  ? 'LINE browser detection with manual instructions; improved share text'
+                  : 'LINE 內建瀏覽器偵測與手動操作提示；分享文字優化'}</span>
+              </li>
+            </ul>
+            <p className="mt-3 text-[10px] text-text-faint">
+              {locale === 'en'
+                ? 'Data sources: Ministry of the Interior, county/city open data platforms. Auto-updated monthly.'
+                : '資料來源：內政部消防署、各縣市政府開放資料平台。每月自動更新。'}
+            </p>
+          </div>
+        </details>
       </div>
 
       {/* Feedback & Footer */}
