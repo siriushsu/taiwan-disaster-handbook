@@ -146,19 +146,23 @@ export default function HandbookPage() {
           </div>
           {isLineApp ? (
             <div className="space-y-3">
-              <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 text-sm text-warning">
-                LINE 內建瀏覽器無法下載 PDF。請點擊下方按鈕用外部瀏覽器開啟。
-                <br />
-                <span className="text-xs text-warning/80">LINE browser cannot download PDFs. Please open in external browser.</span>
+              <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 text-sm">
+                <p className="font-bold text-warning mb-2">⚠️ 請用外部瀏覽器開啟</p>
+                <p className="text-warning/90 text-xs mb-2">LINE 內建瀏覽器無法下載 PDF，請依以下步驟操作：</p>
+                <ol className="text-xs text-text space-y-1 mb-2 list-none pl-0">
+                  <li>1️⃣ 點擊右下角 <span className="font-bold">「⋯」</span> 按鈕</li>
+                  <li>2️⃣ 選擇 <span className="font-bold">「在預設瀏覽器中開啟」</span></li>
+                </ol>
               </div>
               <button
                 onClick={() => {
-                  const url = window.location.href
-                  window.open(url, '_blank')
+                  navigator.clipboard.writeText(window.location.origin).then(() => {
+                    alert('已複製網址！請打開 Safari 或 Chrome，貼上網址即可使用。')
+                  })
                 }}
                 className="inline-block bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors text-base"
               >
-                用外部瀏覽器開啟
+                或點此複製網址
               </button>
             </div>
           ) : (

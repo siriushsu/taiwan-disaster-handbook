@@ -188,23 +188,23 @@ export default function Home() {
       {isLineApp && (
         <div className="max-w-2xl mx-auto px-4 pt-4">
           <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 text-sm">
-            <p className="font-bold text-warning mb-1">請用外部瀏覽器開啟</p>
+            <p className="font-bold text-warning mb-2">⚠️ 請用外部瀏覽器開啟</p>
             <p className="text-warning/90 text-xs mb-3">
-              LINE 內建瀏覽器無法下載 PDF。請點擊下方按鈕，用 Safari 或 Chrome 開啟此頁面。
-              <br />
-              <span className="text-warning/70">LINE&apos;s built-in browser cannot download PDFs. Please open in an external browser.</span>
+              LINE 內建瀏覽器無法下載 PDF，請依以下步驟操作：
             </p>
+            <ol className="text-xs text-text space-y-1.5 mb-3 list-none pl-0">
+              <li>1️⃣ 點擊右下角 <span className="font-bold">「⋯」</span> 按鈕</li>
+              <li>2️⃣ 選擇 <span className="font-bold">「在預設瀏覽器中開啟」</span></li>
+            </ol>
             <button
               onClick={() => {
-                // LINE app supports openExternal URL scheme
-                const url = window.location.href
-                window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;end`
-                // Fallback for iOS LINE
-                setTimeout(() => { window.open(url, '_blank') }, 500)
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                  alert('已複製網址！請打開 Safari 或 Chrome，貼上網址即可使用。')
+                })
               }}
               className="bg-primary text-white px-5 py-2 rounded-lg text-sm font-semibold"
             >
-              用外部瀏覽器開啟
+              或點此複製網址
             </button>
           </div>
         </div>
