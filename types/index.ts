@@ -73,9 +73,21 @@ export interface MedicalFacility {
   address: string
   lat: number
   lng: number
-  type: 'hospital' | 'clinic'
+  type: 'hospital' | 'clinic' | 'pharmacy'
   hasER: boolean
+  erLevel?: '重度' | '中度' | '一般'
   phone?: string
+  distance?: number
+}
+
+// AED 位置
+export interface AedLocation {
+  name: string
+  address: string
+  lat: number
+  lng: number
+  location: string   // AED 放置地點描述
+  phone: string
   distance?: number
 }
 
@@ -99,6 +111,8 @@ export interface LocationInfo {
   shelters: Shelter[]
   airRaid: Shelter[]
   medical: MedicalFacility[]
+  aed?: AedLocation[]
+  erHospital?: MedicalFacility[]
 }
 
 // 手冊生成所需的完整資料

@@ -83,7 +83,7 @@ const s = StyleSheet.create({
   locHeader: { backgroundColor: '#0D7377', padding: '10 14', borderRadius: 6, marginBottom: 10 },
   locTitle: { fontSize: 14, fontWeight: 'bold', color: '#ffffff' },
   locAddr: { fontSize: 9, color: '#ffffff', opacity: 0.75, marginTop: 2 },
-  shelterCard: { flexDirection: 'row', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#F7F5F3' },
+  shelterCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#F7F5F3' },
   shelterNum: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#065A5C', color: '#fff', fontSize: 10, fontWeight: 'bold', textAlign: 'center', paddingTop: 4, marginRight: 8, flexShrink: 0 },
   shelterInfo: { flex: 1 },
   shelterName: { fontWeight: 'bold', fontSize: 10.5 },
@@ -252,6 +252,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Nearest shelters */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_shelters')}</Text>
       {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_shelters')}</Text>}
+      <Text style={{ fontSize: 7, color: '#9C9691', marginBottom: 4 }}>{pt(biMode, 'loc_qr_hint')}</Text>
       {natural.length > 0 ? natural.map((sh: Shelter, i: number) => (
         <View key={i} style={s.shelterCard}>
           <Text style={s.shelterNum}>{i + 1}</Text>
@@ -267,6 +268,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             {sh.phone ? <Text style={s.shelterAddr}>{pt(biMode, 'label_mgmt_phone')}：{sh.phone}</Text> : null}
             {sh.vulnerableFriendly ? <Text style={{ fontSize: 7.5, color: '#059669', marginTop: 1 }}>{pt(biMode, 'label_vulnerable')}</Text> : null}
           </View>
+          {sh.lat && sh.lng ? <Image src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)} style={{ width: 36, height: 36, flexShrink: 0 }} /> : null}
         </View>
       )) : (
         <View style={s.noDataBox}>
@@ -289,6 +291,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
               {sh.address ? <Text style={s.shelterAddr}>{sh.address}</Text> : null}
               <Text style={s.shelterDist}>{distText(sh.distance)}（{walkMin(sh.distance)}）</Text>
             </View>
+            {sh.lat && sh.lng ? <Image src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)} style={{ width: 36, height: 36, flexShrink: 0 }} /> : null}
           </View>
         ))}
       </>)}
@@ -305,9 +308,29 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
               {m.address ? <Text style={s.shelterAddr}>{m.address}</Text> : null}
               <Text style={s.shelterDist}>
                 {m.type === 'hospital' ? pt(biMode, 'label_hospital') : pt(biMode, 'label_clinic')}
-                {m.hasER ? pt(biMode, 'label_has_er_paren') : ''}
+                {m.erLevel === '重度' ? '（重度急救責任醫院）' : m.hasER ? pt(biMode, 'label_has_er_paren') : ''}
                 　{distText(m.distance)}（{walkMin(m.distance)}）
                 {m.phone ? `　${m.phone}` : ''}
+              </Text>
+            </View>
+            {m.lat && m.lng ? <Image src={qrUrl(mapsUrl(m.lat, m.lng), 80)} style={{ width: 36, height: 36, flexShrink: 0 }} /> : null}
+          </View>
+        ))}
+      </>)}
+
+      {/* AED */}
+      {(loc.aed ?? []).length > 0 && (<>
+        <Text style={s.sectionTitle}>{biMode === 'en' ? 'Nearest AED' : '最近 AED（自動體外心臟電擊器）'}</Text>
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>Nearest AED (Automated External Defibrillator)</Text>}
+        {(loc.aed ?? []).slice(0, 2).map((a: {name: string; address: string; lat: number; lng: number; location: string; phone: string; distance?: number}, i: number) => (
+          <View key={i} style={s.medCard}>
+            <Text style={[s.shelterNum, { backgroundColor: '#dc2626' }]}>{i + 1}</Text>
+            <View style={s.shelterInfo}>
+              <Text style={s.shelterName}>{a.name}</Text>
+              {a.location ? <Text style={s.shelterAddr}>{a.location}</Text> : null}
+              <Text style={s.shelterDist}>
+                {distText(a.distance)}（{walkMin(a.distance)}）
+                {a.phone ? `　${a.phone}` : ''}
               </Text>
             </View>
           </View>
@@ -340,7 +363,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             ],
           ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>{'·'}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{zh}</Text>
                 {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{en}</Text>}
@@ -364,7 +387,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             ],
           ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>{'·'}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{zh}</Text>
                 {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{en}</Text>}
@@ -382,8 +405,12 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
 /* ══════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════ */
-function qrUrl(text: string) {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(text)}`
+function qrUrl(text: string, size = 100) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`
+}
+
+function mapsUrl(lat: number, lng: number) {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
 }
 
 /* Bearing from home to a point, returns compass direction */
@@ -612,7 +639,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#92400e', marginBottom: 3 }}>{pt(biMode, 'infant_title')}{biMode !== 'zh' ? ' / ' + ptEn('infant_title') : ''}</Text>
             {(['infant_1', 'infant_2', 'infant_3', 'infant_4', 'infant_5'] as const).map((key, i) => (
               <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
-                <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>•</Text>
+                <Text style={{ color: '#92400e', marginRight: 5, fontSize: 9 }}>{'·'}</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 9, color: '#78350f' }}>{pt(biMode, key)}</Text>
                   {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#92400e' }}>{ptEn(key)}</Text>}
@@ -760,7 +787,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {(['nophone_1', 'nophone_2', 'nophone_3', 'nophone_4', 'nophone_5'] as const).map((key, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>{'·'}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
                 {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{ptEn(key)}</Text>}
@@ -966,7 +993,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 ptEn('foreign_tip_4'),
               ].map((t, i) => (
                 <View key={i} style={{ flexDirection: 'row', marginBottom: 2 }}>
-                  <Text style={{ color: '#0369a1', marginRight: 5, fontSize: 9 }}>{i % 2 === 0 ? '▶' : '　'}</Text>
+                  <Text style={{ color: '#0369a1', marginRight: 5, fontSize: 9 }}>{i % 2 === 0 ? '>' : '　'}</Text>
                   <Text style={{ flex: 1, fontSize: i % 2 === 0 ? 9 : 8, color: i % 2 === 0 ? '#1e293b' : '#64748b' }}>{t}</Text>
                 </View>
               ))}
@@ -1204,7 +1231,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
               pt(biMode, 'qrc_uni_3'),
             ].map((t, i) => (
               <View key={i} style={{ flex: 1, flexDirection: 'row', marginRight: 6 }}>
-                <Text style={{ fontSize: 8.5, color: '#0D7377', marginRight: 3 }}>▶</Text>
+                <Text style={{ fontSize: 8.5, color: '#0D7377', marginRight: 3 }}>{'>'}</Text>
                 <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
               </View>
             ))}
