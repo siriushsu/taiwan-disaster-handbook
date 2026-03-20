@@ -36,95 +36,95 @@ function memberAddr(m: Member, householdAddr: string) {
 
 /* ── styles ────────────────────────────────────────── */
 const s = StyleSheet.create({
-  page: { fontFamily: 'NotoSansTC', padding: '28 36', fontSize: 10, color: '#1a1a1a', lineHeight: 1.5 },
+  page: { fontFamily: 'NotoSansTC', padding: '28 36', fontSize: 10, color: '#2D2A26', lineHeight: 1.5 },
   footer: { position: 'absolute', bottom: 14, left: 36, right: 36, flexDirection: 'row', justifyContent: 'space-between' },
-  footerText: { fontSize: 7.5, color: '#9ca3af' },
-  sectionTitle: { fontSize: 11, fontWeight: 'bold', color: '#3b82f6', borderBottomWidth: 1, borderBottomColor: '#bfdbfe', paddingBottom: 3, marginBottom: 6, marginTop: 10 },
+  footerText: { fontSize: 7.5, color: '#9C9691' },
+  sectionTitle: { fontSize: 11, fontWeight: 'bold', color: '#0D7377', borderBottomWidth: 1, borderBottomColor: '#E6F3F3', paddingBottom: 3, marginBottom: 6, marginTop: 10 },
   twoCol: { flexDirection: 'row', gap: 10 },
   col: { flex: 1 },
   // cover
-  coverPage: { fontFamily: 'NotoSansTC', padding: 0, backgroundColor: '#3b82f6' },
+  coverPage: { fontFamily: 'NotoSansTC', padding: 0, backgroundColor: '#0D7377' },
   coverTop: { padding: '60 40 40', flex: 1 },
   coverTitle: { fontSize: 32, fontWeight: 'bold', color: '#ffffff', marginBottom: 6 },
-  coverSub: { fontSize: 14, color: '#bfdbfe', marginBottom: 30 },
-  coverBox: { backgroundColor: '#3b6fd4', borderRadius: 8, padding: '14 20', marginBottom: 10 },
-  coverBoxLabel: { fontSize: 9, color: '#93c5fd', marginBottom: 3 },
+  coverSub: { fontSize: 14, color: '#ffffff', opacity: 0.75, marginBottom: 30 },
+  coverBox: { backgroundColor: '#065A5C', borderRadius: 8, padding: '14 20', marginBottom: 10 },
+  coverBoxLabel: { fontSize: 9, color: '#ffffff', opacity: 0.6, marginBottom: 3 },
   coverBoxValue: { fontSize: 13, color: '#ffffff', fontWeight: 'bold' },
-  coverFooter: { backgroundColor: '#3b6fd4', padding: '14 40', fontSize: 9, color: '#93c5fd' },
+  coverFooter: { backgroundColor: '#065A5C', padding: '14 40', fontSize: 9, color: '#ffffff', opacity: 0.6 },
   // action card
-  actionPage: { fontFamily: 'NotoSansTC', padding: '20 30', fontSize: 10, color: '#1a1a1a', backgroundColor: '#fef9f0' },
-  actionBanner: { backgroundColor: '#e04545', padding: '10 14', borderRadius: 8, marginBottom: 12 },
+  actionPage: { fontFamily: 'NotoSansTC', padding: '20 30', fontSize: 10, color: '#2D2A26', backgroundColor: '#FEF7E6' },
+  actionBanner: { backgroundColor: '#C93B3B', padding: '10 14', borderRadius: 8, marginBottom: 12 },
   actionBannerText: { color: '#ffffff', fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
   actionBannerSub: { color: '#fecaca', fontSize: 9, textAlign: 'center', marginTop: 2 },
   actionRow: { flexDirection: 'row', borderWidth: 2, borderRadius: 8, padding: '8 12', marginBottom: 8, alignItems: 'flex-start' },
   actionEmoji: { fontSize: 20, marginRight: 10, width: 30 },
   actionLabel: { fontSize: 12, fontWeight: 'bold', marginBottom: 2 },
-  actionBody: { fontSize: 9.5, color: '#374151', lineHeight: 1.4 },
-  actionMeet: { backgroundColor: '#3b82f6', borderRadius: 8, padding: '10 14', marginTop: 4, marginBottom: 8 },
-  actionMeetLabel: { color: '#93c5fd', fontSize: 8, fontWeight: 'bold' },
+  actionBody: { fontSize: 9.5, color: '#6B6560', lineHeight: 1.4 },
+  actionMeet: { backgroundColor: '#0D7377', borderRadius: 8, padding: '10 14', marginTop: 4, marginBottom: 8 },
+  actionMeetLabel: { color: '#ffffff', opacity: 0.6, fontSize: 8, fontWeight: 'bold' },
   actionMeetValue: { color: '#ffffff', fontSize: 16, fontWeight: 'bold', marginTop: 2 },
-  actionMeetDist: { color: '#bfdbfe', fontSize: 9, marginTop: 2 },
+  actionMeetDist: { color: '#ffffff', opacity: 0.75, fontSize: 9, marginTop: 2 },
   // numbers
-  numRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#fee2e2' },
-  numBig: { fontSize: 20, fontWeight: 'bold', color: '#e04545', width: 100 },
-  numLabel: { flex: 1, fontSize: 10, color: '#374151' },
+  numRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#FCEAEA' },
+  numBig: { fontSize: 20, fontWeight: 'bold', color: '#C93B3B', width: 100 },
+  numLabel: { flex: 1, fontSize: 10, color: '#6B6560' },
   // contact card
-  contactCard: { backgroundColor: '#eff6ff', borderRadius: 6, padding: '8 12', marginBottom: 6, borderLeftWidth: 4, borderLeftColor: '#3b6fd4' },
+  contactCard: { backgroundColor: '#E6F3F3', borderRadius: 6, padding: '8 12', marginBottom: 6, borderLeftWidth: 4, borderLeftColor: '#0D7377' },
   contactName: { fontWeight: 'bold', fontSize: 11 },
-  contactPhone: { fontSize: 16, fontWeight: 'bold', color: '#3b82f6', marginTop: 4, lineHeight: 1.2 },
-  contactMeta: { fontSize: 8, color: '#6b7280', marginTop: 4 },
+  contactPhone: { fontSize: 16, fontWeight: 'bold', color: '#0D7377', marginTop: 4, lineHeight: 1.2 },
+  contactMeta: { fontSize: 8, color: '#6B6560', marginTop: 4 },
   // reunion
-  reunionBox: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 6, padding: '8 12', marginBottom: 6 },
-  reunionName: { fontWeight: 'bold', fontSize: 10.5, color: '#3b82f6' },
+  reunionBox: { borderWidth: 1, borderColor: '#E8E4E0', borderRadius: 6, padding: '8 12', marginBottom: 6 },
+  reunionName: { fontWeight: 'bold', fontSize: 10.5, color: '#0D7377' },
   reunionRow: { flexDirection: 'row', marginTop: 3 },
-  reunionLabel: { width: 60, color: '#6b7280', fontSize: 8.5 },
+  reunionLabel: { width: 60, color: '#6B6560', fontSize: 8.5 },
   reunionValue: { flex: 1, fontSize: 8.5 },
   // location
-  locHeader: { backgroundColor: '#3b82f6', padding: '10 14', borderRadius: 6, marginBottom: 10 },
+  locHeader: { backgroundColor: '#0D7377', padding: '10 14', borderRadius: 6, marginBottom: 10 },
   locTitle: { fontSize: 14, fontWeight: 'bold', color: '#ffffff' },
-  locAddr: { fontSize: 9, color: '#bfdbfe', marginTop: 2 },
-  shelterCard: { flexDirection: 'row', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  shelterNum: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#3b6fd4', color: '#fff', fontSize: 10, fontWeight: 'bold', textAlign: 'center', paddingTop: 4, marginRight: 8, flexShrink: 0 },
+  locAddr: { fontSize: 9, color: '#ffffff', opacity: 0.75, marginTop: 2 },
+  shelterCard: { flexDirection: 'row', marginBottom: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#F7F5F3' },
+  shelterNum: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#065A5C', color: '#fff', fontSize: 10, fontWeight: 'bold', textAlign: 'center', paddingTop: 4, marginRight: 8, flexShrink: 0 },
   shelterInfo: { flex: 1 },
   shelterName: { fontWeight: 'bold', fontSize: 10.5 },
-  shelterAddr: { color: '#6b7280', fontSize: 8.5 },
-  shelterDist: { color: '#059669', fontSize: 8.5 },
+  shelterAddr: { color: '#6B6560', fontSize: 8.5 },
+  shelterDist: { color: '#1A8A5C', fontSize: 8.5 },
   shelterTag: { fontSize: 7.5, color: '#8b5cf6', marginTop: 1 },
-  medCard: { flexDirection: 'row', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  medCard: { flexDirection: 'row', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#F7F5F3' },
   meetBox: { flexDirection: 'row', gap: 8, marginTop: 4 },
   meetCard: { flex: 1, borderRadius: 6, padding: '8 10' },
   meetLabel: { fontSize: 8, fontWeight: 'bold', marginBottom: 2 },
   meetValue: { fontSize: 9.5, fontWeight: 'bold' },
   // personal card
-  pCard: { borderWidth: 1.5, borderColor: '#374151', borderRadius: 6, padding: '8 10', marginBottom: 8, borderStyle: 'dashed' },
-  pCardHeader: { flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', paddingBottom: 4, marginBottom: 4 },
-  pCardName: { fontWeight: 'bold', fontSize: 12, color: '#3b82f6' },
-  pCardBlood: { fontWeight: 'bold', fontSize: 11, color: '#e04545' },
+  pCard: { borderWidth: 1.5, borderColor: '#2D2A26', borderRadius: 6, padding: '8 10', marginBottom: 8, borderStyle: 'dashed' },
+  pCardHeader: { flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#E8E4E0', paddingBottom: 4, marginBottom: 4 },
+  pCardName: { fontWeight: 'bold', fontSize: 12, color: '#0D7377' },
+  pCardBlood: { fontWeight: 'bold', fontSize: 11, color: '#C93B3B' },
   pCardRow: { flexDirection: 'row', marginTop: 2 },
-  pCardLabel: { width: 52, color: '#6b7280', fontSize: 8 },
+  pCardLabel: { width: 52, color: '#6B6560', fontSize: 8 },
   pCardValue: { flex: 1, fontSize: 8 },
   // checklist
   checkItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 4 },
-  checkbox: { width: 11, height: 11, borderWidth: 1, borderColor: '#9ca3af', borderRadius: 2, marginRight: 6, marginTop: 1.5, flexShrink: 0 },
+  checkbox: { width: 11, height: 11, borderWidth: 1, borderColor: '#9C9691', borderRadius: 2, marginRight: 6, marginTop: 1.5, flexShrink: 0 },
   checkText: { flex: 1, fontSize: 9.5 },
-  checkCat: { fontWeight: 'bold', fontSize: 10.5, color: '#374151', marginBottom: 5, marginTop: 8 },
+  checkCat: { fontWeight: 'bold', fontSize: 10.5, color: '#2D2A26', marginBottom: 5, marginTop: 8 },
   // scenario
   scenarioTitle: { fontSize: 13, fontWeight: 'bold', marginBottom: 6, paddingBottom: 4, borderBottomWidth: 2 },
   step: { flexDirection: 'row', marginBottom: 5 },
   stepNum: { width: 18, height: 18, borderRadius: 9, marginRight: 8, fontSize: 9, fontWeight: 'bold', textAlign: 'center', paddingTop: 3.5, flexShrink: 0, color: '#ffffff' },
   stepText: { flex: 1, fontSize: 9.5 },
   warningBox: { borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 4 },
-  tipBox: { backgroundColor: '#eff6ff', borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 6, borderWidth: 1, borderColor: '#bfdbfe' },
-  tipText: { fontSize: 8.5, color: '#3b82f6' },
+  tipBox: { backgroundColor: '#E6F3F3', borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 6, borderWidth: 1, borderColor: '#0D7377', opacity: 0.3 },
+  tipText: { fontSize: 8.5, color: '#0D7377' },
   // member health
-  memberCard: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 6, padding: '8 12', marginBottom: 8 },
-  memberName: { fontWeight: 'bold', fontSize: 12, color: '#3b82f6' },
+  memberCard: { borderWidth: 1, borderColor: '#E8E4E0', borderRadius: 6, padding: '8 12', marginBottom: 8 },
+  memberName: { fontWeight: 'bold', fontSize: 12, color: '#0D7377' },
   infoRow: { flexDirection: 'row', marginTop: 4 },
-  infoLabel: { width: 70, color: '#6b7280', fontSize: 9 },
+  infoLabel: { width: 70, color: '#6B6560', fontSize: 9 },
   infoValue: { flex: 1, fontSize: 9 },
-  alertBadge: { backgroundColor: '#fef2f2', borderRadius: 4, padding: '2 6', marginTop: 3, alignSelf: 'flex-start' },
-  alertText: { color: '#e04545', fontSize: 8.5 },
-  noDataBox: { backgroundColor: '#fef9c3', borderRadius: 6, padding: '8 12', marginBottom: 6 },
+  alertBadge: { backgroundColor: '#FCEAEA', borderRadius: 4, padding: '2 6', marginTop: 3, alignSelf: 'flex-start' },
+  alertText: { color: '#C93B3B', fontSize: 8.5 },
+  noDataBox: { backgroundColor: '#FEF7E6', borderRadius: 6, padding: '8 12', marginBottom: 6 },
 })
 
 function Footer({ label, biMode = 'zh' }: { label: string; biMode?: BiMode }) {
@@ -145,7 +145,7 @@ function DirItem({ item }: { item: { name: string; dir: string; dist: string; co
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 8, fontWeight: 'bold' }}>{item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name}</Text>
-        <Text style={{ fontSize: 7, color: '#6b7280' }}>{item.tag}　{item.dist}</Text>
+        <Text style={{ fontSize: 7, color: '#6B6560' }}>{item.tag}　{item.dist}</Text>
       </View>
     </View>
   )
@@ -155,7 +155,7 @@ function MapLegendDot({ color, label }: { color: string; label: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
       <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: color, marginRight: 2 }} />
-      <Text style={{ fontSize: 7, color: '#6b7280' }}>{label}</Text>
+      <Text style={{ fontSize: 7, color: '#6B6560' }}>{label}</Text>
     </View>
   )
 }
@@ -183,7 +183,7 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
   const medical = loc.medical.slice(0, 2)
   const items: { name: string; dir: string; dist: string; color: string; tag: string }[] = []
   for (const sh of shelters) {
-    if (sh.lat && sh.lng) items.push({ name: sh.name, dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng), dist: distText(sh.distance), color: '#3b82f6', tag: pt(_lang, 'label_shelter') })
+    if (sh.lat && sh.lng) items.push({ name: sh.name, dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng), dist: distText(sh.distance), color: '#0D7377', tag: pt(_lang, 'label_shelter') })
   }
   for (const sh of airRaid) {
     if (sh.lat && sh.lng) items.push({ name: sh.address || sh.name, dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng), dist: distText(sh.distance), color: '#8b5cf6', tag: pt(_lang, 'label_air_raid') })
@@ -193,8 +193,8 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
   }
   if (items.length === 0) return null
   return (
-    <View style={{ backgroundColor: '#f8fafc', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
-      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#374151', marginBottom: 5 }}>{pt(_lang, 'loc_dir')}</Text>
+    <View style={{ backgroundColor: '#F7F5F3', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#E8E4E0' }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#2D2A26', marginBottom: 5 }}>{pt(_lang, 'loc_dir')}</Text>
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1, marginRight: 8 }}>
           {items.filter((_, i) => i % 2 === 0).map((item, i) => <DirItem key={i} item={item} />)}
@@ -230,21 +230,21 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Meeting Points */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_meeting')}</Text>
       {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_meeting')}</Text>}
-      <Text style={{ fontSize: 8.5, color: '#6b7280', marginBottom: biMode !== 'zh' ? 1 : 4 }}>
+      <Text style={{ fontSize: 8.5, color: '#6B6560', marginBottom: biMode !== 'zh' ? 1 : 4 }}>
         {pt(biMode, 'loc_meeting_desc')}
       </Text>
-      {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280', marginBottom: 4 }}>{ptEn('loc_meeting_desc')}</Text>}
+      {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560', marginBottom: 4 }}>{ptEn('loc_meeting_desc')}</Text>}
       <View style={s.meetBox}>
-        <View style={[s.meetCard, { backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe' }]}>
-          <Text style={[s.meetLabel, { color: '#3b82f6' }]}>{pt(biMode, 'loc_primary')}{biMode !== 'zh' ? ' / ' + ptEn('loc_primary') : ''}</Text>
+        <View style={[s.meetCard, { backgroundColor: '#E6F3F3', borderWidth: 1, borderColor: '#E6F3F3' }]}>
+          <Text style={[s.meetLabel, { color: '#0D7377' }]}>{pt(biMode, 'loc_primary')}{biMode !== 'zh' ? ' / ' + ptEn('loc_primary') : ''}</Text>
           <Text style={s.meetValue}>{mainShelter?.name ?? pt(biMode, 'loc_fallback_primary')}</Text>
-          {mainShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{mainShelter.address}</Text> : null}
+          {mainShelter?.address ? <Text style={{ fontSize: 8, color: '#6B6560', marginTop: 2 }}>{mainShelter.address}</Text> : null}
           {mainShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）</Text> : null}
         </View>
         <View style={[s.meetCard, { backgroundColor: '#fff7ed', borderWidth: 1, borderColor: '#fed7aa' }]}>
           <Text style={[s.meetLabel, { color: '#c2410c' }]}>{pt(biMode, 'loc_backup')}{biMode !== 'zh' ? ' / ' + ptEn('loc_backup') : ''}</Text>
           <Text style={s.meetValue}>{backupShelter?.name ?? pt(biMode, 'loc_fallback_backup')}</Text>
-          {backupShelter?.address ? <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>{backupShelter.address}</Text> : null}
+          {backupShelter?.address ? <Text style={{ fontSize: 8, color: '#6B6560', marginTop: 2 }}>{backupShelter.address}</Text> : null}
           {backupShelter?.distance ? <Text style={{ fontSize: 8, color: '#059669', marginTop: 1 }}>{distText(backupShelter.distance)}（{walkMin(backupShelter.distance)}）</Text> : null}
         </View>
       </View>
@@ -340,10 +340,10 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             ],
           ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{zh}</Text>
-                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{en}</Text>}
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{en}</Text>}
               </View>
             </View>
           ))}
@@ -364,10 +364,10 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
             ],
           ].map(([zh, en], i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{zh}</Text>
-                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{en}</Text>}
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{en}</Text>}
               </View>
             </View>
           ))}
@@ -413,7 +413,7 @@ function DirectionMap({ loc }: { loc: LocationInfo }) {
   natural.forEach(s => {
     if (s.lat && s.lng) items.push({
       name: s.name, dir: bearing(loc.geo!.lat, loc.geo!.lng, s.lat, s.lng),
-      dist: distText(s.distance), color: '#3b82f6', tag: pt(_lang, 'label_shelter')
+      dist: distText(s.distance), color: '#0D7377', tag: pt(_lang, 'label_shelter')
     })
   })
   air.forEach(s => {
@@ -441,14 +441,14 @@ function DirectionMap({ loc }: { loc: LocationInfo }) {
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 8, fontWeight: 'bold' }}>{item.name.length > 12 ? item.name.slice(0, 12) + '...' : item.name}</Text>
-        <Text style={{ fontSize: 7, color: '#6b7280' }}>{item.tag}　{item.dist}</Text>
+        <Text style={{ fontSize: 7, color: '#6B6560' }}>{item.tag}　{item.dist}</Text>
       </View>
     </View>
   )
 
   return (
-    <View style={{ backgroundColor: '#f8fafc', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
-      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#374151', marginBottom: 5 }}>{pt(_lang, 'loc_dir')}</Text>
+    <View style={{ backgroundColor: '#F7F5F3', borderRadius: 6, padding: '8 12', marginBottom: 8, borderWidth: 1, borderColor: '#E8E4E0' }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#2D2A26', marginBottom: 5 }}>{pt(_lang, 'loc_dir')}</Text>
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1, marginRight: 8 }}>
           {left.map((item, i) => renderItem(item, i))}
@@ -469,7 +469,7 @@ function Bi({ mode, k, style }: { mode: BiMode; k: string; style?: any }) {
   return (
     <View>
       <Text style={style}>{pt(mode, k)}</Text>
-      <Text style={{ fontSize: 7.5, color: '#6b7280', marginTop: 1 }}>{ptEn(k)}</Text>
+      <Text style={{ fontSize: 7.5, color: '#6B6560', marginTop: 1 }}>{ptEn(k)}</Text>
     </View>
   )
 }
@@ -507,7 +507,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <View style={s.coverBox}>
               <Text style={s.coverBoxLabel}>{pt(biMode, 'cover_meeting')}{biMode === 'bi' ? ' / Meeting Point' : ''}</Text>
               <Text style={s.coverBoxValue}>{mainShelter.name}</Text>
-              <Text style={{ color: '#93c5fd', fontSize: 9, marginTop: 2 }}>
+              <Text style={{ color: '#ffffff', fontSize: 9, marginTop: 2 }}>
                 {distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}）
               </Text>
             </View>
@@ -528,9 +528,9 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
               <Text>{pt(biMode, 'cover_footer')}</Text>
-              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#bfdbfe', marginTop: 1 }}>{ptEn('cover_footer')}</Text>}
+              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#ffffff', marginTop: 1 }}>{ptEn('cover_footer')}</Text>}
               <Text style={{ marginTop: 3 }}>{pt(biMode, 'cover_qr')}</Text>
-              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#bfdbfe', marginTop: 1 }}>{ptEn('cover_qr')}</Text>}
+              {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#ffffff', marginTop: 1 }}>{ptEn('cover_qr')}</Text>}
             </View>
             <Image src={qrUrl(`https://disaster-handbook.vercel.app/?city=${encodeURIComponent(household.city)}&district=${encodeURIComponent(household.district)}`)} style={{ width: 56, height: 56 }} />
           </View>
@@ -550,11 +550,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.actionRow, { borderColor: '#e04545' }]}>
           <Text style={s.actionEmoji}>1</Text>
           <View style={{ flex: 1 }}>
-            <Text style={[s.actionLabel, { color: '#e04545' }]}>{pt(biMode, 'eq_title')}{biMode !== 'zh' ? ' / ' + ptEn('eq_title') : ''}</Text>
+            <Text style={[s.actionLabel, { color: '#C93B3B' }]}>{pt(biMode, 'eq_title')}{biMode !== 'zh' ? ' / ' + ptEn('eq_title') : ''}</Text>
             <Text style={s.actionBody}>
               {pt(biMode, 'eq_action')}
             </Text>
-            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('eq_action')}</Text>}
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6B6560', fontSize: 8.5 }]}>{ptEn('eq_action')}</Text>}
           </View>
         </View>
 
@@ -566,7 +566,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <Text style={s.actionBody}>
               {pt(biMode, 'air_action')}
             </Text>
-            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('air_action')}</Text>}
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6B6560', fontSize: 8.5 }]}>{ptEn('air_action')}</Text>}
           </View>
         </View>
 
@@ -583,7 +583,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 : pt(biMode, 'fire_action_house')}
             </Text>
             {biMode !== 'zh' && (
-              <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>
+              <Text style={[s.actionBody, { color: '#6B6560', fontSize: 8.5 }]}>
                 {household.housingType === 'apartment'
                   ? /^[Bb]|地下/.test(household.floor)
                     ? ptEn('fire_apt_basement')
@@ -602,7 +602,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <Text style={s.actionBody}>
               {pt(biMode, 'typhoon_action')}
             </Text>
-            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6b7280', fontSize: 8.5 }]}>{ptEn('typhoon_action')}</Text>}
+            {biMode !== 'zh' && <Text style={[s.actionBody, { color: '#6B6560', fontSize: 8.5 }]}>{ptEn('typhoon_action')}</Text>}
           </View>
         </View>
 
@@ -645,7 +645,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                   <Text style={s.numBig}>{n}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={s.numLabel}>{pt(biMode, key)}</Text>
-                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280' }}>{ptEn(key)}</Text>}
+                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6B6560' }}>{ptEn(key)}</Text>}
                   </View>
                 </View>
               )
@@ -660,7 +660,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                   <Text style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}>{n}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={s.numLabel}>{pt(biMode, key)}</Text>
-                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280' }}>{ptEn(key)}</Text>}
+                    {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6B6560' }}>{ptEn(key)}</Text>}
                   </View>
                 </View>
               )
@@ -673,14 +673,14 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
       {/* ─── PAGE 3: FAMILY REUNION & COMMUNICATION PLAN ─── */}
       <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#3b82f6' }]}>
+        <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#0D7377' }]}>
           {pt(biMode, 'reunion_title')}
         </Text>
-        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#3b82f6', marginBottom: 2 }}>{ptEn('reunion_title')}</Text>}
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: biMode !== 'zh' ? 2 : 8 }}>
+        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#0D7377', marginBottom: 2 }}>{ptEn('reunion_title')}</Text>}
+        <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: biMode !== 'zh' ? 2 : 8 }}>
           {pt(biMode, 'reunion_desc')}
         </Text>
-        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 6 }}>{ptEn('reunion_desc')}</Text>}
+        {biMode !== 'zh' && <Text style={{ fontSize: 8, color: '#6B6560', marginBottom: 6 }}>{ptEn('reunion_desc')}</Text>}
 
         {/* Each member's location and nearest shelter */}
         <Text style={s.sectionTitle}>{pt(biMode, 'reunion_members')}</Text>
@@ -709,8 +709,8 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 <View style={s.reunionRow}>
                   <Text style={s.reunionLabel}>{pt(biMode, 'reunion_special_needs')}{biMode !== 'zh' ? '/' + ptEn('reunion_special_needs') : ''}</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={[s.reunionValue, { color: '#e04545', fontWeight: 'bold' }]}>{pt(biMode, 'reunion_mobility')}</Text>
-                    {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#e04545' }}>{ptEn('reunion_mobility')}</Text>}
+                    <Text style={[s.reunionValue, { color: '#C93B3B', fontWeight: 'bold' }]}>{pt(biMode, 'reunion_mobility')}</Text>
+                    {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#C93B3B' }}>{ptEn('reunion_mobility')}</Text>}
                   </View>
                 </View>
               )}
@@ -748,7 +748,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             return (
               <View key={i} style={{ marginBottom: 2 }}>
                 <Text style={s.tipText}>{zhText}</Text>
-                {biMode !== 'zh' && <Text style={[s.tipText, { fontSize: 7.5, color: '#6b7280' }]}>{enText}</Text>}
+                {biMode !== 'zh' && <Text style={[s.tipText, { fontSize: 7.5, color: '#6B6560' }]}>{enText}</Text>}
               </View>
             )
           })}
@@ -760,10 +760,10 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {(['nophone_1', 'nophone_2', 'nophone_3', 'nophone_4', 'nophone_5'] as const).map((key, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
-                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6b7280' }}>{ptEn(key)}</Text>}
+                {biMode !== 'zh' && <Text style={{ fontSize: 7.5, color: '#6B6560' }}>{ptEn(key)}</Text>}
               </View>
             </View>
           ))}
@@ -798,10 +798,10 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
       {/* ─── COMBINED: MEMBER OVERVIEW ─── */}
       <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#3b82f6' }]}>
+        <Text style={[s.scenarioTitle, { borderBottomColor: '#3b82f6', color: '#0D7377' }]}>
           {pt(biMode, 'member_title')}
         </Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 6 }}>
+        <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 6 }}>
           {pt(biMode, 'member_desc_full')}
         </Text>
 
@@ -839,25 +839,25 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                   {m.medications ? (
                     <View style={s.pCardRow}>
                       <Text style={s.pCardLabel}>{pt(biMode, 'label_medication')}</Text>
-                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#e04545' }]}>{m.medications}</Text>
+                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#C93B3B' }]}>{m.medications}</Text>
                     </View>
                   ) : null}
                   {m.allergies ? (
                     <View style={s.pCardRow}>
                       <Text style={s.pCardLabel}>{pt(biMode, 'label_allergy')}</Text>
-                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#e04545' }]}>{m.allergies}</Text>
+                      <Text style={[s.pCardValue, { fontWeight: 'bold', color: '#C93B3B' }]}>{m.allergies}</Text>
                     </View>
                   ) : null}
                   {m.hasChronic ? (
                     <View style={s.pCardRow}>
                       <Text style={s.pCardLabel}>{pt(biMode, 'label_chronic')}</Text>
-                      <Text style={[s.pCardValue, { color: '#e04545' }]}>{pt(biMode, 'label_has_yes')}</Text>
+                      <Text style={[s.pCardValue, { color: '#C93B3B' }]}>{pt(biMode, 'label_has_yes')}</Text>
                     </View>
                   ) : null}
                   {m.isMobilityImpaired ? (
                     <View style={s.pCardRow}>
                       <Text style={s.pCardLabel}>{pt(biMode, 'label_mobility')}</Text>
-                      <Text style={[s.pCardValue, { color: '#e04545' }]}>{pt(biMode, 'label_mobility_impaired')}</Text>
+                      <Text style={[s.pCardValue, { color: '#C93B3B' }]}>{pt(biMode, 'label_mobility_impaired')}</Text>
                     </View>
                   ) : null}
                   {m.specialNeeds ? (
@@ -903,10 +903,10 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <Text style={[s.scenarioTitle, { borderBottomColor: '#0ea5e9', color: '#0ea5e9' }]}>
               {pt(biMode, 'foreign_title')} Information for Foreign Nationals
             </Text>
-            <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
+            <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 8 }}>
               {pt(biMode, 'foreign_shelter_open')}
             </Text>
-            <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 8 }}>
+            <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 8 }}>
               {ptEn('foreign_shelter_open')}
             </Text>
 
@@ -916,7 +916,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 <Text style={[s.numBig, { fontSize: h.number.length > 4 ? 14 : 20 }]}>{h.number}</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={[s.numLabel, { fontWeight: 'bold' }]}>{h.name}</Text>
-                  <Text style={{ fontSize: 8, color: '#6b7280' }}>{h.nameEn}　{h.note}</Text>
+                  <Text style={{ fontSize: 8, color: '#6B6560' }}>{h.nameEn}　{h.note}</Text>
                 </View>
               </View>
             ))}
@@ -928,7 +928,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
                 <Text style={s.contactPhone}>{res.embassyPhone}</Text>
                 <Text style={[s.contactMeta, { marginTop: 2 }]}>{res.embassyAddress}</Text>
                 {res.emergencyPhone && (
-                  <Text style={[s.contactMeta, { color: '#e04545', fontWeight: 'bold', marginTop: 2 }]}>
+                  <Text style={[s.contactMeta, { color: '#C93B3B', fontWeight: 'bold', marginTop: 2 }]}>
                     {pt(biMode, 'foreign_emergency')} Emergency: {res.emergencyPhone}
                   </Text>
                 )}
@@ -982,7 +982,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <Text style={[s.scenarioTitle, { borderBottomColor: '#16a34a', color: '#15803d' }]}>
           {pt(biMode, 'supply_title')}
         </Text>
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 2 }}>
+        <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 2 }}>
           {pt(biMode, 'supply_desc')}
         </Text>
         <View style={s.twoCol}>
@@ -1096,11 +1096,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
       {/* ─── SCENARIO: EARTHQUAKE ─── */}
       <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#e04545', color: '#e04545' }]}>
+        <Text style={[s.scenarioTitle, { borderBottomColor: '#e04545', color: '#C93B3B' }]}>
           {pt(biMode, 'eq_full_title')}
         </Text>
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_at_home')}</Text>
+        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_at_home')}</Text>
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_at_home')}</Text>}
         {[
           pt(biMode, 'eq_home_1'),
@@ -1121,7 +1121,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_outdoor')}</Text>
+        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_outdoor')}</Text>
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_outdoor')}</Text>}
         {[
           pt(biMode, 'eq_out_1'),
@@ -1135,7 +1135,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           </View>
         ))}
 
-        <Text style={[s.sectionTitle, { color: '#e04545', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_after')}</Text>
+        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_after')}</Text>
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_after')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
@@ -1146,7 +1146,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             pt(biMode, 'eq_after_5'),
           ].map((t, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#e04545', marginRight: 5, fontSize: 9 }}>•</Text>
+              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
               <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
             </View>
           ))}
@@ -1250,7 +1250,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_after')}</Text>
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_after')}</Text>}
-        <View style={[s.warningBox, { backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe' }]}>
+        <View style={[s.warningBox, { backgroundColor: '#E6F3F3', borderWidth: 1, borderColor: '#E6F3F3' }]}>
           {[
             pt(biMode, 'ty_after_1'),
             pt(biMode, 'ty_after_2'),
@@ -1270,7 +1270,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
       {/* ─── IMPORTANT REMINDERS ─── */}
       <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#374151', color: '#374151' }]}>
+        <Text style={[s.scenarioTitle, { borderBottomColor: '#374151', color: '#2D2A26' }]}>
           {pt(biMode, 'remind_title')}
         </Text>
 
@@ -1289,7 +1289,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         <Text style={s.sectionTitle}>{pt(biMode, 'remind_check')}</Text>
         {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_check')}</Text>}
-        <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 4 }}>{pt(biMode, 'remind_check_desc')}</Text>
+        <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 4 }}>{pt(biMode, 'remind_check_desc')}</Text>
         {[
           pt(biMode, 'remind_chk_1'),
           pt(biMode, 'remind_chk_2'),

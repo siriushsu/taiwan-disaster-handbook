@@ -4,7 +4,7 @@ import { DISTRICTS } from '@/lib/districts'
 import { DISTRICTS_EN } from '@/lib/districts-en'
 import { CITIES } from '@/lib/cities'
 
-const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+const INPUT = "w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
 
 interface Props {
   index: number
@@ -21,11 +21,11 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
     onChange(index, { ...member, [field]: value })
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50">
+    <div className="border border-border rounded-xl p-4 space-y-3 bg-surface">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-700">成員 {index + 1}</h3>
+        <h3 className="font-semibold text-text">成員 {index + 1}</h3>
         {canRemove && (
-          <button type="button" onClick={() => onRemove(index)} className="text-red-400 hover:text-red-600 text-sm">
+          <button type="button" onClick={() => onRemove(index)} className="text-error/60 hover:text-error text-sm">
             移除
           </button>
         )}
@@ -33,12 +33,12 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">姓名</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">姓名</label>
           <input type="text" value={member.name} onChange={e => update('name', e.target.value)}
             placeholder="例：王小明" className={INPUT} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">出生年</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">出生年</label>
           <input type="number" value={member.birthYear}
             onChange={e => update('birthYear', e.target.value ? parseInt(e.target.value) : '')}
             placeholder="例：1985" min={1920} max={2026} className={INPUT} />
@@ -46,20 +46,20 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">血型</label>
+        <label className="block text-sm font-medium text-text-muted mb-1">血型</label>
         <select value={member.bloodType} onChange={e => update('bloodType', e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300">
+          className="border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light">
           {['A', 'B', 'AB', 'O', '不知道'].map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
       <div className="flex gap-4 flex-wrap">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-muted">
           <input type="checkbox" checked={member.isMobilityImpaired}
             onChange={e => update('isMobilityImpaired', e.target.checked)} className="rounded" />
           行動不便/輪椅
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-muted">
           <input type="checkbox" checked={member.hasChronic}
             onChange={e => update('hasChronic', e.target.checked)} className="rounded" />
           有慢性病
@@ -68,7 +68,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
 
       {member.hasChronic && (
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">長期用藥（藥名）</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">長期用藥（藥名）</label>
           <input type="text" value={member.medications}
             onChange={e => update('medications', e.target.value)}
             placeholder="例：降血壓藥、胰島素" className={INPUT} />
@@ -76,15 +76,15 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">過敏資訊（選填）</label>
+        <label className="block text-sm font-medium text-text-muted mb-1">過敏資訊（選填）</label>
         <input type="text" value={member.allergies}
           onChange={e => update('allergies', e.target.value)}
           placeholder="例：青黴素過敏、花生過敏" className={INPUT} />
       </div>
 
       {/* 白天地點 */}
-      <div className="border-t border-gray-200 pt-3 space-y-2">
-        <label className="block text-sm font-medium text-gray-600">白天通常在哪裡？（選填，例如上班或上學地址）</label>
+      <div className="border-t border-border pt-3 space-y-2">
+        <label className="block text-sm font-medium text-text-muted">白天通常在哪裡？（選填，例如上班或上學地址）</label>
         <div className="grid grid-cols-3 gap-2">
           <input type="text" value={member.dailyLocation}
             onChange={e => update('dailyLocation', e.target.value)}
@@ -110,8 +110,8 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
       </div>
 
       {/* 不同住址 */}
-      <div className="border-t border-gray-200 pt-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="border-t border-border pt-3">
+        <label className="flex items-center gap-2 text-sm text-text-muted">
           <input type="checkbox" checked={member.hasDifferentAddress}
             onChange={e => update('hasDifferentAddress', e.target.checked)} className="rounded" />
           此成員住址與主住家不同
@@ -121,7 +121,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
           <div className="mt-3 space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">縣市</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">縣市</label>
                 <select value={member.city}
                   onChange={e => onChange(index, { ...member, city: e.target.value, district: '' })}
                   className={INPUT}>
@@ -130,7 +130,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">區/鄉/鎮市</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">區/鄉/鎮市</label>
                 <select value={member.district} onChange={e => update('district', e.target.value)}
                   className={INPUT}>
                   <option value="">請選擇</option>
@@ -139,7 +139,7 @@ export default function MemberForm({ index, member, onChange, onRemove, canRemov
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">詳細地址</label>
+              <label className="block text-sm font-medium text-text-muted mb-1">詳細地址</label>
               <input type="text" value={member.address} onChange={e => update('address', e.target.value)}
                 placeholder="例：中山路一段 100 號" className={INPUT} />
             </div>

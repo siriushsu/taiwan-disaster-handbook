@@ -78,9 +78,9 @@ export default function ShelterMap({ locations }: Props) {
   if (!locations[0]?.geo) return null
 
   return (
-    <div className="rounded-xl overflow-hidden border border-gray-200">
+    <div className="rounded-xl overflow-hidden border border-border">
       <div ref={ref} style={{ height: 300 }} />
-      <div className="flex gap-4 px-3 py-2 bg-gray-50 text-xs text-gray-500">
+      <div className="flex gap-4 px-3 py-2 bg-surface text-xs text-text-muted">
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" /> 住家</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" /> 避難所</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" /> 防空</span>

@@ -162,18 +162,18 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/50">
+    <main className="min-h-screen bg-surface">
       {/* 頁首 */}
-      <div className="bg-slate-700 text-white py-6 px-4">
+      <div className="bg-primary text-white py-6 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">{T('site_title')}</h1>
             <LocaleSwitcher locale={locale} onChange={setLocale} />
           </div>
-          <p className="text-slate-300 mt-1 text-sm">
+          <p className="text-white/75 mt-1 text-sm">
             {T('site_desc')}
           </p>
-          <p className="text-slate-300/80 mt-2 text-xs">
+          <p className="text-white/55 mt-2 text-xs">
             {T('privacy_notice')}
           </p>
         </div>
@@ -190,13 +190,13 @@ export default function Home() {
             <div
               key={n}
               className={`flex-1 flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                step === n ? 'bg-slate-600 text-white' :
-                step > n ? 'bg-emerald-50 text-emerald-600' : 'bg-white text-gray-400'
+                step === n ? 'bg-primary text-white' :
+                step > n ? 'bg-primary-light text-primary' : 'bg-white text-text-faint'
               }`}
             >
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === n ? 'bg-white text-slate-700' :
-                step > n ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
+                step === n ? 'bg-white text-primary' :
+                step > n ? 'bg-success text-white' : 'bg-surface-muted text-text-faint'
               }`}>{n}</span>
               {label}
             </div>
@@ -207,26 +207,26 @@ export default function Home() {
       <div className="max-w-2xl mx-auto px-4 pb-12">
         {/* Step 1: 住家資訊 */}
         {step === 1 && (
-          <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">{T('step1')}</h2>
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+            <h2 className="text-lg font-bold text-text">{T('step1')}</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">{T('city')}</label>
+              <label className="block text-sm font-medium text-text-muted mb-1">{T('city')}</label>
               <select
                 value={form.city}
                 onChange={e => setForm(prev => ({ ...prev, city: e.target.value, district: '' }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
               >
                 {CITIES.map(([zh, en]) => <option key={zh} value={zh}>{locale === 'en' ? `${en} ${zh}` : zh}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">{T('district')}</label>
+              <label className="block text-sm font-medium text-text-muted mb-1">{T('district')}</label>
               <select
                 value={form.district}
                 onChange={e => updateForm('district', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
               >
                 <option value="">{T('select_please')}</option>
                 {(DISTRICTS[form.city] ?? []).map(d => (
@@ -236,23 +236,23 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">{T('address')}</label>
+              <label className="block text-sm font-medium text-text-muted mb-1">{T('address')}</label>
               <input
                 type="text"
                 value={form.address}
                 onChange={e => updateForm('address', e.target.value)}
                 placeholder={T('address_placeholder')}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">{T('housing_type')}</label>
+                <label className="block text-sm font-medium text-text-muted mb-1">{T('housing_type')}</label>
                 <select
                   value={form.housingType}
                   onChange={e => updateForm('housingType', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                 >
                   <option value="apartment">{T('apartment')}</option>
                   <option value="house">{T('house')}</option>
@@ -261,20 +261,20 @@ export default function Home() {
               </div>
               {form.housingType === 'apartment' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">{T('floor')}</label>
+                  <label className="block text-sm font-medium text-text-muted mb-1">{T('floor')}</label>
                   <input
                     type="text"
                     value={form.floor}
                     onChange={e => updateForm('floor', e.target.value)}
                     placeholder="例：8、B1、B2"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                    className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                   />
                 </div>
               )}
             </div>
 
             <div>
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-sm text-text-muted">
                 <input
                   type="checkbox"
                   checked={form.hasPets}
@@ -289,13 +289,13 @@ export default function Home() {
                   value={form.petInfo}
                   onChange={e => updateForm('petInfo', e.target.value)}
                   placeholder="例：柯基犬 1 隻、貓 2 隻"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
                 />
               )}
             </div>
 
             <div>
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-sm text-text-muted">
                 <input
                   type="checkbox"
                   checked={form.hasInfant}
@@ -310,13 +310,13 @@ export default function Home() {
                   value={form.infantInfo}
                   onChange={e => updateForm('infantInfo', e.target.value)}
                   placeholder="例：1 歲男嬰、需要特殊配方奶"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
                 />
               )}
             </div>
 
             <div>
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-sm text-text-muted">
                 <input
                   type="checkbox"
                   checked={form.isForeignNational}
@@ -326,13 +326,13 @@ export default function Home() {
                 外籍人士 / Foreign National
               </label>
               {form.isForeignNational && (
-                <div className="mt-3 space-y-3 bg-blue-50 rounded-lg p-3">
+                <div className="mt-3 space-y-3 bg-primary-light rounded-lg p-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">國籍 Nationality</label>
+                    <label className="block text-sm font-medium text-text-muted mb-1">國籍 Nationality</label>
                     <select
                       value={form.nationality}
                       onChange={e => updateForm('nationality', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                      className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                     >
                       <option value="">請選擇 / Select</option>
                       {FOREIGN_RESOURCES.map(r => (
@@ -343,34 +343,34 @@ export default function Home() {
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">雇主姓名 Employer</label>
+                      <label className="block text-sm font-medium text-text-muted mb-1">雇主姓名 Employer</label>
                       <input type="text" value={form.employerName}
                         onChange={e => updateForm('employerName', e.target.value)}
                         placeholder="選填 / Optional"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">雇主電話</label>
+                      <label className="block text-sm font-medium text-text-muted mb-1">雇主電話</label>
                       <input type="tel" value={form.employerPhone}
                         onChange={e => updateForm('employerPhone', e.target.value)}
                         placeholder="選填 / Optional"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">仲介姓名 Broker</label>
+                      <label className="block text-sm font-medium text-text-muted mb-1">仲介姓名 Broker</label>
                       <input type="text" value={form.brokerName}
                         onChange={e => updateForm('brokerName', e.target.value)}
                         placeholder="選填 / Optional"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">仲介電話</label>
+                      <label className="block text-sm font-medium text-text-muted mb-1">仲介電話</label>
                       <input type="tel" value={form.brokerPhone}
                         onChange={e => updateForm('brokerPhone', e.target.value)}
                         placeholder="選填 / Optional"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light" />
                     </div>
                   </div>
                 </div>
@@ -380,14 +380,14 @@ export default function Home() {
             <button
               onClick={() => setStep(2)}
               disabled={!form.city || !form.address}
-              className="w-full bg-slate-600 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
             >
               {T('next_step_members')}
             </button>
             <button
               onClick={generateHandbook}
               disabled={loading || !form.city || !form.address}
-              className="w-full border border-slate-300 text-slate-500 py-2 rounded-xl text-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
+              className="w-full border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors disabled:opacity-40"
             >
               {loading ? (loadingMsg || T('generating')) : T('skip_generate')}
             </button>
@@ -396,9 +396,9 @@ export default function Home() {
 
         {/* Step 2: 家庭成員 */}
         {step === 2 && (
-          <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">{T('members_title')}</h2>
-            <p className="text-sm text-gray-500">{T('members_desc')}</p>
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+            <h2 className="text-lg font-bold text-text">{T('members_title')}</h2>
+            <p className="text-sm text-text-muted">{T('members_desc')}</p>
 
             <div className="space-y-3">
               {form.members.map((m, i) => (
@@ -420,19 +420,19 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setForm(prev => ({ ...prev, members: [...prev.members, defaultMember()] }))}
-              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-slate-400 hover:text-slate-500 transition-colors text-sm"
+              className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
             >
               + 新增成員
             </button>
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+              <button onClick={() => setStep(1)} className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors">
                 上一步
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={false}
-                className="flex-1 bg-slate-600 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
+                className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
               >
                 下一步：緊急聯絡
               </button>
@@ -442,9 +442,9 @@ export default function Home() {
 
         {/* Step 3: 緊急聯絡人 */}
         {step === 3 && (
-          <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">{T('contacts_title')}</h2>
-            <p className="text-sm text-gray-500">{T('contacts_desc')}</p>
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+            <h2 className="text-lg font-bold text-text">{T('contacts_title')}</h2>
+            <p className="text-sm text-text-muted">{T('contacts_desc')}</p>
 
             <div className="space-y-3">
               {form.contacts.map((c, i) => (
@@ -465,23 +465,23 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setForm(prev => ({ ...prev, contacts: [...prev.contacts, defaultContact()] }))}
-              className="w-full border-2 border-dashed border-gray-300 text-gray-400 py-2 rounded-xl hover:border-slate-400 hover:text-slate-500 transition-colors text-sm"
+              className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
             >
               + 新增聯絡人
             </button>
 
             {error && (
-              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm">{error}</div>
+              <div className="bg-error/10 text-error px-4 py-3 rounded-lg text-sm">{error}</div>
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+              <button onClick={() => setStep(2)} className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors">
                 上一步
               </button>
               <button
                 onClick={generateHandbook}
                 disabled={loading}
-                className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-semibold disabled:opacity-40 hover:bg-emerald-600 transition-colors"
+                className="flex-1 bg-accent text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-accent-dark transition-colors"
               >
                 {loading ? (loadingMsg || T('generating')) : T('generate')}
               </button>
@@ -492,54 +492,54 @@ export default function Home() {
 
       {/* Feedback & Footer */}
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-2">
-          <p className="text-xs font-semibold text-slate-500 mb-1">
+        <div className="bg-white rounded-xl shadow-sm border border-border p-4 space-y-2">
+          <p className="text-xs font-semibold text-text-muted mb-1">
             {locale === 'en' ? 'Help us improve' : '資料有誤？幫助我們改善'}
           </p>
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
             target="_blank" rel="noopener noreferrer"
-            className="block text-center border border-amber-200 bg-amber-50 text-amber-700 py-2 rounded-lg text-sm hover:bg-amber-100 transition-colors">
+            className="block text-center border border-warning/30 bg-warning/10 text-warning py-2 rounded-lg text-sm hover:bg-warning/15 transition-colors">
             {locale === 'en' ? '📍 Report data error' : '📍 回報資料錯誤'}
           </a>
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
             target="_blank" rel="noopener noreferrer"
-            className="block text-center border border-slate-200 text-slate-600 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors">
+            className="block text-center border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors">
             {locale === 'en' ? '💡 Feature request' : '💡 功能建議'}
           </a>
           <a href="https://github.com/siriushsu/taiwan-disaster-handbook"
             target="_blank" rel="noopener noreferrer"
-            className="block text-center text-slate-400 text-xs py-1 hover:underline">
+            className="block text-center text-text-faint text-xs py-1 hover:underline">
             {locale === 'en' ? '⭐ Open source project — contributions welcome' : '⭐ 開源專案 — 歡迎貢獻'}
           </a>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-border p-4">
           {!showSupport ? (
             <button onClick={() => setShowSupport(true)}
-              className="w-full text-center text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors">
+              className="w-full text-center text-sm text-accent hover:text-accent-dark font-medium transition-colors">
               {locale === 'en' ? '☕ Enjoying this? Buy the developer a coffee' : '☕ 覺得有幫助？請開發者喝杯咖啡'}
             </button>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-slate-600 text-center">
+              <p className="text-sm font-semibold text-text text-center">
                 {locale === 'en' ? 'Thank you for your support!' : '感謝你的支持！'}
               </p>
               <a href="https://ko-fi.com/siriushsu" target="_blank" rel="noopener noreferrer"
-                className="block text-center bg-amber-500 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors">
+                className="block text-center bg-accent text-white py-2.5 rounded-lg text-sm font-medium hover:bg-accent-dark transition-colors">
                 ☕ Ko-fi（信用卡 / PayPal）
               </a>
               <div className="text-center">
-                <p className="text-xs text-slate-400 mb-1">或銀行轉帳</p>
-                <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-                  <span className="text-sm text-slate-600">玉山銀行 (808)</span>
-                  <span className="text-sm font-mono font-semibold text-slate-800">0521979118500</span>
+                <p className="text-xs text-text-faint mb-1">或銀行轉帳</p>
+                <div className="inline-flex items-center gap-2 bg-surface border border-border rounded-lg px-3 py-2">
+                  <span className="text-sm text-text-muted">玉山銀行 (808)</span>
+                  <span className="text-sm font-mono font-semibold text-text">0521979118500</span>
                   <button
                     onClick={() => { navigator.clipboard.writeText('0521979118500'); alert('已複製帳號') }}
-                    className="text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-2 py-0.5 rounded transition-colors"
+                    className="text-xs bg-surface-muted hover:bg-border text-text-muted px-2 py-0.5 rounded transition-colors"
                   >複製</button>
                 </div>
               </div>
-              <p className="text-center text-xs text-slate-400">本專案為開源免費工具，您的支持幫助我們維護伺服器與持續改善內容</p>
+              <p className="text-center text-xs text-text-faint">本專案為開源免費工具，您的支持幫助我們維護伺服器與持續改善內容</p>
             </div>
           )}
         </div>

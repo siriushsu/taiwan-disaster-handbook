@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Sans_TC } from "next/font/google";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PWARegister from "@/components/PWARegister";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const notoSansTC = Noto_Sans_TC({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-noto-sans-tc",
+  display: "swap",
+});
 
 const siteUrl = "https://disaster-handbook.vercel.app";
 
@@ -69,7 +73,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <meta name="theme-color" content="#003764" />
+        <meta name="theme-color" content="#0D7377" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         {/* Plausible Analytics — privacy-friendly, no cookies, 1KB script */}
         <script defer data-domain="disaster-handbook.vercel.app" src="https://plausible.io/js/script.js" />
@@ -78,7 +82,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${notoSansTC.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <PWARegister />
       </body>

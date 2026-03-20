@@ -2,36 +2,56 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2D2A26;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   --font-mono: var(--font-geist-mono);
+
+  /* Design System Colors */
+  --color-primary: #0D7377;
+  --color-primary-dark: #065A5C;
+  --color-primary-light: #E6F3F3;
+  --color-accent: #E8704A;
+  --color-accent-dark: #D05A35;
+  --color-surface: #F7F5F3;
+  --color-surface-muted: #EFECE8;
+  --color-border: #E8E4E0;
+  --color-border-dark: #D4CFC9;
+  --color-text: #2D2A26;
+  --color-text-muted: #6B6560;
+  --color-text-faint: #9C9691;
+  --color-success: #1A8A5C;
+  --color-warning: #D4940A;
+  --color-error: #C93B3B;
+  --color-info: #2B7AB5;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1A1816;
+    --foreground: #E8E4E0;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  font-size: 17px;
+  line-height: 1.75;
 }
 
-/* FINDING-001: Checkbox touch targets too small (13px → 20px with padding to 44px) */
+/* Checkbox touch targets (44px) */
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
   min-width: 20px;
   cursor: pointer;
-  accent-color: #475569;
+  accent-color: #0D7377;
 }
 label:has(input[type="checkbox"]) {
   min-height: 44px;
@@ -40,16 +60,17 @@ label:has(input[type="checkbox"]) {
   cursor: pointer;
 }
 
-/* FINDING-007: Improve placeholder visibility */
+/* Placeholder visibility */
 ::placeholder {
-  color: #94a3b8 !important;
+  color: #9C9691 !important;
   opacity: 1;
 }
 
-/* FINDING-004: Better hover/focus on interactive elements */
+/* Hover/focus on interactive elements */
 select:hover, input:hover {
-  border-color: #94a3b8;
+  border-color: #D4CFC9;
 }
 select:focus, input:focus {
-  border-color: #64748b;
+  border-color: #0D7377;
+  box-shadow: 0 0 0 3px #E6F3F3;
 }

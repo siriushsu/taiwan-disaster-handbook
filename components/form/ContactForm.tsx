@@ -14,14 +14,14 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
     onChange(index, { ...contact, [field]: value })
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50">
+    <div className="border border-border rounded-xl p-4 space-y-3 bg-surface">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-700">聯絡人 {index + 1}</h3>
+        <h3 className="font-semibold text-text">聯絡人 {index + 1}</h3>
         {canRemove && (
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="text-red-400 hover:text-red-600 text-sm"
+            className="text-error/60 hover:text-error text-sm"
           >
             移除
           </button>
@@ -30,51 +30,51 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">姓名</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">姓名</label>
           <input
             type="text"
             value={contact.name}
             onChange={e => update('name', e.target.value)}
             placeholder="例：王大明"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">關係</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">關係</label>
           <input
             type="text"
             value={contact.relation}
             onChange={e => update('relation', e.target.value)}
             placeholder="例：父親、鄰居"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">主要電話</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">主要電話</label>
           <input
             type="tel"
             value={contact.phone}
             onChange={e => update('phone', e.target.value)}
             placeholder="0912-345-678"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">備用電話</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">備用電話</label>
           <input
             type="tel"
             value={contact.phoneBackup}
             onChange={e => update('phoneBackup', e.target.value)}
             placeholder="02-1234-5678"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
           />
         </div>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-600">
+      <label className="flex items-center gap-2 text-sm text-text-muted">
         <input
           type="checkbox"
           checked={contact.isOutOfCity}
