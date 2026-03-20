@@ -151,6 +151,15 @@ function DirItem({ item }: { item: { name: string; dir: string; dist: string; co
   )
 }
 
+function MapLegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
+      <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: color, marginRight: 2 }} />
+      <Text style={{ fontSize: 7, color: '#6b7280' }}>{label}</Text>
+    </View>
+  )
+}
+
 function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: string; biMode?: BiMode }) {
   if (!loc.geo) return null
 
@@ -159,9 +168,12 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
     return (
       <View style={{ marginBottom: 8 }}>
         <Image src={mapImg} style={{ width: '100%', height: 160, borderRadius: 4, objectFit: 'cover' }} />
-        <View style={{ flexDirection: 'row', marginTop: 3 }}>
-          <Text style={{ fontSize: 7, color: '#6b7280' }}>{pt(_lang, 'map_legend_full')}</Text>
-          <Text style={{ fontSize: 7, color: '#9ca3af', marginLeft: 8 }}>Map (c) OpenStreetMap</Text>
+        <View style={{ flexDirection: 'row', marginTop: 3, alignItems: 'center' }}>
+          <MapLegendDot color="#ef4444" label={pt(_lang, 'legend_home')} />
+          <MapLegendDot color="#3b82f6" label={pt(_lang, 'legend_shelter')} />
+          <MapLegendDot color="#8b5cf6" label={pt(_lang, 'legend_air_raid')} />
+          <MapLegendDot color="#059669" label={pt(_lang, 'legend_medical')} />
+          <Text style={{ fontSize: 6.5, color: '#9ca3af', marginLeft: 6 }}>Map (c) OpenStreetMap</Text>
         </View>
       </View>
     )
