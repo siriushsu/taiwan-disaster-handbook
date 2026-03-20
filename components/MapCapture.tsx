@@ -102,11 +102,11 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
         bounds.extend([m.lat, m.lng])
       })
 
-      // Fit to just this location's markers, with tighter zoom
+      // Fit bounds with generous padding for better framing
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [20, 20], maxZoom: 16 })
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 })
       } else {
-        map.setView([loc.geo.lat, loc.geo.lng], 16)
+        map.setView([loc.geo.lat, loc.geo.lng], 15)
       }
 
       map.whenReady(() => {
@@ -117,7 +117,10 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
       })
     })
 
-    return () => { maps.forEach(m => m.remove()) }
+    return () => {
+      captured.current = false
+      maps.forEach(m => m.remove())
+    }
   }, [locations, captureAll])
 
   // Filter to only locations with geo
@@ -126,7 +129,7 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
 
   return (
     <div ref={containerRef} style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-      {geoLocations.map((loc, idx) => {
+      {geoLocations.map((loc) => {
         const realIdx = locations.indexOf(loc)
         return (
           <div
