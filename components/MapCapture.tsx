@@ -3,7 +3,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import type { LocationInfo, Shelter, MedicalFacility } from '@/types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { toPng } from 'html-to-image'
+import { toPng, toCanvas } from 'html-to-image'
 
 function dot(color: string) {
   return L.divIcon({
@@ -44,10 +44,25 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
     for (const el of mapEls) {
       const idx = parseInt(el.dataset.mapIdx || '0')
       try {
-        const dataUrl = await toPng(el, { quality: 0.8, pixelRatio: 1.5 })
-        images[idx] = dataUrl
-      } catch {
-        // skip this one
+        const opts = {
+          quality: 0.8,
+          pixelRatio: 1.5,
+          cacheBust: true,
+          fetchRequestInit: { mode: 'cors' as RequestMode, cache: 'no-cache' as RequestCache },
+        }
+        let dataUrl: string
+        try {
+          dataUrl = await toPng(el, opts)
+        } catch {
+          // Fallback: capture via canvas (handles some CORS cases better)
+          const canvas = await toCanvas(el, opts)
+          dataUrl = canvas.toDataURL('image/png', 0.8)
+        }
+        if (dataUrl && dataUrl.length > 100) {
+          images[idx] = dataUrl
+        }
+      } catch (err) {
+        console.warn('[MapCapture] capture failed for idx', idx, err)
       }
     }
 
