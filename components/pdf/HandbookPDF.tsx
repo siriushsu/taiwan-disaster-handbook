@@ -114,8 +114,8 @@ const s = StyleSheet.create({
   stepNum: { width: 18, height: 18, borderRadius: 9, marginRight: 8, fontSize: 9, fontWeight: 'bold', textAlign: 'center', paddingTop: 3.5, flexShrink: 0, color: '#ffffff' },
   stepText: { flex: 1, fontSize: 9.5 },
   warningBox: { borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 4 },
-  tipBox: { backgroundColor: '#E6F3F3', borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 6, borderWidth: 1, borderColor: '#0D7377', opacity: 0.3 },
-  tipText: { fontSize: 8.5, color: '#0D7377' },
+  tipBox: { backgroundColor: '#E6F3F3', borderRadius: 6, padding: '6 10', marginTop: 4, marginBottom: 6, borderWidth: 1, borderColor: '#B8DDDE' },
+  tipText: { fontSize: 8.5, color: '#065A5C' },
   // member health
   memberCard: { borderWidth: 1, borderColor: '#E8E4E0', borderRadius: 6, padding: '8 12', marginBottom: 8 },
   memberName: { fontWeight: 'bold', fontSize: 12, color: '#0D7377' },
@@ -173,7 +173,7 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
           <MapLegendDot color="#3b82f6" label={pt(_lang, 'legend_shelter')} />
           <MapLegendDot color="#8b5cf6" label={pt(_lang, 'legend_air_raid')} />
           <MapLegendDot color="#059669" label={pt(_lang, 'legend_medical')} />
-          <Text style={{ fontSize: 6.5, color: '#9ca3af', marginLeft: 6 }}>Map (c) OpenStreetMap</Text>
+          <Text style={{ fontSize: 6.5, color: '#9C9691', marginLeft: 6 }}>Map (c) OpenStreetMap</Text>
         </View>
       </View>
     )
@@ -203,7 +203,7 @@ function DirMap({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapImg?: st
           {items.filter((_, i) => i % 2 === 1).map((item, i) => <DirItem key={i} item={item} />)}
         </View>
       </View>
-      <Text style={{ fontSize: 6.5, color: '#9ca3af', marginTop: 3 }}>{pt(_lang, 'map_legend_short')}</Text>
+      <Text style={{ fontSize: 6.5, color: '#9C9691', marginTop: 3 }}>{pt(_lang, 'map_legend_short')}</Text>
     </View>
   )
 }
@@ -229,7 +229,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
 
       {/* Meeting Points */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_meeting')}</Text>
-      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_meeting')}</Text>}
+      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_meeting')}</Text>}
       <Text style={{ fontSize: 8.5, color: '#6B6560', marginBottom: biMode !== 'zh' ? 1 : 4 }}>
         {pt(biMode, 'loc_meeting_desc')}
       </Text>
@@ -251,7 +251,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
 
       {/* Nearest shelters */}
       <Text style={s.sectionTitle}>{pt(biMode, 'loc_shelters')}</Text>
-      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_shelters')}</Text>}
+      {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_shelters')}</Text>}
       {natural.length > 0 ? natural.map((sh: Shelter, i: number) => (
         <View key={i} style={s.shelterCard}>
           <Text style={s.shelterNum}>{i + 1}</Text>
@@ -280,7 +280,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Air defense shelters */}
       {air.length > 0 && (<>
         <Text style={s.sectionTitle}>{pt(biMode, 'loc_airraid')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_airraid')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_airraid')}</Text>}
         {air.slice(0, 3).map((sh: Shelter, i: number) => (
           <View key={i} style={s.shelterCard}>
             <Text style={[s.shelterNum, { backgroundColor: '#8b5cf6' }]}>{i + 1}</Text>
@@ -296,7 +296,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Medical */}
       {loc.medical.length > 0 && (<>
         <Text style={s.sectionTitle}>{pt(biMode, 'loc_medical')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_medical')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_medical')}</Text>}
         {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
           <View key={i} style={s.medCard}>
             <Text style={[s.shelterNum, { backgroundColor: '#059669' }]}>{i + 1}</Text>
@@ -317,7 +317,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
       {/* Apartment-specific evacuation */}
       {loc.housingType === 'apartment' && (<>
         <Text style={s.sectionTitle}>{pt(biMode, 'loc_apt_title')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_apt_title')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_apt_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
             [
@@ -352,7 +352,7 @@ function LocationPage({ loc, mapImg, biMode = 'zh' }: { loc: LocationInfo; mapIm
 
       {loc.housingType === 'house' && (<>
         <Text style={s.sectionTitle}>{pt(biMode, 'loc_house_title')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('loc_house_title')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('loc_house_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
             [pt(biMode, 'house_1'), ptEn('house_1')],
@@ -457,7 +457,7 @@ function DirectionMap({ loc }: { loc: LocationInfo }) {
           {right.map((item, i) => renderItem(item, i))}
         </View>
       </View>
-      <Text style={{ fontSize: 6.5, color: '#9ca3af', marginTop: 3 }}>{pt(_lang, 'map_legend_short')}　{pt(_lang, 'map_dir_from_home')}</Text>
+      <Text style={{ fontSize: 6.5, color: '#9C9691', marginTop: 3 }}>{pt(_lang, 'map_legend_short')}　{pt(_lang, 'map_dir_from_home')}</Text>
     </View>
   )
 }
@@ -684,7 +684,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* Each member's location and nearest shelter */}
         <Text style={s.sectionTitle}>{pt(biMode, 'reunion_members')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('reunion_members')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('reunion_members')}</Text>}
         {allMembers.map((m, i) => {
           const addr = memberAddr(m, fullAddr)
           const loc = m.hasDifferentAddress
@@ -726,7 +726,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* Communication Plan */}
         <Text style={s.sectionTitle}>{pt(biMode, 'comm_title')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('comm_title')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('comm_title')}</Text>}
         <View style={[s.tipBox]}>
           {([
             'comm_1',
@@ -756,7 +756,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* When phone doesn't work */}
         <Text style={s.sectionTitle}>{pt(biMode, 'nophone_title')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('nophone_title')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('nophone_title')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {(['nophone_1', 'nophone_2', 'nophone_3', 'nophone_4', 'nophone_5'] as const).map((key, i) => (
             <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
@@ -771,7 +771,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
         {/* Emergency Contacts */}
         <Text style={s.sectionTitle}>{pt(biMode, 'contacts_title')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('contacts_title')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('contacts_title')}</Text>}
         {allContacts.map((c, i) => (
           <View key={i} style={s.contactCard}>
             <Text style={s.contactName}>{c.name}{pt(biMode, 'label_contact_relation_wrap')}{c.relation}{pt(biMode, 'label_contact_relation_wrap_end')}</Text>
@@ -1101,7 +1101,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         </Text>
 
         <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_at_home')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_at_home')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_at_home')}</Text>}
         {[
           pt(biMode, 'eq_home_1'),
           pt(biMode, 'eq_home_2'),
@@ -1122,7 +1122,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_outdoor')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_outdoor')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_outdoor')}</Text>}
         {[
           pt(biMode, 'eq_out_1'),
           pt(biMode, 'eq_out_2'),
@@ -1136,7 +1136,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('eq_after')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_after')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
           {[
             pt(biMode, 'eq_after_1'),
@@ -1166,7 +1166,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         </View>
 
         <Text style={[s.sectionTitle, { color: '#8b5cf6', borderBottomColor: '#d8b4fe' }]}>{pt(biMode, 'air_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('air_after')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('air_after')}</Text>}
         {[
           pt(biMode, 'air_1'),
           pt(biMode, 'air_2'),
@@ -1181,8 +1181,8 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
             <Text style={s.stepText}>{text}</Text>
           </View>
         ))}
-        <View style={[s.tipBox, { borderColor: '#d8b4fe' }]}>
-          <Text style={[s.tipText, { color: '#8b5cf6' }]}>
+        <View style={[s.tipBox, { backgroundColor: '#faf5ff', borderColor: '#d8b4fe' }]}>
+          <Text style={[s.tipText, { color: '#6d28d9' }]}>
             {pt(biMode, 'air_tip')}
           </Text>
         </View>
@@ -1191,7 +1191,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           {pt(biMode, 'fire_full_title')}
         </Text>
         <Text style={[s.sectionTitle, { color: '#d4882a', borderBottomColor: '#fed7aa' }]}>{pt(biMode, 'fire_when')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('fire_when')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('fire_when')}</Text>}
         {([
           pt(biMode, 'fire_1'),
           household.housingType === 'apartment'
@@ -1218,7 +1218,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         </Text>
 
         <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_before')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_before')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_before')}</Text>}
         {[
           pt(biMode, 'ty_before_1'),
           pt(biMode, 'ty_before_2'),
@@ -1234,7 +1234,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_during')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_during')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_during')}</Text>}
         {[
           pt(biMode, 'ty_during_1'),
           pt(biMode, 'ty_during_2'),
@@ -1249,7 +1249,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('typhoon_after')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_after')}</Text>}
         <View style={[s.warningBox, { backgroundColor: '#E6F3F3', borderWidth: 1, borderColor: '#E6F3F3' }]}>
           {[
             pt(biMode, 'ty_after_1'),
@@ -1275,7 +1275,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         </Text>
 
         <Text style={s.sectionTitle}>{pt(biMode, 'remind_equip')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_equip')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('remind_equip')}</Text>}
         {[
           `${pt(biMode, 'rem_gas')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
           `${pt(biMode, 'rem_power')}：＿＿＿＿＿＿＿＿＿＿＿＿＿＿`,
@@ -1288,7 +1288,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={s.sectionTitle}>{pt(biMode, 'remind_check')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_check')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('remind_check')}</Text>}
         <Text style={{ fontSize: 9, color: '#6B6560', marginBottom: 4 }}>{pt(biMode, 'remind_check_desc')}</Text>
         {[
           pt(biMode, 'remind_chk_1'),
@@ -1309,7 +1309,7 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         ))}
 
         <Text style={s.sectionTitle}>{pt(biMode, 'remind_memo')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6b7280'}}>{ptEn('remind_memo')}</Text>}
+        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('remind_memo')}</Text>}
         {[
           `${pt(biMode, 'rem_doctor')}：＿＿＿＿＿＿＿＿＿＿＿`,
           `${pt(biMode, 'rem_insurance')}：＿＿＿＿＿＿＿＿＿＿＿`,
