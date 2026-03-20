@@ -44,7 +44,7 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
     for (const el of mapEls) {
       const idx = parseInt(el.dataset.mapIdx || '0')
       try {
-        const dataUrl = await toPng(el, { quality: 0.85, pixelRatio: 2 })
+        const dataUrl = await toPng(el, { quality: 0.8, pixelRatio: 1.5 })
         images[idx] = dataUrl
       } catch {
         // skip this one
