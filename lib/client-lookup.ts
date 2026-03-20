@@ -27,6 +27,7 @@ const CDN_BASE = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook
 let shelterCache: Shelter[] | null = null
 let medicalCache: MedicalFacility[] | null = null
 let airRaidCache: { a: string; t: number; g: number; c: number | null }[] | null = null
+let mrtCache: { a: string; t: number; g: number; c: number | null; n: string; s: string }[] | null = null
 
 /** Fetch with fallback: try CDN first, fall back to local /data/ */
 async function fetchData(filename: string): Promise<Response> {
@@ -56,6 +57,13 @@ async function loadAirRaid() {
   const res = await fetchData('taiwan-air-raid.json')
   airRaidCache = await res.json()
   return airRaidCache!
+}
+
+async function loadMrt() {
+  if (mrtCache) return mrtCache
+  const res = await fetchData('taiwan-mrt-shelters.json')
+  mrtCache = await res.json()
+  return mrtCache!
 }
 
 /** Geocode address using Nominatim (browser-side, CORS supported) */
@@ -94,10 +102,11 @@ export async function geocode(address: string): Promise<GeoLocation | null> {
 
 /** Find nearest shelters, air raid shelters, and medical facilities */
 export async function findNearby(lat: number, lng: number) {
-  const [shelters, airRaidRaw, medical] = await Promise.all([
+  const [shelters, airRaidRaw, medical, mrtRaw] = await Promise.all([
     loadShelters(),
     loadAirRaid(),
     loadMedical(),
+    loadMrt(),
   ])
 
   // Nearest disaster shelters
@@ -111,7 +120,22 @@ export async function findNearby(lat: number, lng: number) {
       const shortName = s.a.replace(/^.+?[區鎮鄉市](.+?里)?/, '').trim() || s.a
       return { name: shortName, address: s.a, lat: s.t, lng: s.g, capacity: s.c ?? undefined, type: 'air_defense' as const } as Shelter
     })
-  const nearAirRaid = findNearest(airCandidates, lat, lng, 3)
+
+  // MRT stations as air raid shelters (underground = safe during air raids)
+  const mrtCandidates = mrtRaw
+    .filter(s => s.t > lat - delta && s.t < lat + delta && s.g > lng - delta && s.g < lng + delta)
+    .map(s => ({
+      name: `${s.n}站（${s.s}）`,
+      address: s.a,
+      lat: s.t,
+      lng: s.g,
+      capacity: s.c ?? undefined,
+      type: 'air_defense' as const,
+    } as Shelter))
+
+  // Merge air raid + MRT, deduplicate by proximity, return nearest 3
+  const allAirRaid = [...airCandidates, ...mrtCandidates]
+  const nearAirRaid = findNearest(allAirRaid, lat, lng, 3)
 
   // Nearest medical
   const nearMedical = findNearest(medical, lat, lng, 3)
