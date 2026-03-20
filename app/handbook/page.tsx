@@ -19,6 +19,9 @@ export default function HandbookPage() {
   const [biMode, setBiMode] = useState<BiMode>('zh')
   const [isLineApp, setIsLineApp] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [relocating, setRelocating] = useState<number | null>(null)
+  const [relocateAddr, setRelocateAddr] = useState('')
+  const [relocateLoading, setRelocateLoading] = useState(false)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('handbookData')
@@ -118,6 +121,48 @@ export default function HandbookPage() {
     }
   }
 
+  // Re-geocode a location: update address, geo, and all nearby facilities
+  const relocateLocation = async (locIdx: number) => {
+    if (!data || !relocateAddr.trim()) return
+    setRelocateLoading(true)
+    try {
+      const { geocode, findNearby } = await import('@/lib/client-lookup')
+      const loc = data.locations[locIdx]
+      const geo = await geocode(relocateAddr.trim(), { city: loc.city, district: loc.district })
+      if (!geo) {
+        alert('找不到此地址，請確認輸入正確')
+        setRelocateLoading(false)
+        return
+      }
+      const result = await findNearby(geo.lat, geo.lng)
+      setData(prev => {
+        if (!prev) return prev
+        const locs = [...prev.locations]
+        locs[locIdx] = {
+          ...locs[locIdx],
+          address: relocateAddr.trim(),
+          geo,
+          shelters: result.shelters as Shelter[],
+          airRaid: result.airRaid as Shelter[],
+          medical: result.medical as MedicalFacility[],
+          aed: (result.aed || []) as import('@/types').AedLocation[],
+          erHospital: (result.erHospital || []) as MedicalFacility[],
+        }
+        const updated = { ...prev, locations: locs }
+        sessionStorage.setItem('handbookData', JSON.stringify(updated))
+        // Clear map images so MapCapture re-renders
+        sessionStorage.removeItem('mapImages')
+        return updated
+      })
+      setMapImages({})
+      setRelocating(null)
+      setRelocateAddr('')
+    } catch {
+      alert('重新定位失敗，請稍後再試')
+    }
+    setRelocateLoading(false)
+  }
+
   const memberName = data.household.members[0]?.name || '我的家庭'
   const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, '-')}.pdf`
   const pageCount = 3 + data.locations.length + 5
@@ -175,7 +220,9 @@ export default function HandbookPage() {
               {({ loading }) => loading ? '準備 PDF 中（首次需載入字型）...' : '下載 PDF 手冊'}
             </PDFDownloadLink>
           )}
-          <p className="text-xs text-text-faint mt-3">所有資料僅在瀏覽器本機處理，不會上傳。</p>
+          <p className="text-xs text-text-faint mt-3">
+            所有資料僅在瀏覽器本機處理，不會上傳。
+          </p>
 
           {/* QR Code */}
           <div className="mt-5 flex flex-col items-center">
@@ -238,7 +285,36 @@ export default function HandbookPage() {
                 <span className="bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{locIdx + 1}</span>
                 <span className="font-semibold text-text">{loc.label}</span>
                 <span className="text-xs text-text-faint ml-auto">{loc.address}</span>
+                <button
+                  onClick={() => { setRelocating(relocating === locIdx ? null : locIdx); setRelocateAddr(loc.address) }}
+                  className="text-xs text-primary hover:text-primary-dark font-medium flex-shrink-0"
+                >
+                  {relocating === locIdx ? '取消' : '重新定位'}
+                </button>
               </div>
+              {relocating === locIdx && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
+                  <p className="text-xs text-blue-700">如果地圖定位不準確，可以重新輸入地址。系統將重新查詢附近所有避難設施。</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={relocateAddr}
+                      onChange={e => setRelocateAddr(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && relocateLocation(locIdx)}
+                      placeholder="輸入正確地址，例如：新北市永和區成功路二段191巷2號"
+                      className="flex-1 text-sm border border-blue-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-light"
+                      disabled={relocateLoading}
+                    />
+                    <button
+                      onClick={() => relocateLocation(locIdx)}
+                      disabled={relocateLoading || !relocateAddr.trim()}
+                      className="px-4 py-1.5 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 whitespace-nowrap"
+                    >
+                      {relocateLoading ? '查詢中...' : '重新定位'}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Disaster shelters */}
               {loc.shelters.length > 0 && (
