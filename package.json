@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "update-data": "npx tsx scripts/update-data.ts",
+    "update-data:dry": "npx tsx scripts/update-data.ts --dry-run"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.2",
