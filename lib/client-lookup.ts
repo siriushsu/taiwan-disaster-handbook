@@ -28,6 +28,7 @@ let shelterCache: Shelter[] | null = null
 let medicalCache: MedicalFacility[] | null = null
 let airRaidCache: { a: string; t: number; g: number; c: number | null }[] | null = null
 let mrtCache: { a: string; t: number; g: number; c: number | null; n: string; s: string }[] | null = null
+let aedCache: { name: string; address: string; city: string; district: string; lat: number; lng: number; location: string; phone: string; allDay: boolean }[] | null = null
 
 /** Fetch with fallback: try CDN first, fall back to local /data/ */
 async function fetchData(filename: string): Promise<Response> {
@@ -66,47 +67,181 @@ async function loadMrt() {
   return mrtCache!
 }
 
-/** Geocode address using Nominatim (browser-side, CORS supported) */
-export async function geocode(address: string): Promise<GeoLocation | null> {
-  const normalized = address.replace(/臺/g, '台')
-  const candidates = [
-    normalized,
-    normalized.replace(/\d+號.*$/, '').trim(),
-    normalized.replace(/\d+之?\d*號.*$/, '').trim(),
-  ].filter((s, i, arr) => s && arr.indexOf(s) === i)
+async function loadAed() {
+  if (aedCache) return aedCache
+  const res = await fetchData('taiwan-aed.json')
+  aedCache = await res.json()
+  return aedCache!
+}
 
-  for (const q of candidates) {
-    try {
-      const ctrl = new AbortController()
-      const timer = setTimeout(() => ctrl.abort(), 10000)
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=tw&accept-language=zh`,
-        { signal: ctrl.signal }
-      )
-      clearTimeout(timer)
-      if (!res.ok) continue
-      const data = await res.json()
-      if (data?.[0]) {
-        return {
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon),
-          formattedAddress: data[0].display_name,
-        }
-      }
-    } catch {
-      continue
-    }
+/** Helper: fetch with timeout */
+async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response> {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal })
+    clearTimeout(timer)
+    return res
+  } catch (e) {
+    clearTimeout(timer)
+    throw e
   }
+}
+
+/** Try Nominatim geocoder */
+async function tryNominatim(query: string): Promise<GeoLocation | null> {
+  try {
+    const res = await fetchWithTimeout(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=jsonv2&limit=5&countrycodes=tw&accept-language=zh&addressdetails=1`
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    if (!data?.length) return null
+
+    // Priority: building/amenity/shop > house > road
+    // Higher place_rank = more specific (30=building, 26=road, 16=city)
+    const scored = data.map((d: Record<string, unknown>) => {
+      let score = 0
+      const cat = d.category || d.class
+      if (cat === 'building' || cat === 'amenity' || cat === 'shop') score += 100
+      if (d.type === 'house') score += 80
+      if (d.addresstype === 'building') score += 60
+      const rank = Number(d.place_rank) || 0
+      score += rank  // higher rank = more specific
+      return { ...d, _score: score }
+    })
+    scored.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
+      (b._score as number) - (a._score as number)
+    )
+    const best = scored[0]
+    return {
+      lat: parseFloat(best.lat as string),
+      lng: parseFloat(best.lon as string),
+      formattedAddress: best.display_name as string,
+    }
+  } catch { /* skip */ }
   return null
 }
 
-/** Find nearest shelters, air raid shelters, and medical facilities */
+/** Try Photon (Komoot) geocoder — often better for Asian addresses */
+async function tryPhoton(query: string): Promise<GeoLocation | null> {
+  try {
+    const res = await fetchWithTimeout(
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=3&lang=default&lat=23.5&lon=121&bbox=118,20,123,27`
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const feat = data?.features?.[0]
+    if (feat?.geometry?.coordinates) {
+      const [lng, lat] = feat.geometry.coordinates
+      // Verify result is in Taiwan bounding box
+      if (lat >= 20 && lat <= 27 && lng >= 118 && lng <= 123) {
+        return {
+          lat,
+          lng,
+          formattedAddress: feat.properties?.name || query,
+        }
+      }
+    }
+  } catch { /* skip */ }
+  return null
+}
+
+/**
+ * Parse a Taiwan address into parts for flexible query building.
+ * e.g. "台北市大安區敦化南路一段205號" →
+ *   { city: "台北市", district: "大安區", street: "敦化南路一段", number: "205" }
+ */
+function parseAddress(addr: string) {
+  const m = addr.match(
+    /^([\u4e00-\u9fff]{2,3}[市縣])?([\u4e00-\u9fff]{2,3}[區鄉鎮市])?(.*?)(\d+)號?(.*)$/
+  )
+  if (!m) return null
+  return {
+    city: m[1] || '',
+    district: m[2] || '',
+    street: m[3]?.trim() || '',
+    number: m[4] || '',
+    rest: m[5]?.trim() || '',
+  }
+}
+
+/** Geocode address using multiple providers for better accuracy */
+export async function geocode(
+  address: string,
+  hint?: { city?: string; district?: string }
+): Promise<GeoLocation | null> {
+  // Normalize: 臺→台 for better matching
+  const normalized = address.replace(/臺/g, '台')
+  const parsed = parseAddress(normalized)
+
+  // Use hint from form fields if parseAddress couldn't extract city/district
+  const city = (parsed?.city || hint?.city || '').replace(/臺/g, '台')
+  const district = (parsed?.district || hint?.district || '').replace(/臺/g, '台')
+
+  // Build candidate queries in priority order:
+  // 1. "區名+街道名 門牌號" (disambiguates same-name streets across cities)
+  // 2. "城市+街道名 門牌號" (if district is empty, at least use city)
+  // 3. Full address
+  // 4. Street-level fallback (no number)
+  const candidates: string[] = []
+  if (parsed?.street && parsed?.number) {
+    // IMPORTANT: Include district to disambiguate (成功路 exists in many cities)
+    if (district) {
+      candidates.push(`${district}${parsed.street} ${parsed.number}`)  // "永和區成功路二段 191"
+    }
+    // If no district but city is known, use city for basic disambiguation
+    if (!district && city) {
+      candidates.push(`${city}${parsed.street} ${parsed.number}`)  // "新北市成功路二段 191"
+    }
+    // Without any location context as last resort
+    candidates.push(`${parsed.street} ${parsed.number}`)  // "成功路二段 191"
+  }
+  candidates.push(normalized)  // "台北市大安區敦化南路一段205號"
+  if (parsed?.street && district) {
+    candidates.push(`${parsed.street}, ${district}, ${city}`.replace(/^,\s*|,\s*$/g, ''))
+  }
+  // Remove duplicates
+  const unique = candidates.filter((s, i, arr) => s && arr.indexOf(s) === i)
+
+  // Debug: log geocoding queries (remove after stabilizing)
+  console.log('[geocode] address:', address, '| hint:', hint, '| candidates:', unique)
+
+  // Strategy 1: Try the best query format on Nominatim (street + number works best)
+  const [nomResult, photonResult] = await Promise.allSettled([
+    tryNominatim(unique[0]),
+    tryPhoton(normalized),
+  ])
+
+  const nom = nomResult.status === 'fulfilled' ? nomResult.value : null
+  const pho = photonResult.status === 'fulfilled' ? photonResult.value : null
+
+  console.log('[geocode] nom:', nom, '| photon:', pho)
+
+  // Prefer Nominatim POI-level result (building/amenity) over street-level
+  if (nom) {
+    // If Nominatim found a specific POI (not just a road), use it directly
+    return nom
+  }
+  if (pho) return pho
+
+  // Strategy 2: Fallback to remaining query formats
+  for (let i = 1; i < unique.length; i++) {
+    const result = await tryNominatim(unique[i])
+    if (result) return result
+  }
+
+  return null
+}
+
+/** Find nearest shelters, air raid shelters, medical facilities, and AEDs */
 export async function findNearby(lat: number, lng: number) {
-  const [shelters, airRaidRaw, medical, mrtRaw] = await Promise.all([
+  const [shelters, airRaidRaw, medical, mrtRaw, aedRaw] = await Promise.all([
     loadShelters(),
     loadAirRaid(),
     loadMedical(),
     loadMrt(),
+    loadAed(),
   ])
 
   // Nearest disaster shelters
@@ -137,8 +272,17 @@ export async function findNearby(lat: number, lng: number) {
   const allAirRaid = [...airCandidates, ...mrtCandidates]
   const nearAirRaid = findNearest(allAirRaid, lat, lng, 3)
 
-  // Nearest medical
+  // Nearest medical (prioritize hospitals with ER)
+  const hospitalsWithER = medical.filter(m => m.hasER)
+  const nearERHospital = findNearest(hospitalsWithER, lat, lng, 1)
   const nearMedical = findNearest(medical, lat, lng, 3)
 
-  return { shelters: nearShelters, airRaid: nearAirRaid, medical: nearMedical }
+  // Nearest AED
+  const aedCandidates = aedRaw
+    .filter(a => a.lat > lat - delta && a.lat < lat + delta && a.lng > lng - delta && a.lng < lng + delta)
+    .map(a => ({ ...a, distance: calcDist(lat, lng, a.lat, a.lng) }))
+  aedCandidates.sort((a, b) => a.distance - b.distance)
+  const nearAed = aedCandidates.slice(0, 3)
+
+  return { shelters: nearShelters, airRaid: nearAirRaid, medical: nearMedical, erHospital: nearERHospital, aed: nearAed }
 }
