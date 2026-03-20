@@ -188,7 +188,7 @@ export default function HandbookPage() {
           {data.locations[0]?.shelters[0] && (
             <div className="mt-4 flex gap-2 justify-center">
               <a
-                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://disaster-handbook.vercel.app')}&text=${encodeURIComponent(`我剛做好防災手冊！我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + 'm' : ''}）。你也可以做一份：`)}`}
+                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://disaster-handbook.vercel.app')}&text=${encodeURIComponent(`我剛用這個免費工具做了一份專屬防災手冊 📋\n\n輸入地址就能自動產生 PDF，包含你家最近的避難所、防空避難處、醫療院所、緊急電話和物資清單。\n\n我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + 'm' : ''}）。\n\n推薦你也做一份，印出來放在家裡：\n⚠️ 請用 Safari/Chrome 開啟（LINE 內建瀏覽器無法下載 PDF）`)}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 bg-[#06C755] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#05b34d] transition-colors"
               >
@@ -198,7 +198,7 @@ export default function HandbookPage() {
               <button
                 onClick={() => {
                   if (navigator.share) {
-                    navigator.share({ title: '家庭防災手冊', text: `我剛做好防災手冊！`, url: window.location.origin })
+                    navigator.share({ title: '家庭防災手冊', text: '免費產生你家專屬的防災手冊 PDF — 輸入地址就有避難所、緊急電話、物資清單。推薦你也做一份！', url: window.location.origin })
                   } else {
                     navigator.clipboard.writeText(window.location.origin)
                     alert('已複製連結！')

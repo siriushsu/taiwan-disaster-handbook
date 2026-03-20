@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MemberForm from '@/components/form/MemberForm'
 import ContactForm from '@/components/form/ContactForm'
 import LocaleSwitcher from '@/components/LocaleSwitcher'
@@ -32,6 +32,11 @@ export default function Home() {
   const [loadingMsg, setLoadingMsg] = useState('')
   const [error, setError] = useState('')
   const [showSupport, setShowSupport] = useState(false)
+  const [isLineApp, setIsLineApp] = useState(false)
+
+  useEffect(() => {
+    if (/Line\//i.test(navigator.userAgent)) setIsLineApp(true)
+  }, [])
 
   const [form, setForm] = useState<HouseholdForm>({
     address: '', city: '臺北市', district: '',
@@ -178,6 +183,32 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      {/* LINE 內建瀏覽器警告 */}
+      {isLineApp && (
+        <div className="max-w-2xl mx-auto px-4 pt-4">
+          <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 text-sm">
+            <p className="font-bold text-warning mb-1">請用外部瀏覽器開啟</p>
+            <p className="text-warning/90 text-xs mb-3">
+              LINE 內建瀏覽器無法下載 PDF。請點擊下方按鈕，用 Safari 或 Chrome 開啟此頁面。
+              <br />
+              <span className="text-warning/70">LINE&apos;s built-in browser cannot download PDFs. Please open in an external browser.</span>
+            </p>
+            <button
+              onClick={() => {
+                // LINE app supports openExternal URL scheme
+                const url = window.location.href
+                window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;end`
+                // Fallback for iOS LINE
+                setTimeout(() => { window.open(url, '_blank') }, 500)
+              }}
+              className="bg-primary text-white px-5 py-2 rounded-lg text-sm font-semibold"
+            >
+              用外部瀏覽器開啟
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 步驟指示器 */}
       <div className="max-w-2xl mx-auto px-4 py-4">
