@@ -3,7 +3,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import type { LocationInfo, Shelter, MedicalFacility } from '@/types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { toJpeg, toCanvas } from 'html-to-image'
+import { toCanvas } from 'html-to-image'
 
 function dot(color: string) {
   return L.divIcon({
@@ -44,20 +44,12 @@ export default function MapCapture({ locations, onAllCaptured }: Props) {
     for (const el of mapEls) {
       const idx = parseInt(el.dataset.mapIdx || '0')
       try {
-        const opts = {
-          quality: 0.6,
+        const canvas = await toCanvas(el, {
           pixelRatio: 1,
           cacheBust: true,
           fetchRequestInit: { mode: 'cors' as RequestMode, cache: 'no-cache' as RequestCache },
-        }
-        let dataUrl: string
-        try {
-          dataUrl = await toJpeg(el, opts)
-        } catch {
-          // Fallback: capture via canvas
-          const canvas = await toCanvas(el, { ...opts, pixelRatio: 1 })
-          dataUrl = canvas.toDataURL('image/jpeg', 0.6)
-        }
+        })
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.5)
         if (dataUrl && dataUrl.length > 100) {
           images[idx] = dataUrl
         }
