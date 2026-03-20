@@ -1105,8 +1105,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           <View style={s.col}>
             {/* Earthquake */}
             <View style={{ backgroundColor: '#fef2f2', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
-              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#C93B3B', marginBottom: 4 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#C93B3B', marginBottom: 2 }}>
                 {pt(biMode, 'qrc_earthquake')}
+              </Text>
+              <Text style={{ fontSize: 7.5, color: '#C93B3B', backgroundColor: '#fecaca', borderRadius: 3, padding: '2 5', marginBottom: 4, alignSelf: 'flex-start', fontWeight: 'bold' }}>
+                {pt(biMode, 'qrc_eq_principle')}
               </Text>
               {[
                 pt(biMode, 'qrc_eq_1'),
@@ -1123,8 +1126,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
             {/* Fire */}
             <View style={{ backgroundColor: '#FEF7E6', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
-              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#d4882a', marginBottom: 4 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#d4882a', marginBottom: 2 }}>
                 {pt(biMode, 'qrc_fire')}
+              </Text>
+              <Text style={{ fontSize: 7.5, color: '#d4882a', backgroundColor: '#fed7aa', borderRadius: 3, padding: '2 5', marginBottom: 4, alignSelf: 'flex-start', fontWeight: 'bold' }}>
+                {pt(biMode, 'qrc_fire_principle')}
               </Text>
               {[
                 pt(biMode, 'qrc_fire_1'),
@@ -1144,8 +1150,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
           <View style={s.col}>
             {/* Air Raid */}
             <View style={{ backgroundColor: '#faf5ff', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
-              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#8b5cf6', marginBottom: 4 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#8b5cf6', marginBottom: 2 }}>
                 {pt(biMode, 'qrc_air')}
+              </Text>
+              <Text style={{ fontSize: 7.5, color: '#6d28d9', backgroundColor: '#e9d5ff', borderRadius: 3, padding: '2 5', marginBottom: 4, alignSelf: 'flex-start', fontWeight: 'bold' }}>
+                {pt(biMode, 'qrc_air_principle')}
               </Text>
               {[
                 pt(biMode, 'qrc_air_1'),
@@ -1162,8 +1171,11 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
 
             {/* Typhoon & Flood */}
             <View style={{ backgroundColor: '#eff6ff', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
-              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#3b6fd4', marginBottom: 4 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#3b6fd4', marginBottom: 2 }}>
                 {pt(biMode, 'qrc_typhoon')}
+              </Text>
+              <Text style={{ fontSize: 7.5, color: '#3b6fd4', backgroundColor: '#bfdbfe', borderRadius: 3, padding: '2 5', marginBottom: 4, alignSelf: 'flex-start', fontWeight: 'bold' }}>
+                {pt(biMode, 'qrc_ty_principle')}
               </Text>
               {[
                 pt(biMode, 'qrc_ty_1'),
