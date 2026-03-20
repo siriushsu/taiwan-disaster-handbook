@@ -1094,178 +1094,112 @@ export default function HandbookPDF({ data, mapImages, biMode = 'zh' }: { data: 
         <Footer label={pt(biMode, "supply_title")} biMode={biMode} />
       </Page>
 
-      {/* ─── SCENARIO: EARTHQUAKE ─── */}
+      {/* ─── DISASTER QUICK RESPONSE CARD (condensed) ─── */}
       <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#e04545', color: '#C93B3B' }]}>
-          {pt(biMode, 'eq_full_title')}
+        <Text style={[s.scenarioTitle, { borderBottomColor: '#0D7377', color: '#0D7377' }]}>
+          {pt(biMode, 'qrc_title')}
         </Text>
 
-        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_at_home')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_at_home')}</Text>}
-        {[
-          pt(biMode, 'eq_home_1'),
-          pt(biMode, 'eq_home_2'),
-          pt(biMode, 'eq_home_3'),
-          pt(biMode, 'eq_home_4'),
-          household.housingType === 'apartment'
-            ? /^[Bb]|地下/.test(household.floor)
-              ? pt(biMode, 'eq_basement_up')
-              : `${pt(biMode, 'eq_floor_down_pre')} ${household.floor || '?'} ${pt(biMode, 'eq_floor_down_post')}`
-            : pt(biMode, 'eq_house_check'),
-          `${pt(biMode, 'eq_go_meeting_pre')}${mainShelter?.name ?? pt(biMode, 'eq_go_meeting_fallback')}`,
-          pt(biMode, 'eq_headcount'),
-        ].map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#e04545' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-
-        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_outdoor')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_outdoor')}</Text>}
-        {[
-          pt(biMode, 'eq_out_1'),
-          pt(biMode, 'eq_out_2'),
-          pt(biMode, 'eq_out_3'),
-          pt(biMode, 'eq_out_4'),
-        ].map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#e04545' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-
-        <Text style={[s.sectionTitle, { color: '#C93B3B', borderBottomColor: '#fecaca' }]}>{pt(biMode, 'eq_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('eq_after')}</Text>}
-        <View style={[s.warningBox, { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' }]}>
-          {[
-            pt(biMode, 'eq_after_1'),
-            pt(biMode, 'eq_after_2'),
-            pt(biMode, 'eq_after_3'),
-            pt(biMode, 'eq_after_4'),
-            pt(biMode, 'eq_after_5'),
-          ].map((t, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#C93B3B', marginRight: 5, fontSize: 9 }}>•</Text>
-              <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
+        <View style={s.twoCol}>
+          {/* Left column: Earthquake + Fire */}
+          <View style={s.col}>
+            {/* Earthquake */}
+            <View style={{ backgroundColor: '#fef2f2', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#C93B3B', marginBottom: 4 }}>
+                {pt(biMode, 'qrc_earthquake')}
+              </Text>
+              {[
+                pt(biMode, 'qrc_eq_1'),
+                pt(biMode, 'qrc_eq_2'),
+                pt(biMode, 'qrc_eq_3'),
+                pt(biMode, 'qrc_eq_4'),
+              ].map((t, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+                  <Text style={{ fontSize: 9, color: '#C93B3B', marginRight: 4, fontWeight: 'bold' }}>{i + 1}.</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-        <Footer label={pt(biMode, "eq_full_title")} biMode={biMode} />
-      </Page>
 
-      {/* ─── SCENARIO: AIR RAID + FIRE ─── */}
-      <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#8b5cf6', color: '#8b5cf6' }]}>
-          {pt(biMode, 'air_full_title')}
-        </Text>
-        <View style={[s.warningBox, { backgroundColor: '#faf5ff', borderWidth: 1, borderColor: '#d8b4fe', marginBottom: 6 }]}>
-          <Text style={{ fontSize: 9, color: '#8b5cf6', fontWeight: 'bold' }}>
-            {pt(biMode, 'air_sound')}
-          </Text>
-        </View>
-
-        <Text style={[s.sectionTitle, { color: '#8b5cf6', borderBottomColor: '#d8b4fe' }]}>{pt(biMode, 'air_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('air_after')}</Text>}
-        {[
-          pt(biMode, 'air_1'),
-          pt(biMode, 'air_2'),
-          pt(biMode, 'air_3'),
-          pt(biMode, 'air_4'),
-          pt(biMode, 'air_5'),
-          pt(biMode, 'air_6'),
-          pt(biMode, 'air_7'),
-        ].map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#8b5cf6' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-        <View style={[s.tipBox, { backgroundColor: '#faf5ff', borderColor: '#d8b4fe' }]}>
-          <Text style={[s.tipText, { color: '#6d28d9' }]}>
-            {pt(biMode, 'air_tip')}
-          </Text>
-        </View>
-
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#d4882a', color: '#d4882a', marginTop: 12 }]}>
-          {pt(biMode, 'fire_full_title')}
-        </Text>
-        <Text style={[s.sectionTitle, { color: '#d4882a', borderBottomColor: '#fed7aa' }]}>{pt(biMode, 'fire_when')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('fire_when')}</Text>}
-        {([
-          pt(biMode, 'fire_1'),
-          household.housingType === 'apartment'
-            ? pt(biMode, 'fire_2_apt')
-            : pt(biMode, 'fire_2_house'),
-          pt(biMode, 'fire_3'),
-          pt(biMode, 'fire_4'),
-          `${pt(biMode, 'fire_5_pre')}${fullAddr}${pt(biMode, 'fire_5_post')}`,
-          pt(biMode, 'fire_6'),
-          `${pt(biMode, 'fire_7_pre')} ${mainShelter?.name ?? pt(biMode, 'loc_fallback_plaza')}${pt(biMode, 'fire_7_post')}`,
-        ] as string[]).map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#d4882a' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-        <Footer label={pt(biMode, 'airfire_footer')} biMode={biMode} />
-      </Page>
-
-      {/* ─── SCENARIO: TYPHOON + FLOOD ─── */}
-      <Page size="A4" style={s.page}>
-        <Text style={[s.scenarioTitle, { borderBottomColor: '#3b6fd4', color: '#3b6fd4' }]}>
-          {pt(biMode, 'typhoon_full_title')}
-        </Text>
-
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_before')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_before')}</Text>}
-        {[
-          pt(biMode, 'ty_before_1'),
-          pt(biMode, 'ty_before_2'),
-          pt(biMode, 'ty_before_3'),
-          pt(biMode, 'ty_before_4'),
-          pt(biMode, 'ty_before_5'),
-          pt(biMode, 'ty_before_6'),
-        ].map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#3b6fd4' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_during')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_during')}</Text>}
-        {[
-          pt(biMode, 'ty_during_1'),
-          pt(biMode, 'ty_during_2'),
-          pt(biMode, 'ty_during_3'),
-          pt(biMode, 'ty_during_4'),
-          pt(biMode, 'ty_during_5'),
-        ].map((text, i) => (
-          <View key={i} style={s.step}>
-            <Text style={[s.stepNum, { backgroundColor: '#3b6fd4' }]}>{i + 1}</Text>
-            <Text style={s.stepText}>{text}</Text>
-          </View>
-        ))}
-
-        <Text style={[s.sectionTitle, { color: '#3b6fd4', borderBottomColor: '#bfdbfe' }]}>{pt(biMode, 'typhoon_after')}</Text>
-        {biMode !== 'zh' && <Text style={{fontSize:7.5,color:'#6B6560'}}>{ptEn('typhoon_after')}</Text>}
-        <View style={[s.warningBox, { backgroundColor: '#E6F3F3', borderWidth: 1, borderColor: '#E6F3F3' }]}>
-          {[
-            pt(biMode, 'ty_after_1'),
-            pt(biMode, 'ty_after_2'),
-            pt(biMode, 'ty_after_3'),
-            pt(biMode, 'ty_after_4'),
-            pt(biMode, 'ty_after_5'),
-          ].map((t, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ color: '#3b6fd4', marginRight: 5, fontSize: 9 }}>•</Text>
-              <Text style={{ flex: 1, fontSize: 9 }}>{t}</Text>
+            {/* Fire */}
+            <View style={{ backgroundColor: '#FEF7E6', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#d4882a', marginBottom: 4 }}>
+                {pt(biMode, 'qrc_fire')}
+              </Text>
+              {[
+                pt(biMode, 'qrc_fire_1'),
+                pt(biMode, 'qrc_fire_2'),
+                pt(biMode, 'qrc_fire_3'),
+                pt(biMode, 'qrc_fire_4'),
+              ].map((t, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+                  <Text style={{ fontSize: 9, color: '#d4882a', marginRight: 4, fontWeight: 'bold' }}>{i + 1}.</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+                </View>
+              ))}
             </View>
-          ))}
+          </View>
+
+          {/* Right column: Air Raid + Typhoon */}
+          <View style={s.col}>
+            {/* Air Raid */}
+            <View style={{ backgroundColor: '#faf5ff', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#8b5cf6', marginBottom: 4 }}>
+                {pt(biMode, 'qrc_air')}
+              </Text>
+              {[
+                pt(biMode, 'qrc_air_1'),
+                pt(biMode, 'qrc_air_2'),
+                pt(biMode, 'qrc_air_3'),
+                pt(biMode, 'qrc_air_4'),
+              ].map((t, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+                  <Text style={{ fontSize: 9, color: '#8b5cf6', marginRight: 4, fontWeight: 'bold' }}>{i + 1}.</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Typhoon & Flood */}
+            <View style={{ backgroundColor: '#eff6ff', borderRadius: 6, padding: '8 10', marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#3b6fd4', marginBottom: 4 }}>
+                {pt(biMode, 'qrc_typhoon')}
+              </Text>
+              {[
+                pt(biMode, 'qrc_ty_1'),
+                pt(biMode, 'qrc_ty_2'),
+                pt(biMode, 'qrc_ty_3'),
+                pt(biMode, 'qrc_ty_4'),
+              ].map((t, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+                  <Text style={{ fontSize: 9, color: '#3b6fd4', marginRight: 4, fontWeight: 'bold' }}>{i + 1}.</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
         </View>
 
-        <Footer label={pt(biMode, "typhoon_full_title")} biMode={biMode} />
+        {/* Universal rules */}
+        <View style={{ backgroundColor: '#E6F3F3', borderRadius: 6, padding: '8 12', marginTop: 2 }}>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#0D7377', marginBottom: 4 }}>
+            {pt(biMode, 'qrc_universal')}
+          </Text>
+          <View style={{ flexDirection: 'row' }}>
+            {[
+              pt(biMode, 'qrc_uni_1'),
+              pt(biMode, 'qrc_uni_2'),
+              pt(biMode, 'qrc_uni_3'),
+            ].map((t, i) => (
+              <View key={i} style={{ flex: 1, flexDirection: 'row', marginRight: 6 }}>
+                <Text style={{ fontSize: 8.5, color: '#0D7377', marginRight: 3 }}>▶</Text>
+                <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <Footer label={pt(biMode, 'qrc_title')} biMode={biMode} />
       </Page>
 
       {/* ─── IMPORTANT REMINDERS ─── */}
