@@ -1,6 +1,6 @@
 {
   "name": "disaster-handbook",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "update-data": "npx tsx scripts/update-data.ts",
-    "update-data:dry": "npx tsx scripts/update-data.ts --dry-run"
+    "update-data:dry": "npx tsx scripts/update-data.ts --dry-run",
+    "version:patch": "npx tsx scripts/bump-version.ts patch",
+    "version:minor": "npx tsx scripts/bump-version.ts minor",
+    "version:major": "npx tsx scripts/bump-version.ts major"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.2",

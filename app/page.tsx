@@ -9,6 +9,7 @@ import { CITIES } from '@/lib/cities'
 import { t, type Locale } from '@/lib/i18n'
 import { FOREIGN_RESOURCES } from '@/lib/foreign-resources'
 import type { HouseholdForm, Member, EmergencyContact, HandbookData } from '@/types'
+import { APP_VERSION } from '@/lib/version'
 
 const defaultMember = (): Member => ({
   name: '', birthYear: '', bloodType: '不知道',
@@ -625,6 +626,10 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        <p className="text-center text-[10px] text-text-faint/50 py-2">
+          v{APP_VERSION}
+        </p>
       </div>
     </main>
   )

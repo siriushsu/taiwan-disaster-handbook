@@ -5,6 +5,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer'
 import { QRCodeSVG } from 'qrcode.react'
 import HandbookPDF from '@/components/pdf/HandbookPDF'
 import type { HandbookData, Shelter, MedicalFacility } from '@/types'
+import { APP_VERSION } from '@/lib/version'
 import type { BiMode } from '@/lib/pdf-i18n'
 import { CITY_DISASTER_LINKS, GENERAL_DISASTER_LINKS } from '@/lib/city-resources'
 
@@ -554,6 +555,10 @@ export default function HandbookPage() {
         </div>
 
         <a href="/" className="block text-center text-text-muted text-sm py-2 hover:underline">重新填寫</a>
+
+        <p className="text-center text-[10px] text-text-faint/50 py-2">
+          v{APP_VERSION}
+        </p>
       </div>
     </main>
   )
