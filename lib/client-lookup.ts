@@ -1,90 +1,152 @@
-import type { GeoLocation, Shelter, MedicalFacility } from '@/types'
+import type { GeoLocation, Shelter, MedicalFacility } from "@/types";
 
 /** Haversine distance in meters */
-function calcDist(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371000
-  const dLat = ((lat2 - lat1) * Math.PI) / 180
-  const dLng = ((lng2 - lng1) * Math.PI) / 180
+function calcDist(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
-  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
 function findNearest<T extends { lat: number; lng: number; distance?: number }>(
-  items: T[], lat: number, lng: number, limit: number
+  items: T[],
+  lat: number,
+  lng: number,
+  limit: number,
 ): T[] {
   return items
-    .map(item => ({ ...item, distance: calcDist(lat, lng, item.lat, item.lng) }))
+    .map((item) => ({
+      ...item,
+      distance: calcDist(lat, lng, item.lat, item.lng),
+    }))
     .sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0))
-    .slice(0, limit)
+    .slice(0, limit);
 }
 
 // CDN base URL (jsDelivr serves from GitHub with free unlimited bandwidth)
-const CDN_BASE = 'https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@main/public/data'
+const CDN_BASE =
+  "https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@main/public/data";
 
 // In-memory cache
-let shelterCache: Shelter[] | null = null
-let medicalCache: MedicalFacility[] | null = null
-let airRaidCache: { a: string; t: number; g: number; c: number | null }[] | null = null
-let mrtCache: { a: string; t: number; g: number; c: number | null; n: string; s: string }[] | null = null
-let aedCache: { name: string; address: string; city: string; district: string; lat: number; lng: number; location: string; phone: string; allDay: boolean }[] | null = null
+let shelterCache: Shelter[] | null = null;
+let medicalCache: MedicalFacility[] | null = null;
+let airRaidCache:
+  | { a: string; t: number; g: number; c: number | null }[]
+  | null = null;
+let mrtCache:
+  | {
+      a: string;
+      t: number;
+      g: number;
+      c: number | null;
+      n: string;
+      s: string;
+    }[]
+  | null = null;
+let aedCache:
+  | {
+      name: string;
+      address: string;
+      city: string;
+      district: string;
+      lat: number;
+      lng: number;
+      location: string;
+      phone: string;
+      allDay: boolean;
+    }[]
+  | null = null;
 
 /** Fetch with fallback: try CDN first, fall back to local /data/ */
 async function fetchData(filename: string): Promise<Response> {
   try {
-    const res = await fetch(`${CDN_BASE}/${filename}`)
-    if (res.ok) return res
-  } catch { /* CDN failed, try local */ }
-  return fetch(`/data/${filename}`)
+    const res = await fetch(`${CDN_BASE}/${filename}`);
+    if (res.ok) return res;
+  } catch {
+    /* CDN failed, try local */
+  }
+  return fetch(`/data/${filename}`);
 }
 
 async function loadShelters(): Promise<Shelter[]> {
-  if (shelterCache) return shelterCache
-  const res = await fetchData('taiwan-shelters.json')
-  shelterCache = await res.json()
-  return shelterCache!
+  if (shelterCache) return shelterCache;
+  const res = await fetchData("taiwan-shelters.json");
+  if (!res.ok) throw new Error(`Failed to load shelters: HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data))
+    throw new Error("Invalid shelter data: expected array");
+  shelterCache = data;
+  return shelterCache;
 }
 
 async function loadMedical(): Promise<MedicalFacility[]> {
-  if (medicalCache) return medicalCache
-  const res = await fetchData('taiwan-medical.json')
-  medicalCache = await res.json()
-  return medicalCache!
+  if (medicalCache) return medicalCache;
+  const res = await fetchData("taiwan-medical.json");
+  if (!res.ok)
+    throw new Error(`Failed to load medical data: HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data))
+    throw new Error("Invalid medical data: expected array");
+  medicalCache = data;
+  return medicalCache;
 }
 
 async function loadAirRaid() {
-  if (airRaidCache) return airRaidCache
-  const res = await fetchData('taiwan-air-raid.json')
-  airRaidCache = await res.json()
-  return airRaidCache!
+  if (airRaidCache) return airRaidCache;
+  const res = await fetchData("taiwan-air-raid.json");
+  if (!res.ok)
+    throw new Error(`Failed to load air-raid data: HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data))
+    throw new Error("Invalid air-raid data: expected array");
+  airRaidCache = data;
+  return airRaidCache;
 }
 
 async function loadMrt() {
-  if (mrtCache) return mrtCache
-  const res = await fetchData('taiwan-mrt-shelters.json')
-  mrtCache = await res.json()
-  return mrtCache!
+  if (mrtCache) return mrtCache;
+  const res = await fetchData("taiwan-mrt-shelters.json");
+  if (!res.ok) throw new Error(`Failed to load MRT data: HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error("Invalid MRT data: expected array");
+  mrtCache = data;
+  return mrtCache;
 }
 
 async function loadAed() {
-  if (aedCache) return aedCache
-  const res = await fetchData('taiwan-aed.json')
-  aedCache = await res.json()
-  return aedCache!
+  if (aedCache) return aedCache;
+  const res = await fetchData("taiwan-aed.json");
+  if (!res.ok) throw new Error(`Failed to load AED data: HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error("Invalid AED data: expected array");
+  aedCache = data;
+  return aedCache;
 }
 
 /** Helper: fetch with timeout */
-async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response> {
-  const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+async function fetchWithTimeout(
+  url: string,
+  timeoutMs = 8000,
+): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { signal: ctrl.signal })
-    clearTimeout(timer)
-    return res
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    return res;
   } catch (e) {
-    clearTimeout(timer)
-    throw e
+    clearTimeout(timer);
+    throw e;
   }
 }
 
@@ -92,59 +154,68 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
 async function tryNominatim(query: string): Promise<GeoLocation | null> {
   try {
     const res = await fetchWithTimeout(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=jsonv2&limit=5&countrycodes=tw&accept-language=zh&addressdetails=1`
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    if (!data?.length) return null
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=jsonv2&limit=5&countrycodes=tw&accept-language=zh&addressdetails=1`,
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data?.length) return null;
 
     // Priority: building/amenity/shop > house > road
     // Higher place_rank = more specific (30=building, 26=road, 16=city)
     const scored = data.map((d: Record<string, unknown>) => {
-      let score = 0
-      const cat = d.category || d.class
-      if (cat === 'building' || cat === 'amenity' || cat === 'shop') score += 100
-      if (d.type === 'house') score += 80
-      if (d.addresstype === 'building') score += 60
-      const rank = Number(d.place_rank) || 0
-      score += rank  // higher rank = more specific
-      return { ...d, _score: score }
-    })
-    scored.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
-      (b._score as number) - (a._score as number)
-    )
-    const best = scored[0]
+      let score = 0;
+      const cat = d.category || d.class;
+      if (cat === "building" || cat === "amenity" || cat === "shop")
+        score += 100;
+      if (d.type === "house") score += 80;
+      if (d.addresstype === "building") score += 60;
+      const rank = Number(d.place_rank) || 0;
+      score += rank; // higher rank = more specific
+      return { ...d, _score: score };
+    });
+    scored.sort(
+      (a: Record<string, unknown>, b: Record<string, unknown>) =>
+        (b._score as number) - (a._score as number),
+    );
+    const best = scored[0];
+    const lat = parseFloat(best.lat as string);
+    const lng = parseFloat(best.lon as string);
+    if (isNaN(lat) || isNaN(lng)) return null;
     return {
-      lat: parseFloat(best.lat as string),
-      lng: parseFloat(best.lon as string),
-      formattedAddress: best.display_name as string,
-    }
-  } catch { /* skip */ }
-  return null
+      lat,
+      lng,
+      formattedAddress: (best.display_name as string) || "",
+    };
+  } catch {
+    /* skip */
+  }
+  return null;
 }
 
 /** Try Photon (Komoot) geocoder — often better for Asian addresses */
 async function tryPhoton(query: string): Promise<GeoLocation | null> {
   try {
     const res = await fetchWithTimeout(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=3&lang=default&lat=23.5&lon=121&bbox=118,20,123,27`
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    const feat = data?.features?.[0]
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=3&lang=default&lat=23.5&lon=121&bbox=118,20,123,27`,
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const feat = data?.features?.[0];
     if (feat?.geometry?.coordinates) {
-      const [lng, lat] = feat.geometry.coordinates
+      const [lng, lat] = feat.geometry.coordinates;
       // Verify result is in Taiwan bounding box
       if (lat >= 20 && lat <= 27 && lng >= 118 && lng <= 123) {
         return {
           lat,
           lng,
           formattedAddress: feat.properties?.name || query,
-        }
+        };
       }
     }
-  } catch { /* skip */ }
-  return null
+  } catch {
+    /* skip */
+  }
+  return null;
 }
 
 /**
@@ -154,84 +225,84 @@ async function tryPhoton(query: string): Promise<GeoLocation | null> {
  */
 function parseAddress(addr: string) {
   const m = addr.match(
-    /^([\u4e00-\u9fff]{2,3}[市縣])?([\u4e00-\u9fff]{2,3}[區鄉鎮市])?(.*?)(\d+)號?(.*)$/
-  )
-  if (!m) return null
+    /^([\u4e00-\u9fff]{2,3}[市縣])?([\u4e00-\u9fff]{2,3}[區鄉鎮市])?(.*?)(\d+)號?(.*)$/,
+  );
+  if (!m) return null;
   return {
-    city: m[1] || '',
-    district: m[2] || '',
-    street: m[3]?.trim() || '',
-    number: m[4] || '',
-    rest: m[5]?.trim() || '',
-  }
+    city: m[1] || "",
+    district: m[2] || "",
+    street: m[3]?.trim() || "",
+    number: m[4] || "",
+    rest: m[5]?.trim() || "",
+  };
 }
 
 /** Geocode address using multiple providers for better accuracy */
 export async function geocode(
   address: string,
-  hint?: { city?: string; district?: string }
+  hint?: { city?: string; district?: string },
 ): Promise<GeoLocation | null> {
   // Normalize: 臺→台 for better matching
-  const normalized = address.replace(/臺/g, '台')
-  const parsed = parseAddress(normalized)
+  const normalized = address.replace(/臺/g, "台");
+  const parsed = parseAddress(normalized);
 
   // Use hint from form fields if parseAddress couldn't extract city/district
-  const city = (parsed?.city || hint?.city || '').replace(/臺/g, '台')
-  const district = (parsed?.district || hint?.district || '').replace(/臺/g, '台')
+  const city = (parsed?.city || hint?.city || "").replace(/臺/g, "台");
+  const district = (parsed?.district || hint?.district || "").replace(
+    /臺/g,
+    "台",
+  );
 
   // Build candidate queries in priority order:
   // 1. "區名+街道名 門牌號" (disambiguates same-name streets across cities)
   // 2. "城市+街道名 門牌號" (if district is empty, at least use city)
   // 3. Full address
   // 4. Street-level fallback (no number)
-  const candidates: string[] = []
+  const candidates: string[] = [];
   if (parsed?.street && parsed?.number) {
     // IMPORTANT: Include district to disambiguate (成功路 exists in many cities)
     if (district) {
-      candidates.push(`${district}${parsed.street} ${parsed.number}`)  // "永和區成功路二段 191"
+      candidates.push(`${district}${parsed.street} ${parsed.number}`); // "永和區成功路二段 191"
     }
     // If no district but city is known, use city for basic disambiguation
     if (!district && city) {
-      candidates.push(`${city}${parsed.street} ${parsed.number}`)  // "新北市成功路二段 191"
+      candidates.push(`${city}${parsed.street} ${parsed.number}`); // "新北市成功路二段 191"
     }
     // Without any location context as last resort
-    candidates.push(`${parsed.street} ${parsed.number}`)  // "成功路二段 191"
+    candidates.push(`${parsed.street} ${parsed.number}`); // "成功路二段 191"
   }
-  candidates.push(normalized)  // "台北市大安區敦化南路一段205號"
+  candidates.push(normalized); // "台北市大安區敦化南路一段205號"
   if (parsed?.street && district) {
-    candidates.push(`${parsed.street}, ${district}, ${city}`.replace(/^,\s*|,\s*$/g, ''))
+    candidates.push(
+      `${parsed.street}, ${district}, ${city}`.replace(/^,\s*|,\s*$/g, ""),
+    );
   }
   // Remove duplicates
-  const unique = candidates.filter((s, i, arr) => s && arr.indexOf(s) === i)
-
-  // Debug: log geocoding queries (remove after stabilizing)
-  console.log('[geocode] address:', address, '| hint:', hint, '| candidates:', unique)
+  const unique = candidates.filter((s, i, arr) => s && arr.indexOf(s) === i);
 
   // Strategy 1: Try the best query format on Nominatim (street + number works best)
   const [nomResult, photonResult] = await Promise.allSettled([
     tryNominatim(unique[0]),
     tryPhoton(normalized),
-  ])
+  ]);
 
-  const nom = nomResult.status === 'fulfilled' ? nomResult.value : null
-  const pho = photonResult.status === 'fulfilled' ? photonResult.value : null
-
-  console.log('[geocode] nom:', nom, '| photon:', pho)
+  const nom = nomResult.status === "fulfilled" ? nomResult.value : null;
+  const pho = photonResult.status === "fulfilled" ? photonResult.value : null;
 
   // Prefer Nominatim POI-level result (building/amenity) over street-level
   if (nom) {
     // If Nominatim found a specific POI (not just a road), use it directly
-    return nom
+    return nom;
   }
-  if (pho) return pho
+  if (pho) return pho;
 
   // Strategy 2: Fallback to remaining query formats
   for (let i = 1; i < unique.length; i++) {
-    const result = await tryNominatim(unique[i])
-    if (result) return result
+    const result = await tryNominatim(unique[i]);
+    if (result) return result;
   }
 
-  return null
+  return null;
 }
 
 /** Find nearest shelters, air raid shelters, medical facilities, and AEDs */
@@ -242,47 +313,81 @@ export async function findNearby(lat: number, lng: number) {
     loadMedical(),
     loadMrt(),
     loadAed(),
-  ])
+  ]);
 
   // Nearest disaster shelters
-  const nearShelters = findNearest(shelters, lat, lng, 5)
+  const nearShelters = findNearest(shelters, lat, lng, 5);
 
   // Air raid: bounding box pre-filter then nearest
-  const delta = 0.03
+  const delta = 0.03;
   const airCandidates = airRaidRaw
-    .filter(s => s.t > lat - delta && s.t < lat + delta && s.g > lng - delta && s.g < lng + delta)
-    .map(s => {
-      const shortName = s.a.replace(/^.+?[區鎮鄉市](.+?里)?/, '').trim() || s.a
-      return { name: shortName, address: s.a, lat: s.t, lng: s.g, capacity: s.c ?? undefined, type: 'air_defense' as const } as Shelter
-    })
+    .filter(
+      (s) =>
+        s.t > lat - delta &&
+        s.t < lat + delta &&
+        s.g > lng - delta &&
+        s.g < lng + delta,
+    )
+    .map((s) => {
+      const shortName = s.a.replace(/^.+?[區鎮鄉市](.+?里)?/, "").trim() || s.a;
+      return {
+        name: shortName,
+        address: s.a,
+        lat: s.t,
+        lng: s.g,
+        capacity: s.c ?? undefined,
+        type: "air_defense" as const,
+      } as Shelter;
+    });
 
   // MRT stations as air raid shelters (underground = safe during air raids)
   const mrtCandidates = mrtRaw
-    .filter(s => s.t > lat - delta && s.t < lat + delta && s.g > lng - delta && s.g < lng + delta)
-    .map(s => ({
-      name: `${s.n}站（${s.s}）`,
-      address: s.a,
-      lat: s.t,
-      lng: s.g,
-      capacity: s.c ?? undefined,
-      type: 'air_defense' as const,
-    } as Shelter))
+    .filter(
+      (s) =>
+        s.t > lat - delta &&
+        s.t < lat + delta &&
+        s.g > lng - delta &&
+        s.g < lng + delta,
+    )
+    .map(
+      (s) =>
+        ({
+          name: `${s.n}站（${s.s}）`,
+          address: s.a,
+          lat: s.t,
+          lng: s.g,
+          capacity: s.c ?? undefined,
+          type: "air_defense" as const,
+        }) as Shelter,
+    );
 
   // Merge air raid + MRT, deduplicate by proximity, return nearest 3
-  const allAirRaid = [...airCandidates, ...mrtCandidates]
-  const nearAirRaid = findNearest(allAirRaid, lat, lng, 3)
+  const allAirRaid = [...airCandidates, ...mrtCandidates];
+  const nearAirRaid = findNearest(allAirRaid, lat, lng, 3);
 
   // Nearest medical (prioritize hospitals with ER)
-  const hospitalsWithER = medical.filter(m => m.hasER)
-  const nearERHospital = findNearest(hospitalsWithER, lat, lng, 1)
-  const nearMedical = findNearest(medical, lat, lng, 3)
+  const hospitalsWithER = medical.filter((m) => m.hasER);
+  const nearERHospital = findNearest(hospitalsWithER, lat, lng, 1);
+  const nearMedical = findNearest(medical, lat, lng, 3);
 
   // Nearest AED
   const aedCandidates = aedRaw
-    .filter(a => a.lat > lat - delta && a.lat < lat + delta && a.lng > lng - delta && a.lng < lng + delta)
-    .map(a => ({ ...a, distance: calcDist(lat, lng, a.lat, a.lng) }))
-  aedCandidates.sort((a, b) => a.distance - b.distance)
-  const nearAed = aedCandidates.slice(0, 3)
+    .filter(
+      (a) =>
+        a.lat > lat - delta &&
+        a.lat < lat + delta &&
+        a.lng > lng - delta &&
+        a.lng < lng + delta,
+    )
+    .map((a) => ({ ...a, distance: calcDist(lat, lng, a.lat, a.lng) }));
+  aedCandidates.sort((a, b) => a.distance - b.distance);
+  const nearAed = aedCandidates.slice(0, 3);
 
-  return { shelters: nearShelters, airRaid: nearAirRaid, medical: nearMedical, erHospital: nearERHospital, aed: nearAed }
+  return {
+    shelters: nearShelters,
+    airRaid: nearAirRaid,
+    medical: nearMedical,
+    erHospital: nearERHospital,
+    aed: nearAed,
+  };
 }
