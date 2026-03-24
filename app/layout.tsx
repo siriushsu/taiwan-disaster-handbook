@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC } from "next/font/google";
-import Script from "next/script";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PWARegister from "@/components/PWARegister";
 import "./globals.css";
@@ -87,6 +86,20 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#0D7377" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Google Analytics (gtag.js) */}
+        <script
+          defer
+          data-ga="gtag"
+          src="https://www.googletagmanager.com/gtag/js?id=G-6J1275K6C5"
+        />
+        <script
+          defer
+          data-ga="config"
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-6J1275K6C5');",
+          }}
+        />
         {/* Plausible Analytics — privacy-friendly, no cookies, 1KB script */}
         <script
           defer
@@ -98,19 +111,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      {/* Google Analytics (gtag.js) */}
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-6J1275K6C5"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-6J1275K6C5');
-        `}
-      </Script>
       <body className={`${notoSansTC.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <PWARegister />
