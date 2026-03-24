@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_TC } from "next/font/google";
+import Script from "next/script";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PWARegister from "@/components/PWARegister";
 import "./globals.css";
@@ -17,11 +18,22 @@ export const metadata: Metadata = {
   title: "台灣家庭防災手冊產生器 | Taiwan Family Emergency Handbook",
   description:
     "免費產生個人化防災手冊 PDF。包含最近避難所、防空避難處、醫療院所、緊急聯絡、物資清單與情境應對指南。所有資料在瀏覽器中處理，不會上傳。",
-  keywords: ["防災", "避難所", "防空避難", "台灣", "地震", "颱風", "緊急準備", "disaster preparedness", "Taiwan"],
+  keywords: [
+    "防災",
+    "避難所",
+    "防空避難",
+    "台灣",
+    "地震",
+    "颱風",
+    "緊急準備",
+    "disaster preparedness",
+    "Taiwan",
+  ],
   authors: [{ name: "Taiwan Family Emergency Handbook" }],
   openGraph: {
     title: "台灣家庭防災手冊產生器",
-    description: "輸入地址，立即產生你家專屬的防災手冊 PDF — 最近避難所、集合點、緊急電話、物資清單一次搞定。",
+    description:
+      "輸入地址，立即產生你家專屬的防災手冊 PDF — 最近避難所、集合點、緊急電話、物資清單一次搞定。",
     url: siteUrl,
     siteName: "台灣家庭防災手冊",
     locale: "zh_TW",
@@ -76,12 +88,29 @@ export default function RootLayout({
         <meta name="theme-color" content="#0D7377" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         {/* Plausible Analytics — privacy-friendly, no cookies, 1KB script */}
-        <script defer data-domain="disaster-handbook.vercel.app" src="https://plausible.io/js/script.js" />
+        <script
+          defer
+          data-domain="disaster-handbook.vercel.app"
+          src="https://plausible.io/js/script.js"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
+      {/* Google Analytics (gtag.js) */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-6J1275K6C5"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-6J1275K6C5');
+        `}
+      </Script>
       <body className={`${notoSansTC.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <PWARegister />
