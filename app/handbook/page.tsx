@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { QRCodeSVG } from "qrcode.react";
 import HandbookPDF from "@/components/pdf/HandbookPDF";
+import EmergencyCardView from "@/components/EmergencyCardView";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import type { HandbookData, Shelter, MedicalFacility } from "@/types";
 import { APP_VERSION } from "@/lib/version";
@@ -394,6 +395,9 @@ export default function HandbookPage() {
             </div>
           )}
         </div>
+
+        {/* Emergency Card — mobile-friendly, screenshot-ready */}
+        <EmergencyCardView data={data} />
 
         {/* Map */}
         {data.locations[0]?.geo && (
