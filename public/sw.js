@@ -1,4 +1,4 @@
-const CACHE_NAME = "disaster-handbook-v4";
+const CACHE_NAME = "disaster-handbook-v5";
 const STATIC_ASSETS = [
   "/manifest.json",
   "/fonts/NotoSansTC-Regular-subset.ttf",
