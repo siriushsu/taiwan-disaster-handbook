@@ -70,6 +70,8 @@ export default function Home() {
     airRaid: Shelter[];
     medical: MedicalFacility[];
     aed: AedLocation[];
+    fireStation: import("@/types").FireStation[];
+    policeStation: import("@/types").PoliceStation[];
   } | null>(null);
 
   useEffect(() => {
@@ -126,6 +128,8 @@ export default function Home() {
     let medical: MedicalFacility[] = [];
     let aed: AedLocation[] = [];
     let erHospital: MedicalFacility[] = [];
+    let fireStation: import("@/types").FireStation[] = [];
+    let policeStation: import("@/types").PoliceStation[] = [];
     try {
       geo = await geocode(address, { city, district });
     } catch {
@@ -140,11 +144,22 @@ export default function Home() {
         medical = result.medical;
         aed = result.aed || [];
         erHospital = result.erHospital || [];
+        fireStation = result.fireStation || [];
+        policeStation = result.policeStation || [];
       } catch {
         /* 查詢失敗，跳過 */
       }
     }
-    return { geo, shelters, airRaid, medical, aed, erHospital };
+    return {
+      geo,
+      shelters,
+      airRaid,
+      medical,
+      aed,
+      erHospital,
+      fireStation,
+      policeStation,
+    };
   };
 
   const generateHandbook = async () => {
@@ -200,8 +215,16 @@ export default function Home() {
         setLoadingMsg(
           `查詢地址 ${i + 1}/${addressTargets.length}：${t.label}...`,
         );
-        const { geo, shelters, airRaid, medical, aed, erHospital } =
-          await queryLocation(t.address, t.city, t.district);
+        const {
+          geo,
+          shelters,
+          airRaid,
+          medical,
+          aed,
+          erHospital,
+          fireStation,
+          policeStation,
+        } = await queryLocation(t.address, t.city, t.district);
         locations.push({
           label: t.label,
           memberName: t.memberName,
@@ -216,6 +239,8 @@ export default function Home() {
           medical,
           aed,
           erHospital,
+          fireStation,
+          policeStation,
         });
       }
 
@@ -256,6 +281,8 @@ export default function Home() {
         airRaid: result.airRaid,
         medical: result.medical,
         aed: result.aed,
+        fireStation: result.fireStation,
+        policeStation: result.policeStation,
       });
     } catch {
       setError("查詢失敗，請確認地址後再試");
@@ -282,6 +309,8 @@ export default function Home() {
         airRaid: result.airRaid,
         medical: result.medical,
         aed: result.aed,
+        fireStation: result.fireStation,
+        policeStation: result.policeStation,
       });
     } catch {
       setError("查詢失敗");
@@ -530,6 +559,38 @@ export default function Home() {
                       </p>
                       <p className="text-xs text-text-muted">
                         {(quickResult.aed[0] as AedLocation).address}
+                      </p>
+                    </div>
+                  )}
+                  {quickResult.fireStation?.[0] && (
+                    <div className="border-l-4 border-red-500 pl-3">
+                      <p className="text-xs text-text-faint">
+                        {locale === "en"
+                          ? "Nearest fire station"
+                          : "最近消防隊"}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {quickResult.fireStation[0].name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {quickResult.fireStation[0].address} /{" "}
+                        {quickResult.fireStation[0].phone}
+                      </p>
+                    </div>
+                  )}
+                  {quickResult.policeStation?.[0] && (
+                    <div className="border-l-4 border-blue-500 pl-3">
+                      <p className="text-xs text-text-faint">
+                        {locale === "en"
+                          ? "Nearest police station"
+                          : "最近派出所"}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {quickResult.policeStation[0].name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {quickResult.policeStation[0].address} /{" "}
+                        {quickResult.policeStation[0].phone}
                       </p>
                     </div>
                   )}

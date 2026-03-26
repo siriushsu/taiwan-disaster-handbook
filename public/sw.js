@@ -1,4 +1,4 @@
-const CACHE_NAME = "disaster-handbook-v3";
+const CACHE_NAME = "disaster-handbook-v4";
 const STATIC_ASSETS = [
   "/manifest.json",
   "/fonts/NotoSansTC-Regular-subset.ttf",
@@ -7,6 +7,8 @@ const STATIC_ASSETS = [
   "/data/taiwan-medical.json",
   "/data/taiwan-air-raid.json",
   "/data/taiwan-aed.json",
+  "/data/taiwan-fire-stations.json",
+  "/data/taiwan-police-stations.json",
 ];
 
 // Install: cache static assets (fonts + data only, NOT HTML pages)

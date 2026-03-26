@@ -2,8 +2,8 @@ name: Update Disaster Data
 
 on:
   schedule:
-    # Every 1st of the month at 3:00 AM UTC (11:00 AM Taiwan time)
-    - cron: '0 3 1 * *'
+    # Every Monday at 3:00 AM UTC (11:00 AM Taiwan time)
+    - cron: "0 3 * * 1"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install tsx
         run: npm install -g tsx

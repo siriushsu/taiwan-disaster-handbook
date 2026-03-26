@@ -1,4 +1,10 @@
-import type { GeoLocation, Shelter, MedicalFacility } from "@/types";
+import type {
+  GeoLocation,
+  Shelter,
+  MedicalFacility,
+  FireStation,
+  PoliceStation,
+} from "@/types";
 
 /** Haversine distance in meters */
 function calcDist(
@@ -66,6 +72,8 @@ let aedCache:
       allDay: boolean;
     }[]
   | null = null;
+let fireStationCache: FireStation[] | null = null;
+let policeStationCache: PoliceStation[] | null = null;
 
 /** Fetch with fallback: try CDN first, fall back to local /data/ */
 async function fetchData(filename: string): Promise<Response> {
@@ -131,6 +139,24 @@ async function loadAed() {
   if (!Array.isArray(data)) throw new Error("Invalid AED data: expected array");
   aedCache = data;
   return aedCache;
+}
+
+async function loadFireStations(): Promise<FireStation[]> {
+  if (fireStationCache) return fireStationCache;
+  const res = await fetchData("taiwan-fire-stations.json");
+  if (!res.ok) return [];
+  const data = await res.json();
+  fireStationCache = Array.isArray(data) ? data : [];
+  return fireStationCache;
+}
+
+async function loadPoliceStations(): Promise<PoliceStation[]> {
+  if (policeStationCache) return policeStationCache;
+  const res = await fetchData("taiwan-police-stations.json");
+  if (!res.ok) return [];
+  const data = await res.json();
+  policeStationCache = Array.isArray(data) ? data : [];
+  return policeStationCache;
 }
 
 /** Helper: fetch with timeout */
@@ -307,13 +333,16 @@ export async function geocode(
 
 /** Find nearest shelters, air raid shelters, medical facilities, and AEDs */
 export async function findNearby(lat: number, lng: number) {
-  const [shelters, airRaidRaw, medical, mrtRaw, aedRaw] = await Promise.all([
-    loadShelters(),
-    loadAirRaid(),
-    loadMedical(),
-    loadMrt(),
-    loadAed(),
-  ]);
+  const [shelters, airRaidRaw, medical, mrtRaw, aedRaw, fireRaw, policeRaw] =
+    await Promise.all([
+      loadShelters(),
+      loadAirRaid(),
+      loadMedical(),
+      loadMrt(),
+      loadAed(),
+      loadFireStations(),
+      loadPoliceStations(),
+    ]);
 
   // Nearest disaster shelters
   const nearShelters = findNearest(shelters, lat, lng, 5);
@@ -383,11 +412,27 @@ export async function findNearby(lat: number, lng: number) {
   aedCandidates.sort((a, b) => a.distance - b.distance);
   const nearAed = aedCandidates.slice(0, 3);
 
+  // Nearest fire station (only those with coords)
+  const fireWithCoords = fireRaw.filter(
+    (f): f is FireStation & { lat: number; lng: number } =>
+      f.lat != null && f.lng != null,
+  );
+  const nearFire = findNearest(fireWithCoords, lat, lng, 1);
+
+  // Nearest police station (only those with coords)
+  const policeWithCoords = policeRaw.filter(
+    (p): p is PoliceStation & { lat: number; lng: number } =>
+      p.lat != null && p.lng != null,
+  );
+  const nearPolice = findNearest(policeWithCoords, lat, lng, 1);
+
   return {
     shelters: nearShelters,
     airRaid: nearAirRaid,
     medical: nearMedical,
     erHospital: nearERHospital,
     aed: nearAed,
+    fireStation: nearFire,
+    policeStation: nearPolice,
   };
 }
