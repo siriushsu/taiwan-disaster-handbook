@@ -1,25 +1,18 @@
-const CACHE_NAME = "disaster-handbook-v5";
-const STATIC_ASSETS = [
-  "/manifest.json",
+const CACHE_NAME = "disaster-handbook-v6";
+const FONT_ASSETS = [
   "/fonts/NotoSansTC-Regular-subset.ttf",
   "/fonts/NotoSansTC-Bold-subset.ttf",
-  "/data/taiwan-shelters.json",
-  "/data/taiwan-medical.json",
-  "/data/taiwan-air-raid.json",
-  "/data/taiwan-aed.json",
-  "/data/taiwan-fire-stations.json",
-  "/data/taiwan-police-stations.json",
 ];
 
-// Install: cache static assets (fonts + data only, NOT HTML pages)
+// Install: only pre-cache fonts (rarely change, large files)
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(FONT_ASSETS)),
   );
   self.skipWaiting();
 });
 
-// Activate: clean old caches immediately
+// Activate: clean ALL old caches immediately
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
@@ -34,53 +27,47 @@ self.addEventListener("activate", (event) => {
 });
 
 // Fetch strategy:
-// - HTML/pages: network-first (always get latest, fallback to cache if offline)
-// - Static assets (fonts, data, JS, CSS): cache-first
+// - Fonts (.ttf): cache-first (never change)
+// - Data (.json) + HTML/pages: network-first (always get latest, cache for offline)
+// - External requests: network only
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // External requests (Nominatim etc): network only
+  // External requests (Nominatim, Google, CDN): network only
   if (url.origin !== self.location.origin) return;
 
-  // HTML pages: network-first so updates are always visible
-  if (
-    event.request.mode === "navigate" ||
-    event.request.headers.get("accept")?.includes("text/html")
-  ) {
+  // Fonts: cache-first (large, rarely change)
+  if (url.pathname.endsWith(".ttf")) {
     event.respondWith(
-      fetch(event.request)
-        .then((res) => {
-          const clone = res.clone();
-          caches
-            .open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, clone));
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => cache.put(event.request, clone));
+          }
           return res;
-        })
-        .catch(() => caches.match(event.request)),
+        });
+      }),
     );
     return;
   }
 
-  // Static assets: cache-first
+  // Everything else (HTML, data JSON, JS, CSS): network-first
+  // Always try network for latest data; cache as offline fallback
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
-        if (
-          res.ok &&
-          (url.pathname.endsWith(".ttf") ||
-            url.pathname.endsWith(".json") ||
-            url.pathname.endsWith(".js") ||
-            url.pathname.endsWith(".css") ||
-            url.pathname.startsWith("/data/"))
-        ) {
+    fetch(event.request)
+      .then((res) => {
+        if (res.ok) {
           const clone = res.clone();
           caches
             .open(CACHE_NAME)
             .then((cache) => cache.put(event.request, clone));
         }
         return res;
-      });
-    }),
+      })
+      .catch(() => caches.match(event.request)),
   );
 });
