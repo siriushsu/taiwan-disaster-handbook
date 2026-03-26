@@ -3,15 +3,22 @@
  * 台灣防災資料自動更新腳本
  *
  * 資料來源：
- * 1. 避難收容處所 — data.gov.tw 中央資料集 (ID: 73242)
+ * 1. 避難收容處所 — data.gov.tw 中央資料集 (ID: 73242) + 各縣市開放資料
  * 2. 防空疏散避難設施 — 各縣市政府開放資料平台
- * 3. 醫療院所 — 衛福部開放資料
- * 4. 捷運站 — 手動維護（變動少）
+ * 3. 醫療院所 — 健保署 NHI 特約機構清單 (醫學中心/區域醫院/地區醫院/診所)
+ * 4. AED — 衛福部 AED 開放資料 (https://tw-aed.mohw.gov.tw)
+ * 5. 消防隊 — 消防署開放資料 (data.gov.tw dataset 5969)
+ * 6. 派出所 — 警政署開放資料 (data.gov.tw dataset 5958, TWD97→WGS84)
+ * 7. 捷運站 — 手動維護（變動少）
  *
  * 用法：
  *   npx tsx scripts/update-data.ts              # 更新全部
  *   npx tsx scripts/update-data.ts --shelters   # 只更新避難收容處所
  *   npx tsx scripts/update-data.ts --air-raid   # 只更新防空避難
+ *   npx tsx scripts/update-data.ts --medical    # 只更新醫療院所
+ *   npx tsx scripts/update-data.ts --aed        # 只更新 AED
+ *   npx tsx scripts/update-data.ts --fire       # 只更新消防隊
+ *   npx tsx scripts/update-data.ts --police     # 只更新派出所
  *   npx tsx scripts/update-data.ts --dry-run    # 只檢查，不寫入
  */
 
@@ -509,6 +516,491 @@ async function updateAirRaid(dryRun: boolean) {
   return { added, updated, failed, total: existing.length };
 }
 
+// ─── Medical Facilities (醫療院所) Update ─────────────────
+
+interface MedicalFacility {
+  name: string;
+  address: string;
+  phone: string;
+  type: "hospital" | "clinic";
+  hasER: boolean;
+  erLevel?: string;
+  lat?: number;
+  lng?: number;
+}
+
+const NHI_SOURCES = [
+  {
+    name: "醫學中心",
+    url: "https://info.nhi.gov.tw/api/iode0000s01/Dataset?rId=A21030000I-D21001-003",
+  },
+  {
+    name: "區域醫院",
+    url: "https://info.nhi.gov.tw/api/iode0000s01/Dataset?rId=A21030000I-D21002-005",
+  },
+  {
+    name: "地區醫院",
+    url: "https://info.nhi.gov.tw/api/iode0000s01/Dataset?rId=A21030000I-D21003-003",
+  },
+  {
+    name: "診所",
+    url: "https://info.nhi.gov.tw/api/iode0000s01/Dataset?rId=A21030000I-D21004-009",
+  },
+];
+
+/** Check if a clinic name suggests it's beauty/cosmetic or dental-only */
+function isFilteredClinic(name: string): boolean {
+  const beautyPatterns = /醫美|整形|美容|時尚診所|微整|雷射美容|美學/;
+  const dentalPatterns = /^.*牙科.*$|^.*牙醫.*$/;
+  return beautyPatterns.test(name) || dentalPatterns.test(name);
+}
+
+/** Extract street name from an address for approximate coord matching */
+function extractStreet(address: string): string | null {
+  // Match up to 路/街/大道
+  const m = address.match(/^(.+?(?:路|街|大道))/);
+  return m ? m[1] : null;
+}
+
+async function updateMedical(dryRun: boolean) {
+  console.log("\n🏥 更新醫療院所...");
+
+  const filePath = path.join(DATA_DIR, "taiwan-medical.json");
+  let existing: MedicalFacility[];
+  try {
+    existing = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch {
+    console.log("  ⚠ No existing file, starting fresh");
+    existing = [];
+  }
+
+  // Build lookup by name+address for preserving coords
+  const existingMap = new Map(
+    existing.map((m) => [`${m.name}|${m.address}`, m]),
+  );
+  // Build street→coord lookup from entries that have coordinates
+  const streetCoords = new Map<string, { lat: number; lng: number }>();
+  for (const m of existing) {
+    if (m.lat && m.lng) {
+      const street = extractStreet(m.address);
+      if (street && !streetCoords.has(street)) {
+        streetCoords.set(street, { lat: m.lat, lng: m.lng });
+      }
+    }
+  }
+
+  const newEntries: MedicalFacility[] = [];
+  const seenKeys = new Set<string>();
+
+  for (const source of NHI_SOURCES) {
+    console.log(`  ⬇ ${source.name}`);
+    const csv = await fetchCSV(source.url);
+    if (!csv) continue;
+
+    const rows = parseCSV(csv);
+    console.log(`    ${rows.length} rows`);
+
+    for (const row of rows) {
+      const name = row["醫事機構名稱"] || "";
+      const address = row["地址"] || "";
+      const phone = row["電話"] || "";
+      const contractType = row["特約類別"] || "";
+      const services = row["診療科別"] || "";
+
+      if (!name || !address) continue;
+
+      // Classify type: 1=醫學中心, 2=區域醫院, 3=地區醫院 → hospital
+      // 4=診所 → clinic; skip 5=藥局 and others
+      const typeCode = parseInt(contractType);
+      let facilityType: "hospital" | "clinic";
+      if (typeCode >= 1 && typeCode <= 3) {
+        facilityType = "hospital";
+      } else if (typeCode === 4) {
+        facilityType = "clinic";
+      } else {
+        continue; // Skip 藥局 (5) and others
+      }
+
+      // Filter out beauty clinics and dental-only clinics
+      if (facilityType === "clinic" && isFilteredClinic(name)) continue;
+
+      const key = `${name}|${address}`;
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+
+      // Determine ER info
+      const hasER =
+        facilityType === "hospital" ||
+        services.includes("急診") ||
+        services.includes("急救");
+      let erLevel: string | undefined;
+      if (typeCode === 1) erLevel = "醫學中心";
+      else if (typeCode === 2) erLevel = "區域醫院";
+      else if (typeCode === 3) erLevel = "地區醫院";
+
+      // Preserve existing coordinates
+      const prev = existingMap.get(key);
+      let lat = prev?.lat;
+      let lng = prev?.lng;
+
+      // Try street-level match for new entries without coords
+      if (!lat || !lng) {
+        const street = extractStreet(address);
+        if (street) {
+          const coord = streetCoords.get(street);
+          if (coord) {
+            lat = coord.lat;
+            lng = coord.lng;
+          }
+        }
+      }
+
+      const entry: MedicalFacility = {
+        name,
+        address,
+        phone,
+        type: facilityType,
+        hasER,
+      };
+      if (erLevel) entry.erLevel = erLevel;
+      if (lat && lng) {
+        entry.lat = lat;
+        entry.lng = lng;
+      }
+      newEntries.push(entry);
+    }
+    await sleep(SLEEP_MS);
+  }
+
+  const prevCount = existing.length;
+  const added = newEntries.filter(
+    (e) => !existingMap.has(`${e.name}|${e.address}`),
+  ).length;
+  const removed = existing.filter(
+    (e) => !seenKeys.has(`${e.name}|${e.address}`),
+  ).length;
+
+  console.log(
+    `  ✓ Results: ${newEntries.length} total (was ${prevCount}), +${added} new, -${removed} removed`,
+  );
+
+  if (!dryRun && newEntries.length > 0) {
+    newEntries.sort((a, b) => a.name.localeCompare(b.name));
+    fs.writeFileSync(filePath, JSON.stringify(newEntries));
+    console.log(`  💾 Saved to ${filePath}`);
+  }
+
+  return { total: newEntries.length, added, removed };
+}
+
+// ─── AED Locations Update ─────────────────────────────────
+
+interface AedLocation {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  location: string;
+  phone?: string;
+}
+
+async function updateAed(dryRun: boolean) {
+  console.log("\n💚 更新 AED 位置...");
+
+  const filePath = path.join(DATA_DIR, "taiwan-aed.json");
+  const url = "https://tw-aed.mohw.gov.tw/openData?t=csv";
+
+  console.log("  ⬇ 衛福部 AED 開放資料");
+  const csv = await fetchCSV(url);
+  if (!csv) {
+    console.log("  ✗ Failed to download AED data");
+    return { total: 0, error: "download failed" };
+  }
+
+  const rows = parseCSV(csv);
+  console.log(`    ${rows.length} rows`);
+
+  const entries: AedLocation[] = [];
+
+  for (const row of rows) {
+    const name = row["場所名稱"] || "";
+    const address = row["場所地址"] || "";
+    const lat = parseFloat(row["地點LAT"] || "");
+    const lng = parseFloat(row["地點LNG"] || "");
+    const location = row["AED放置地點"] || "";
+    const phone = row["管理人聯絡電話"] || row["聯絡電話"] || "";
+
+    if (!name || !address) continue;
+    if (!isValidTaiwanCoord(lat, lng)) continue;
+
+    const entry: AedLocation = { name, address, lat, lng, location };
+    if (phone) entry.phone = phone;
+    entries.push(entry);
+  }
+
+  console.log(`  ✓ Results: ${entries.length} valid AED locations`);
+
+  if (!dryRun && entries.length > 0) {
+    fs.writeFileSync(filePath, JSON.stringify(entries));
+    console.log(`  💾 Saved to ${filePath}`);
+  }
+
+  return { total: entries.length };
+}
+
+// ─── Fire Stations (消防隊) Update ────────────────────────
+
+interface FireStation {
+  name: string;
+  address: string;
+  phone: string;
+  city: string;
+  lat?: number;
+  lng?: number;
+}
+
+/** Decode Big5 buffer to string */
+function decodeBig5(buffer: ArrayBuffer): string {
+  const decoder = new TextDecoder("big5");
+  return decoder.decode(buffer);
+}
+
+/** Extract city from a Taiwan address */
+function extractCity(address: string): string {
+  const m = address.match(/^(.+?[市縣])/);
+  return m ? normalizeCity(m[1]) : "";
+}
+
+async function updateFireStations(dryRun: boolean) {
+  console.log("\n🚒 更新消防隊...");
+
+  const filePath = path.join(DATA_DIR, "taiwan-fire-stations.json");
+  const url =
+    "https://opdadm.moi.gov.tw/api/v1/no-auth/resource/api/dataset/57F3DD1D-A40E-49A6-8410-57303B2FF87E/resource/C38B7AC2-E7F3-4DD5-A3F3-88E623B55924/download";
+
+  console.log("  ⬇ 消防署開放資料 (Big5)");
+  let text: string;
+  try {
+    const res = await fetchWithTimeout(url);
+    if (!res.ok) {
+      console.log(`  ✗ HTTP ${res.status}`);
+      return { total: 0, error: `HTTP ${res.status}` };
+    }
+    const buffer = await res.arrayBuffer();
+    text = decodeBig5(buffer);
+    // Check if it's actually CSV
+    if (text.trim().startsWith("<!") || text.trim().startsWith("<html")) {
+      console.log("  ✗ Got HTML instead of CSV");
+      return { total: 0, error: "HTML response" };
+    }
+  } catch (e) {
+    console.log(`  ✗ Failed: ${(e as Error).message}`);
+    return { total: 0, error: (e as Error).message };
+  }
+
+  const rows = parseCSV(text);
+  console.log(`    ${rows.length} rows`);
+
+  const entries: FireStation[] = [];
+
+  for (const row of rows) {
+    const name = row["消防隊名稱"] || "";
+    const address = row["地址"] || "";
+    const phone = row["聯絡電話"] || "";
+
+    if (!name || !address) continue;
+
+    const city = extractCity(address);
+
+    // Despite column name saying TWD97, values are actually WGS84 decimal degrees
+    const lng = parseFloat(row["X座標_TWD97TM121"] || "");
+    const lat = parseFloat(row["Y座標_TWD97TM121"] || "");
+
+    const entry: FireStation = {
+      name,
+      address: normalizeCity(address),
+      phone,
+      city,
+    };
+
+    if (isValidTaiwanCoord(lat, lng)) {
+      entry.lat = lat;
+      entry.lng = lng;
+    }
+
+    entries.push(entry);
+  }
+
+  console.log(`  ✓ Results: ${entries.length} fire stations`);
+
+  if (!dryRun && entries.length > 0) {
+    entries.sort(
+      (a, b) => a.city.localeCompare(b.city) || a.name.localeCompare(b.name),
+    );
+    fs.writeFileSync(filePath, JSON.stringify(entries));
+    console.log(`  💾 Saved to ${filePath}`);
+  }
+
+  return { total: entries.length };
+}
+
+// ─── Police Stations (派出所) Update ──────────────────────
+
+interface PoliceStation {
+  name: string;
+  address: string;
+  phone: string;
+  city: string;
+  lat?: number;
+  lng?: number;
+}
+
+/** Convert TWD97 TM2 (EPSG:3826) coordinates to WGS84 */
+function twd97ToWgs84(x: number, y: number): { lat: number; lng: number } {
+  const a = 6378137.0;
+  const f = 1 / 298.257222101;
+  const lng0 = (121.0 * Math.PI) / 180;
+  const k0 = 0.9999;
+  const dx = 250000;
+  const e = Math.sqrt(2 * f - f * f);
+  const e2 = (e * e) / (1 - e * e);
+  x -= dx;
+  const M = y / k0;
+  const mu =
+    M / (a * (1 - (e * e) / 4 - (3 * e ** 4) / 64 - (5 * e ** 6) / 256));
+  const e1 = (1 - Math.sqrt(1 - e * e)) / (1 + Math.sqrt(1 - e * e));
+  const fp =
+    mu +
+    ((3 * e1) / 2 - (27 * e1 ** 3) / 32) * Math.sin(2 * mu) +
+    ((21 * e1 ** 2) / 16 - (55 * e1 ** 4) / 32) * Math.sin(4 * mu) +
+    ((151 * e1 ** 3) / 96) * Math.sin(6 * mu) +
+    ((1097 * e1 ** 4) / 512) * Math.sin(8 * mu);
+  const C1 = e2 * Math.cos(fp) ** 2;
+  const T1 = Math.tan(fp) ** 2;
+  const R1 = (a * (1 - e * e)) / (1 - e * e * Math.sin(fp) ** 2) ** 1.5;
+  const N1 = a / Math.sqrt(1 - e * e * Math.sin(fp) ** 2);
+  const D = x / (N1 * k0);
+  const lat =
+    fp -
+    ((N1 * Math.tan(fp)) / R1) *
+      (D ** 2 / 2 -
+        ((5 + 3 * T1 + 10 * C1 - 4 * C1 ** 2 - 9 * e2) * D ** 4) / 24 +
+        ((61 + 90 * T1 + 298 * C1 + 45 * T1 ** 2 - 252 * e2 - 3 * C1 ** 2) *
+          D ** 6) /
+          720);
+  const lng =
+    lng0 +
+    (D -
+      ((1 + 2 * T1 + C1) * D ** 3) / 6 +
+      ((5 - 2 * C1 + 28 * T1 - 3 * C1 ** 2 + 8 * e2 + 24 * T1 ** 2) * D ** 5) /
+        120) /
+      Math.cos(fp);
+  return { lat: (lat * 180) / Math.PI, lng: (lng * 180) / Math.PI };
+}
+
+async function updatePoliceStations(dryRun: boolean) {
+  console.log("\n👮 更新派出所...");
+
+  const filePath = path.join(DATA_DIR, "taiwan-police-stations.json");
+
+  // The authoritative source is a ZIP from TGOS, which is complex to handle.
+  // Try the direct CSV download from data.gov.tw NPA dataset instead.
+  // Fallback: manual update with the ZIP contents.
+  const url =
+    "https://opdadm.moi.gov.tw/api/v1/no-auth/resource/api/dataset/A52DA7A0-E6F4-44E3-8687-3C04BB1EABB4/resource/89F93411-922E-4459-B7F3-0ADF444CDEAD/download";
+
+  console.log("  ⬇ 警政署派出所資料");
+  let text: string | null = null;
+
+  // Try UTF-8 first
+  try {
+    const res = await fetchWithTimeout(url);
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      // Try UTF-8 first, fallback to Big5
+      const utf8 = new TextDecoder("utf-8", { fatal: true });
+      try {
+        text = utf8.decode(buf);
+      } catch {
+        text = decodeBig5(buf);
+      }
+      if (text.trim().startsWith("<!") || text.trim().startsWith("<html")) {
+        text = null;
+        console.log("  ✗ Got HTML instead of CSV");
+      }
+    }
+  } catch (e) {
+    console.log(`  ✗ Primary source failed: ${(e as Error).message}`);
+  }
+
+  // Fallback: try TGOS CSV URL
+  if (!text) {
+    console.log("  ⬇ Trying TGOS fallback...");
+    text = await fetchCSV(
+      "https://www.tgos.tw/tgos/VirtualDir/Product/9927eb8a-efed-40c0-8bc4-83121ad6834a/PoliceAddress1.csv",
+    );
+  }
+
+  if (!text) {
+    console.log(
+      "  ⚠ Could not download police station data. " +
+        "TODO: manually download ZIP from https://www.tgos.tw and extract CSV.",
+    );
+    return { total: 0, error: "download failed" };
+  }
+
+  const rows = parseCSV(text);
+  console.log(`    ${rows.length} rows`);
+
+  const entries: PoliceStation[] = [];
+
+  for (const row of rows) {
+    const name = row["中文單位名稱"] || row["單位名稱"] || "";
+    const address = row["地址"] || "";
+    const phone = row["電話"] || "";
+    const pointX = parseFloat(row["POINT_X"] || row["X座標"] || "");
+    const pointY = parseFloat(row["POINT_Y"] || row["Y座標"] || "");
+
+    if (!name || !address) continue;
+
+    const city = extractCity(address);
+
+    const entry: PoliceStation = {
+      name,
+      address: normalizeCity(address),
+      phone,
+      city,
+    };
+
+    // Convert TWD97 TM2 to WGS84 if values look like TWD97 (large numbers)
+    if (pointX > 100000 && pointY > 2000000) {
+      const wgs = twd97ToWgs84(pointX, pointY);
+      if (isValidTaiwanCoord(wgs.lat, wgs.lng)) {
+        entry.lat = Math.round(wgs.lat * 1e6) / 1e6;
+        entry.lng = Math.round(wgs.lng * 1e6) / 1e6;
+      }
+    } else if (isValidTaiwanCoord(pointY, pointX)) {
+      // Already WGS84
+      entry.lat = pointY;
+      entry.lng = pointX;
+    }
+
+    entries.push(entry);
+  }
+
+  console.log(`  ✓ Results: ${entries.length} police stations`);
+
+  if (!dryRun && entries.length > 0) {
+    entries.sort(
+      (a, b) => a.city.localeCompare(b.city) || a.name.localeCompare(b.name),
+    );
+    fs.writeFileSync(filePath, JSON.stringify(entries));
+    console.log(`  💾 Saved to ${filePath}`);
+  }
+
+  return { total: entries.length };
+}
+
 // ─── Main ────────────────────────────────────────────────
 
 async function main() {
@@ -516,7 +1008,17 @@ async function main() {
   const dryRun = args.includes("--dry-run");
   const onlyShelters = args.includes("--shelters");
   const onlyAirRaid = args.includes("--air-raid");
-  const all = !onlyShelters && !onlyAirRaid;
+  const onlyMedical = args.includes("--medical");
+  const onlyAed = args.includes("--aed");
+  const onlyFire = args.includes("--fire");
+  const onlyPolice = args.includes("--police");
+  const all =
+    !onlyShelters &&
+    !onlyAirRaid &&
+    !onlyMedical &&
+    !onlyAed &&
+    !onlyFire &&
+    !onlyPolice;
 
   console.log("🇹🇼 台灣防災資料更新");
   console.log(`   模式: ${dryRun ? "🔍 檢查（不寫入）" : "💾 更新"}`);
@@ -530,6 +1032,22 @@ async function main() {
 
   if (all || onlyAirRaid) {
     results.airRaid = await updateAirRaid(dryRun);
+  }
+
+  if (all || onlyMedical) {
+    results.medical = await updateMedical(dryRun);
+  }
+
+  if (all || onlyAed) {
+    results.aed = await updateAed(dryRun);
+  }
+
+  if (all || onlyFire) {
+    results.fireStations = await updateFireStations(dryRun);
+  }
+
+  if (all || onlyPolice) {
+    results.policeStations = await updatePoliceStations(dryRun);
   }
 
   console.log("\n" + "═".repeat(50));
