@@ -348,6 +348,26 @@ export async function geocode(
     if (result) return result;
   }
 
+  // Strategy 3: Google Geocoding API fallback (server-side, preserves API key)
+  try {
+    const res = await fetchWithTimeout(
+      `/api/geocode?address=${encodeURIComponent(address)}`,
+      10000,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (data.lat && data.lng) {
+        return {
+          lat: data.lat,
+          lng: data.lng,
+          formattedAddress: data.formattedAddress || address,
+        };
+      }
+    }
+  } catch {
+    /* Google fallback also failed */
+  }
+
   return null;
 }
 
