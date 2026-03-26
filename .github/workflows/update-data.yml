@@ -23,6 +23,8 @@ jobs:
         run: npm install -g tsx
 
       - name: Run data update script
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         run: npx tsx scripts/update-data.ts
 
       - name: Check for changes

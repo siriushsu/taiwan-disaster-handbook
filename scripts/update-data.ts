@@ -20,6 +20,9 @@
  *   npx tsx scripts/update-data.ts --fire       # 只更新消防隊
  *   npx tsx scripts/update-data.ts --police     # 只更新派出所
  *   npx tsx scripts/update-data.ts --dry-run    # 只檢查，不寫入
+ *
+ * 環境變數：
+ *   GOOGLE_MAPS_API_KEY — Google Geocoding API key（醫療院所新增條目定位用）
  */
 
 import * as fs from "fs";
@@ -27,6 +30,7 @@ import * as path from "path";
 
 const DATA_DIR = path.join(__dirname, "..", "public", "data");
 const SLEEP_MS = 1500; // rate limit between requests
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || "";
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -123,6 +127,30 @@ function normalizeCity(city: string): string {
 
 function isValidTaiwanCoord(lat: number, lng: number): boolean {
   return lat >= 20 && lat <= 27 && lng >= 118 && lng <= 123;
+}
+
+/** Google Geocoding API — returns precise coordinates for a Taiwan address */
+async function googleGeocode(
+  address: string,
+): Promise<{ lat: number; lng: number } | null> {
+  if (!GOOGLE_API_KEY) return null;
+  try {
+    const res = await fetchWithTimeout(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=tw&language=zh-TW&key=${GOOGLE_API_KEY}`,
+      10000,
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.status === "OK" && data.results?.[0]) {
+      const loc = data.results[0].geometry.location;
+      const lat = Math.round(loc.lat * 1e6) / 1e6;
+      const lng = Math.round(loc.lng * 1e6) / 1e6;
+      if (isValidTaiwanCoord(lat, lng)) return { lat, lng };
+    }
+  } catch {
+    /* skip */
+  }
+  return null;
 }
 
 // ─── data.gov.tw API ──────────────────────────────────────
@@ -655,6 +683,21 @@ async function updateMedical(dryRun: boolean) {
         }
       }
 
+      // Google Geocoding for entries still without coords
+      if (!lat || !lng) {
+        const geo = await googleGeocode(address);
+        if (geo) {
+          lat = geo.lat;
+          lng = geo.lng;
+          // Also update street cache for future entries on same street
+          const street = extractStreet(address);
+          if (street && !streetCoords.has(street)) {
+            streetCoords.set(street, geo);
+          }
+        }
+        await sleep(50); // 50ms = 20 QPS, well within Google's 50 QPS limit
+      }
+
       const entry: MedicalFacility = {
         name,
         address,
@@ -673,6 +716,8 @@ async function updateMedical(dryRun: boolean) {
   }
 
   const prevCount = existing.length;
+  const withCoords = newEntries.filter((e) => e.lat && e.lng).length;
+  const noCoords = newEntries.length - withCoords;
   const added = newEntries.filter(
     (e) => !existingMap.has(`${e.name}|${e.address}`),
   ).length;
@@ -682,6 +727,9 @@ async function updateMedical(dryRun: boolean) {
 
   console.log(
     `  ✓ Results: ${newEntries.length} total (was ${prevCount}), +${added} new, -${removed} removed`,
+  );
+  console.log(
+    `  📍 Coordinates: ${withCoords} with coords, ${noCoords} missing${GOOGLE_API_KEY ? " (Google API active)" : " (set GOOGLE_MAPS_API_KEY for precise geocoding)"}`,
   );
 
   if (!dryRun && newEntries.length > 0) {
