@@ -218,25 +218,44 @@ async function tryNominatim(query: string): Promise<GeoLocation | null> {
   return null;
 }
 
-/** Try Photon (Komoot) geocoder — often better for Asian addresses */
-async function tryPhoton(query: string): Promise<GeoLocation | null> {
+/** Try Photon (Komoot) geocoder — with city verification */
+async function tryPhoton(
+  query: string,
+  expectedCity?: string,
+): Promise<GeoLocation | null> {
   try {
     const res = await fetchWithTimeout(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=3&lang=default&lat=23.5&lon=121&bbox=118,20,123,27`,
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5&lang=default&lat=23.5&lon=121&bbox=118,20,123,27`,
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const feat = data?.features?.[0];
-    if (feat?.geometry?.coordinates) {
+    const features = data?.features || [];
+    for (const feat of features) {
+      if (!feat?.geometry?.coordinates) continue;
       const [lng, lat] = feat.geometry.coordinates;
-      // Verify result is in Taiwan bounding box
-      if (lat >= 20 && lat <= 27 && lng >= 118 && lng <= 123) {
-        return {
-          lat,
-          lng,
-          formattedAddress: feat.properties?.name || query,
-        };
+      if (!(lat >= 20 && lat <= 27 && lng >= 118 && lng <= 123)) continue;
+      // Verify city matches if we have an expected city
+      if (expectedCity) {
+        const props = feat.properties || {};
+        const rCity = (props.city || props.county || props.state || "").replace(
+          /臺/g,
+          "台",
+        );
+        const eCity = expectedCity.replace(/臺/g, "台");
+        if (
+          rCity &&
+          eCity &&
+          !rCity.includes(eCity.slice(0, 2)) &&
+          !eCity.includes(rCity.slice(0, 2))
+        ) {
+          continue; // Wrong city, skip
+        }
       }
+      return {
+        lat,
+        lng,
+        formattedAddress: feat.properties?.name || query,
+      };
     }
   } catch {
     /* skip */
@@ -306,10 +325,12 @@ export async function geocode(
   // Remove duplicates
   const unique = candidates.filter((s, i, arr) => s && arr.indexOf(s) === i);
 
-  // Strategy 1: Try the best query format on Nominatim (street + number works best)
+  // Strategy 1: Try the best query format on both providers
+  // Pass district-prefixed query to Photon too, and verify city
+  const photonQuery = unique[0] || normalized;
   const [nomResult, photonResult] = await Promise.allSettled([
     tryNominatim(unique[0]),
-    tryPhoton(normalized),
+    tryPhoton(photonQuery, city),
   ]);
 
   const nom = nomResult.status === "fulfilled" ? nomResult.value : null;
@@ -317,7 +338,6 @@ export async function geocode(
 
   // Prefer Nominatim POI-level result (building/amenity) over street-level
   if (nom) {
-    // If Nominatim found a specific POI (not just a road), use it directly
     return nom;
   }
   if (pho) return pho;
