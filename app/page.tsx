@@ -52,12 +52,25 @@ export default function Home() {
   const [locale, setLocale] = useState<Locale>("zh-TW");
   const T = (key: Parameters<typeof t>[1], vars?: Record<string, string>) =>
     t(locale, key, vars);
+  // "landing" = hero page, "quick" = quick lookup, "form" = full form
+  const [mode, setMode] = useState<"landing" | "quick" | "form">("landing");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
   const [error, setError] = useState("");
   const [showSupport, setShowSupport] = useState(false);
   const [isLineApp, setIsLineApp] = useState(false);
+  // Quick lookup state
+  const [quickCity, setQuickCity] = useState("臺北市");
+  const [quickDistrict, setQuickDistrict] = useState("");
+  const [quickAddress, setQuickAddress] = useState("");
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [quickResult, setQuickResult] = useState<{
+    shelters: Shelter[];
+    airRaid: Shelter[];
+    medical: MedicalFacility[];
+    aed: AedLocation[];
+  } | null>(null);
 
   useEffect(() => {
     if (/Line\//i.test(navigator.userAgent)) setIsLineApp(true);
@@ -230,17 +243,84 @@ export default function Home() {
     }
   };
 
+  const quickLookup = async () => {
+    if (!quickCity || !quickAddress) return;
+    setQuickLoading(true);
+    setQuickResult(null);
+    setError("");
+    try {
+      const fullAddr = `${quickCity}${quickDistrict}${quickAddress}`;
+      const result = await queryLocation(fullAddr, quickCity, quickDistrict);
+      setQuickResult({
+        shelters: result.shelters,
+        airRaid: result.airRaid,
+        medical: result.medical,
+        aed: result.aed,
+      });
+    } catch {
+      setError("查詢失敗，請確認地址後再試");
+    } finally {
+      setQuickLoading(false);
+    }
+  };
+
+  const runDemo = async () => {
+    setMode("quick");
+    setQuickCity("臺北市");
+    setQuickDistrict("信義區");
+    setQuickAddress("信義路五段7號");
+    setQuickLoading(true);
+    setQuickResult(null);
+    try {
+      const result = await queryLocation(
+        "臺北市信義區信義路五段7號",
+        "臺北市",
+        "信義區",
+      );
+      setQuickResult({
+        shelters: result.shelters,
+        airRaid: result.airRaid,
+        medical: result.medical,
+        aed: result.aed,
+      });
+    } catch {
+      setError("查詢失敗");
+    } finally {
+      setQuickLoading(false);
+    }
+  };
+
+  const quickToFullForm = () => {
+    setForm((prev) => ({
+      ...prev,
+      city: quickCity,
+      district: quickDistrict,
+      address: quickAddress,
+    }));
+    setMode("form");
+    setStep(1);
+  };
+
   return (
     <main className="min-h-screen bg-surface">
       {/* 頁首 */}
       <div className="bg-primary text-white py-6 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">{T("site_title")}</h1>
+            <h1
+              className={`font-bold ${mode === "landing" ? "text-2xl" : "text-lg"}`}
+            >
+              {mode === "landing"
+                ? T("site_title")
+                : locale === "en"
+                  ? "Taiwan Emergency Handbook"
+                  : "台灣家庭防災手冊"}
+            </h1>
             <LocaleSwitcher locale={locale} onChange={setLocale} />
           </div>
-          <p className="text-white/75 mt-1 text-sm">{T("site_desc")}</p>
-          <p className="text-white/55 mt-2 text-xs">{T("privacy_notice")}</p>
+          {mode === "landing" && (
+            <p className="text-white/75 mt-1 text-sm">{T("site_desc")}</p>
+          )}
         </div>
       </div>
 
@@ -277,410 +357,659 @@ export default function Home() {
         </div>
       )}
 
-      {/* 步驟指示器 */}
-      <div className="max-w-2xl mx-auto px-4 py-4">
-        <div className="flex gap-2">
-          {[
-            { n: 1, label: T("step1") },
-            { n: 2, label: T("step2") },
-            { n: 3, label: T("step3") },
-          ].map(({ n, label }) => (
-            <div
-              key={n}
-              className={`flex-1 flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                step === n
-                  ? "bg-primary text-white"
-                  : step > n
-                    ? "bg-primary-light text-primary"
-                    : "bg-white text-text-faint"
-              }`}
-            >
-              <span
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  step === n
-                    ? "bg-white text-primary"
-                    : step > n
-                      ? "bg-success text-white"
-                      : "bg-surface-muted text-text-faint"
-                }`}
+      {/* === LANDING MODE === */}
+      {mode === "landing" && (
+        <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+          {/* Data stats */}
+          <div className="grid grid-cols-2 gap-3">
+            {(
+              [
+                ["6,300+", T("hero_stat_shelters")],
+                ["71,000+", T("hero_stat_airraid")],
+                ["4,200+", T("hero_stat_medical")],
+                ["15,000+", T("hero_stat_aed")],
+              ] as const
+            ).map(([num, label]) => (
+              <div
+                key={label}
+                className="bg-white rounded-xl border border-border p-3 text-center"
               >
-                {n}
-              </span>
-              {label}
-            </div>
-          ))}
+                <p className="text-xl font-bold text-primary">{num}</p>
+                <p className="text-xs text-text-muted mt-0.5">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Primary CTA */}
+          <button
+            onClick={() => setMode("quick")}
+            className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-md hover:bg-primary-dark transition-colors"
+          >
+            {T("hero_cta_quick")}
+          </button>
+
+          {/* Secondary CTAs */}
+          <div className="flex gap-3">
+            <button
+              onClick={runDemo}
+              className="flex-1 border-2 border-primary text-primary py-3 rounded-xl font-semibold text-sm hover:bg-primary-light transition-colors"
+            >
+              {T("hero_cta_demo")}
+            </button>
+            <button
+              onClick={() => setMode("form")}
+              className="flex-1 border border-border text-text-muted py-3 rounded-xl text-sm hover:bg-surface transition-colors"
+            >
+              {T("hero_cta_full")}
+            </button>
+          </div>
+
+          <p className="text-center text-xs text-text-faint">
+            {T("privacy_notice")}
+          </p>
         </div>
-      </div>
+      )}
 
-      <div className="max-w-2xl mx-auto px-4 pb-12">
-        {/* Step 1: 住家資訊 */}
-        {step === 1 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
-            <h2 className="text-lg font-bold text-text">{T("step1")}</h2>
+      {/* === QUICK LOOKUP MODE === */}
+      {mode === "quick" && (
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+          <div className="bg-white rounded-xl shadow-sm p-5 border border-border space-y-4">
+            <h2 className="text-lg font-bold text-text">{T("quick_title")}</h2>
 
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">
-                {T("city")}
-              </label>
+            <div className="grid grid-cols-2 gap-3">
               <select
-                value={form.city}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    city: e.target.value,
-                    district: "",
-                  }))
-                }
-                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                value={quickCity}
+                onChange={(e) => {
+                  setQuickCity(e.target.value);
+                  setQuickDistrict("");
+                }}
+                className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
               >
                 {CITIES.map(([zh, en]) => (
                   <option key={zh} value={zh}>
-                    {locale === "en" ? `${en} ${zh}` : zh}
+                    {locale === "en" ? `${en}` : zh}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">
-                {T("district")}
-              </label>
               <select
-                value={form.district}
-                onChange={(e) => updateForm("district", e.target.value)}
-                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                value={quickDistrict}
+                onChange={(e) => setQuickDistrict(e.target.value)}
+                className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
               >
                 <option value="">{T("select_please")}</option>
-                {(DISTRICTS[form.city] ?? []).map((d) => (
+                {(DISTRICTS[quickCity] ?? []).map((d) => (
                   <option key={d} value={d}>
-                    {locale === "en" ? `${DISTRICTS_EN[d] || d} ${d}` : d}
+                    {locale === "en" ? `${DISTRICTS_EN[d] || d}` : d}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">
-                {T("address")}
-              </label>
-              <input
-                type="text"
-                value={form.address}
-                onChange={(e) => updateForm("address", e.target.value)}
-                placeholder={T("address_placeholder")}
-                className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
-              />
-            </div>
+            <input
+              type="text"
+              value={quickAddress}
+              onChange={(e) => setQuickAddress(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && quickLookup()}
+              placeholder={T("address_placeholder")}
+              className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            />
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-text-muted mb-1">
-                  {T("housing_type")}
-                </label>
-                <select
-                  value={form.housingType}
-                  onChange={(e) => updateForm("housingType", e.target.value)}
-                  className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            <button
+              onClick={quickLookup}
+              disabled={quickLoading || !quickAddress}
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
+            >
+              {quickLoading
+                ? T("quick_searching")
+                : locale === "en"
+                  ? "Search"
+                  : "搜尋附近避難設施"}
+            </button>
+          </div>
+
+          {/* Quick Results */}
+          {quickResult && (
+            <div className="bg-white rounded-xl shadow-sm p-5 border border-border space-y-4">
+              <h3 className="font-bold text-text">{T("quick_result_title")}</h3>
+
+              {quickResult.shelters.length === 0 &&
+              quickResult.airRaid.length === 0 ? (
+                <p className="text-sm text-text-muted">
+                  {T("quick_no_result")}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {quickResult.shelters[0] && (
+                    <div className="border-l-4 border-primary pl-3">
+                      <p className="text-xs text-text-faint">
+                        {T("quick_result_nearest_shelter")}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {quickResult.shelters[0].name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {quickResult.shelters[0].address} /{" "}
+                        {quickResult.shelters[0].distance}
+                      </p>
+                    </div>
+                  )}
+                  {quickResult.airRaid[0] && (
+                    <div className="border-l-4 border-warning pl-3">
+                      <p className="text-xs text-text-faint">
+                        {T("quick_result_nearest_airraid")}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {quickResult.airRaid[0].name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {quickResult.airRaid[0].address} /{" "}
+                        {quickResult.airRaid[0].distance}
+                      </p>
+                    </div>
+                  )}
+                  {quickResult.medical[0] && (
+                    <div className="border-l-4 border-success pl-3">
+                      <p className="text-xs text-text-faint">
+                        {T("quick_result_nearest_medical")}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {quickResult.medical[0].name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {quickResult.medical[0].address}
+                      </p>
+                    </div>
+                  )}
+                  {quickResult.aed[0] && (
+                    <div className="border-l-4 border-accent pl-3">
+                      <p className="text-xs text-text-faint">
+                        {T("quick_result_nearest_aed")}
+                      </p>
+                      <p className="font-semibold text-text text-sm">
+                        {(quickResult.aed[0] as AedLocation).name}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {(quickResult.aed[0] as AedLocation).address}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Show counts */}
+                  <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border/50">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-primary">
+                        {quickResult.shelters.length}
+                      </p>
+                      <p className="text-[10px] text-text-faint">
+                        {locale === "en" ? "Shelters" : "避難所"}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-warning">
+                        {quickResult.airRaid.length}
+                      </p>
+                      <p className="text-[10px] text-text-faint">
+                        {locale === "en" ? "Air Raid" : "防空洞"}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-success">
+                        {quickResult.medical.length}
+                      </p>
+                      <p className="text-[10px] text-text-faint">
+                        {locale === "en" ? "Medical" : "醫療"}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-accent">
+                        {quickResult.aed.length}
+                      </p>
+                      <p className="text-[10px] text-text-faint">AED</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={quickToFullForm}
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+              >
+                {T("quick_make_handbook")}
+              </button>
+              <button
+                onClick={() => {
+                  setQuickResult(null);
+                  setQuickAddress("");
+                }}
+                className="w-full text-text-muted text-sm py-1 hover:text-text transition-colors"
+              >
+                {T("quick_try_another")}
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={() => setMode("landing")}
+            className="w-full text-text-faint text-xs py-1 hover:text-text-muted transition-colors"
+          >
+            {locale === "en" ? "Back" : "返回首頁"}
+          </button>
+        </div>
+      )}
+
+      {/* === FULL FORM MODE === */}
+      {mode === "form" && (
+        <>
+          {/* 步驟指示器 */}
+          <div className="max-w-2xl mx-auto px-4 py-4">
+            <div className="flex gap-2">
+              {[
+                { n: 1, label: T("step1") },
+                { n: 2, label: T("step2") },
+                { n: 3, label: T("step3") },
+              ].map(({ n, label }) => (
+                <div
+                  key={n}
+                  className={`flex-1 flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    step === n
+                      ? "bg-primary text-white"
+                      : step > n
+                        ? "bg-primary-light text-primary"
+                        : "bg-white text-text-faint"
+                  }`}
                 >
-                  <option value="apartment">{T("apartment")}</option>
-                  <option value="house">{T("house")}</option>
-                  <option value="rural">{T("rural")}</option>
-                </select>
-              </div>
-              {form.housingType === "apartment" && (
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      step === n
+                        ? "bg-white text-primary"
+                        : step > n
+                          ? "bg-success text-white"
+                          : "bg-surface-muted text-text-faint"
+                    }`}
+                  >
+                    {n}
+                  </span>
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-w-2xl mx-auto px-4 pb-12">
+            {/* Step 1: 住家資訊 */}
+            {step === 1 && (
+              <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+                <h2 className="text-lg font-bold text-text">{T("step1")}</h2>
+
                 <div>
                   <label className="block text-sm font-medium text-text-muted mb-1">
-                    {T("floor")}
+                    {T("city")}
+                  </label>
+                  <select
+                    value={form.city}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        city: e.target.value,
+                        district: "",
+                      }))
+                    }
+                    className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  >
+                    {CITIES.map(([zh, en]) => (
+                      <option key={zh} value={zh}>
+                        {locale === "en" ? `${en} ${zh}` : zh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-muted mb-1">
+                    {T("district")}
+                  </label>
+                  <select
+                    value={form.district}
+                    onChange={(e) => updateForm("district", e.target.value)}
+                    className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  >
+                    <option value="">{T("select_please")}</option>
+                    {(DISTRICTS[form.city] ?? []).map((d) => (
+                      <option key={d} value={d}>
+                        {locale === "en" ? `${DISTRICTS_EN[d] || d} ${d}` : d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-muted mb-1">
+                    {T("address")}
                   </label>
                   <input
                     type="text"
-                    value={form.floor}
-                    onChange={(e) => updateForm("floor", e.target.value)}
-                    placeholder="例：8、B1、B2"
+                    value={form.address}
+                    onChange={(e) => updateForm("address", e.target.value)}
+                    placeholder={T("address_placeholder")}
                     className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                   />
                 </div>
-              )}
-            </div>
 
-            <div>
-              <label className="flex items-center gap-2 text-sm text-text-muted">
-                <input
-                  type="checkbox"
-                  checked={form.hasPets}
-                  onChange={(e) => updateForm("hasPets", e.target.checked)}
-                  className="rounded"
-                />
-                {T("has_pets")}
-              </label>
-              {form.hasPets && (
-                <input
-                  type="text"
-                  value={form.petInfo}
-                  onChange={(e) => updateForm("petInfo", e.target.value)}
-                  placeholder="例：柯基犬 1 隻、貓 2 隻"
-                  className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                />
-              )}
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2 text-sm text-text-muted">
-                <input
-                  type="checkbox"
-                  checked={form.hasInfant}
-                  onChange={(e) => updateForm("hasInfant", e.target.checked)}
-                  className="rounded"
-                />
-                家中有嬰幼兒（3 歲以下）
-              </label>
-              {form.hasInfant && (
-                <input
-                  type="text"
-                  value={form.infantInfo}
-                  onChange={(e) => updateForm("infantInfo", e.target.value)}
-                  placeholder="例：1 歲男嬰、需要特殊配方奶"
-                  className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                />
-              )}
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2 text-sm text-text-muted">
-                <input
-                  type="checkbox"
-                  checked={form.isForeignNational}
-                  onChange={(e) =>
-                    updateForm("isForeignNational", e.target.checked)
-                  }
-                  className="rounded"
-                />
-                外籍人士 / Foreign National
-              </label>
-              {form.isForeignNational && (
-                <div className="mt-3 space-y-3 bg-primary-light rounded-lg p-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-text-muted mb-1">
-                      國籍 Nationality
+                      {T("housing_type")}
                     </label>
                     <select
-                      value={form.nationality}
+                      value={form.housingType}
                       onChange={(e) =>
-                        updateForm("nationality", e.target.value)
+                        updateForm("housingType", e.target.value)
                       }
-                      className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                      className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                     >
-                      <option value="">請選擇 / Select</option>
-                      {FOREIGN_RESOURCES.map((r) => (
-                        <option key={r.nationality} value={r.nationality}>
-                          {r.nameZh} {r.nameNative}
-                        </option>
-                      ))}
-                      <option value="OTHER">其他 / Other</option>
+                      <option value="apartment">{T("apartment")}</option>
+                      <option value="house">{T("house")}</option>
+                      <option value="rural">{T("rural")}</option>
                     </select>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  {form.housingType === "apartment" && (
                     <div>
                       <label className="block text-sm font-medium text-text-muted mb-1">
-                        雇主姓名 Employer
+                        {T("floor")}
                       </label>
                       <input
                         type="text"
-                        value={form.employerName}
-                        onChange={(e) =>
-                          updateForm("employerName", e.target.value)
-                        }
-                        placeholder="選填 / Optional"
-                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                        value={form.floor}
+                        onChange={(e) => updateForm("floor", e.target.value)}
+                        placeholder="例：8、B1、B2"
+                        className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
-                        雇主電話
-                      </label>
-                      <input
-                        type="tel"
-                        value={form.employerPhone}
-                        onChange={(e) =>
-                          updateForm("employerPhone", e.target.value)
-                        }
-                        placeholder="選填 / Optional"
-                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
-                        仲介姓名 Broker
-                      </label>
-                      <input
-                        type="text"
-                        value={form.brokerName}
-                        onChange={(e) =>
-                          updateForm("brokerName", e.target.value)
-                        }
-                        placeholder="選填 / Optional"
-                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-muted mb-1">
-                        仲介電話
-                      </label>
-                      <input
-                        type="tel"
-                        value={form.brokerPhone}
-                        onChange={(e) =>
-                          updateForm("brokerPhone", e.target.value)
-                        }
-                        placeholder="選填 / Optional"
-                        className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <button
-              onClick={() => setStep(2)}
-              disabled={!form.city || !form.address}
-              className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
-            >
-              {T("next_step_members")}
-            </button>
-            <button
-              onClick={generateHandbook}
-              disabled={loading || !form.city || !form.address}
-              className="w-full border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors disabled:opacity-40"
-            >
-              {loading ? loadingMsg || T("generating") : T("skip_generate")}
-            </button>
-          </div>
-        )}
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-text-muted">
+                    <input
+                      type="checkbox"
+                      checked={form.hasPets}
+                      onChange={(e) => updateForm("hasPets", e.target.checked)}
+                      className="rounded"
+                    />
+                    {T("has_pets")}
+                  </label>
+                  {form.hasPets && (
+                    <input
+                      type="text"
+                      value={form.petInfo}
+                      onChange={(e) => updateForm("petInfo", e.target.value)}
+                      placeholder="例：柯基犬 1 隻、貓 2 隻"
+                      className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                    />
+                  )}
+                </div>
 
-        {/* Step 2: 家庭成員 */}
-        {step === 2 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
-            <h2 className="text-lg font-bold text-text">
-              {T("members_title")}
-            </h2>
-            <p className="text-sm text-text-muted">{T("members_desc")}</p>
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-text-muted">
+                    <input
+                      type="checkbox"
+                      checked={form.hasInfant}
+                      onChange={(e) =>
+                        updateForm("hasInfant", e.target.checked)
+                      }
+                      className="rounded"
+                    />
+                    家中有嬰幼兒（3 歲以下）
+                  </label>
+                  {form.hasInfant && (
+                    <input
+                      type="text"
+                      value={form.infantInfo}
+                      onChange={(e) => updateForm("infantInfo", e.target.value)}
+                      placeholder="例：1 歲男嬰、需要特殊配方奶"
+                      className="mt-2 w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                    />
+                  )}
+                </div>
 
-            <div className="space-y-3">
-              {form.members.map((m, i) => (
-                <MemberForm
-                  key={i}
-                  index={i}
-                  member={m}
-                  onChange={updateMember}
-                  onRemove={(i) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      members: prev.members.filter((_, idx) => idx !== i),
-                    }))
-                  }
-                  canRemove={form.members.length > 1}
-                  locale={locale}
-                />
-              ))}
-            </div>
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-text-muted">
+                    <input
+                      type="checkbox"
+                      checked={form.isForeignNational}
+                      onChange={(e) =>
+                        updateForm("isForeignNational", e.target.checked)
+                      }
+                      className="rounded"
+                    />
+                    外籍人士 / Foreign National
+                  </label>
+                  {form.isForeignNational && (
+                    <div className="mt-3 space-y-3 bg-primary-light rounded-lg p-3">
+                      <div>
+                        <label className="block text-sm font-medium text-text-muted mb-1">
+                          國籍 Nationality
+                        </label>
+                        <select
+                          value={form.nationality}
+                          onChange={(e) =>
+                            updateForm("nationality", e.target.value)
+                          }
+                          className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                        >
+                          <option value="">請選擇 / Select</option>
+                          {FOREIGN_RESOURCES.map((r) => (
+                            <option key={r.nationality} value={r.nationality}>
+                              {r.nameZh} {r.nameNative}
+                            </option>
+                          ))}
+                          <option value="OTHER">其他 / Other</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-sm font-medium text-text-muted mb-1">
+                            雇主姓名 Employer
+                          </label>
+                          <input
+                            type="text"
+                            value={form.employerName}
+                            onChange={(e) =>
+                              updateForm("employerName", e.target.value)
+                            }
+                            placeholder="選填 / Optional"
+                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-text-muted mb-1">
+                            雇主電話
+                          </label>
+                          <input
+                            type="tel"
+                            value={form.employerPhone}
+                            onChange={(e) =>
+                              updateForm("employerPhone", e.target.value)
+                            }
+                            placeholder="選填 / Optional"
+                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-sm font-medium text-text-muted mb-1">
+                            仲介姓名 Broker
+                          </label>
+                          <input
+                            type="text"
+                            value={form.brokerName}
+                            onChange={(e) =>
+                              updateForm("brokerName", e.target.value)
+                            }
+                            placeholder="選填 / Optional"
+                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-text-muted mb-1">
+                            仲介電話
+                          </label>
+                          <input
+                            type="tel"
+                            value={form.brokerPhone}
+                            onChange={(e) =>
+                              updateForm("brokerPhone", e.target.value)
+                            }
+                            placeholder="選填 / Optional"
+                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setForm((prev) => ({
-                  ...prev,
-                  members: [...prev.members, defaultMember()],
-                }))
-              }
-              className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
-            >
-              + 新增成員
-            </button>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setStep(1)}
-                className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors"
-              >
-                上一步
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={false}
-                className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
-              >
-                下一步：緊急聯絡
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: 緊急聯絡人 */}
-        {step === 3 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
-            <h2 className="text-lg font-bold text-text">
-              {T("contacts_title")}
-            </h2>
-            <p className="text-sm text-text-muted">{T("contacts_desc")}</p>
-
-            <div className="space-y-3">
-              {form.contacts.map((c, i) => (
-                <ContactForm
-                  key={i}
-                  index={i}
-                  contact={c}
-                  onChange={updateContact}
-                  onRemove={(i) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      contacts: prev.contacts.filter((_, idx) => idx !== i),
-                    }))
-                  }
-                  canRemove={form.contacts.length > 1}
-                />
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setForm((prev) => ({
-                  ...prev,
-                  contacts: [...prev.contacts, defaultContact()],
-                }))
-              }
-              className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
-            >
-              + 新增聯絡人
-            </button>
-
-            {error && (
-              <div className="bg-error/10 text-error px-4 py-3 rounded-lg text-sm">
-                {error}
+                <button
+                  onClick={() => setStep(2)}
+                  disabled={!form.city || !form.address}
+                  className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
+                >
+                  {T("next_step_members")}
+                </button>
+                <button
+                  onClick={generateHandbook}
+                  disabled={loading || !form.city || !form.address}
+                  className="w-full border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors disabled:opacity-40"
+                >
+                  {loading ? loadingMsg || T("generating") : T("skip_generate")}
+                </button>
               </div>
             )}
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setStep(2)}
-                className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors"
-              >
-                上一步
-              </button>
-              <button
-                onClick={generateHandbook}
-                disabled={loading}
-                className="flex-1 bg-accent text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-accent-dark transition-colors"
-              >
-                {loading ? loadingMsg || T("generating") : T("generate")}
-              </button>
-            </div>
+            {/* Step 2: 家庭成員 */}
+            {step === 2 && (
+              <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+                <h2 className="text-lg font-bold text-text">
+                  {T("members_title")}
+                </h2>
+                <p className="text-sm text-text-muted">{T("members_desc")}</p>
+
+                <div className="space-y-3">
+                  {form.members.map((m, i) => (
+                    <MemberForm
+                      key={i}
+                      index={i}
+                      member={m}
+                      onChange={updateMember}
+                      onRemove={(i) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          members: prev.members.filter((_, idx) => idx !== i),
+                        }))
+                      }
+                      canRemove={form.members.length > 1}
+                      locale={locale}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      members: [...prev.members, defaultMember()],
+                    }))
+                  }
+                  className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
+                >
+                  + 新增成員
+                </button>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors"
+                  >
+                    上一步
+                  </button>
+                  <button
+                    onClick={() => setStep(3)}
+                    disabled={false}
+                    className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
+                  >
+                    下一步：緊急聯絡
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: 緊急聯絡人 */}
+            {step === 3 && (
+              <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 border border-border">
+                <h2 className="text-lg font-bold text-text">
+                  {T("contacts_title")}
+                </h2>
+                <p className="text-sm text-text-muted">{T("contacts_desc")}</p>
+
+                <div className="space-y-3">
+                  {form.contacts.map((c, i) => (
+                    <ContactForm
+                      key={i}
+                      index={i}
+                      contact={c}
+                      onChange={updateContact}
+                      onRemove={(i) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          contacts: prev.contacts.filter((_, idx) => idx !== i),
+                        }))
+                      }
+                      canRemove={form.contacts.length > 1}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      contacts: [...prev.contacts, defaultContact()],
+                    }))
+                  }
+                  className="w-full border-2 border-dashed border-border text-text-faint py-2 rounded-lg hover:border-primary hover:text-primary transition-colors text-sm"
+                >
+                  + 新增聯絡人
+                </button>
+
+                {error && (
+                  <div className="bg-error/10 text-error px-4 py-3 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex-1 border border-border text-text-muted py-3 rounded-lg font-semibold hover:bg-surface transition-colors"
+                  >
+                    上一步
+                  </button>
+                  <button
+                    onClick={generateHandbook}
+                    disabled={loading}
+                    className="flex-1 bg-accent text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-accent-dark transition-colors"
+                  >
+                    {loading ? loadingMsg || T("generating") : T("generate")}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Updates & Footer */}
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
