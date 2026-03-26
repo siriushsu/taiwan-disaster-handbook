@@ -1,6 +1,7 @@
 // 家庭成員
 export interface Member {
   name: string;
+  phone: string;
   birthYear: number | "";
   bloodType: "A" | "B" | "AB" | "O" | "不知道";
   isMobilityImpaired: boolean;

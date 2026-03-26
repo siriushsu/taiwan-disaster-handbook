@@ -21,6 +21,7 @@ import { APP_VERSION } from "@/lib/version";
 
 const defaultMember = (): Member => ({
   name: "",
+  phone: "",
   birthYear: "",
   bloodType: "不知道",
   isMobilityImpaired: false,
@@ -443,57 +444,80 @@ export default function Home() {
       {mode === "quick" && (
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
           <div className="bg-white rounded-xl shadow-sm p-5 border border-border space-y-4">
-            <h2 className="text-lg font-bold text-text">{T("quick_title")}</h2>
-
-            <div className="grid grid-cols-2 gap-3">
-              <select
-                value={quickCity}
-                onChange={(e) => {
-                  setQuickCity(e.target.value);
-                  setQuickDistrict("");
-                }}
-                className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
-              >
-                {CITIES.map(([zh, en]) => (
-                  <option key={zh} value={zh}>
-                    {locale === "en" ? `${en}` : zh}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={quickDistrict}
-                onChange={(e) => setQuickDistrict(e.target.value)}
-                className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
-              >
-                <option value="">{T("select_please")}</option>
-                {(DISTRICTS[quickCity] ?? []).map((d) => (
-                  <option key={d} value={d}>
-                    {locale === "en" ? `${DISTRICTS_EN[d] || d}` : d}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <input
-              type="text"
-              value={quickAddress}
-              onChange={(e) => setQuickAddress(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && quickLookup()}
-              placeholder={T("address_placeholder")}
-              className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
-            />
-
-            <button
-              onClick={quickLookup}
-              disabled={quickLoading || !quickAddress}
-              className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
-            >
-              {quickLoading
-                ? T("quick_searching")
-                : locale === "en"
-                  ? "Search"
-                  : "搜尋附近避難設施"}
-            </button>
+            {quickResult ? (
+              /* Results showing — compact address bar */
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-text">
+                  <span className="font-semibold">
+                    {quickCity}
+                    {quickDistrict}
+                    {quickAddress}
+                  </span>
+                </p>
+                <button
+                  onClick={() => {
+                    setQuickResult(null);
+                  }}
+                  className="text-xs text-primary hover:text-primary-dark underline shrink-0 ml-2"
+                >
+                  {locale === "en" ? "Change" : "換地址"}
+                </button>
+              </div>
+            ) : (
+              /* No results yet — full input form */
+              <>
+                <h2 className="text-lg font-bold text-text">
+                  {T("quick_title")}
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <select
+                    value={quickCity}
+                    onChange={(e) => {
+                      setQuickCity(e.target.value);
+                      setQuickDistrict("");
+                    }}
+                    className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  >
+                    {CITIES.map(([zh, en]) => (
+                      <option key={zh} value={zh}>
+                        {locale === "en" ? `${en}` : zh}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={quickDistrict}
+                    onChange={(e) => setQuickDistrict(e.target.value)}
+                    className="border border-border rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  >
+                    <option value="">{T("select_please")}</option>
+                    {(DISTRICTS[quickCity] ?? []).map((d) => (
+                      <option key={d} value={d}>
+                        {locale === "en" ? `${DISTRICTS_EN[d] || d}` : d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  value={quickAddress}
+                  onChange={(e) => setQuickAddress(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && quickLookup()}
+                  placeholder={T("address_placeholder")}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                />
+                <button
+                  onClick={quickLookup}
+                  disabled={quickLoading || !quickAddress}
+                  className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
+                >
+                  {quickLoading
+                    ? T("quick_searching")
+                    : locale === "en"
+                      ? "Search"
+                      : "搜尋附近避難設施"}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Quick Results */}

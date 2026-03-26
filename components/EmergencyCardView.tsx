@@ -51,6 +51,14 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
                   {!m.dailyLocation && (
                     <p className="text-xs text-text-faint">{mainAddr}</p>
                   )}
+                  {m.phone && (
+                    <a
+                      href={`tel:${m.phone}`}
+                      className="text-xs text-primary font-mono"
+                    >
+                      {m.phone}
+                    </a>
+                  )}
                 </div>
                 {m.medications && (
                   <span className="text-[10px] bg-warning/10 text-warning px-1.5 py-0.5 rounded shrink-0">

@@ -315,30 +315,7 @@ export async function geocode(
   // Remove duplicates
   const unique = candidates.filter((s, i, arr) => s && arr.indexOf(s) === i);
 
-  // Strategy 1: Try the best query format on both providers
-  // Pass district-prefixed query to Photon too, and verify city
-  const photonQuery = unique[0] || normalized;
-  const [nomResult, photonResult] = await Promise.allSettled([
-    tryNominatim(unique[0]),
-    tryPhoton(photonQuery, city),
-  ]);
-
-  const nom = nomResult.status === "fulfilled" ? nomResult.value : null;
-  const pho = photonResult.status === "fulfilled" ? photonResult.value : null;
-
-  // Prefer Nominatim POI-level result (building/amenity) over street-level
-  if (nom) {
-    return nom;
-  }
-  if (pho) return pho;
-
-  // Strategy 2: Fallback to remaining query formats
-  for (let i = 1; i < unique.length; i++) {
-    const result = await tryNominatim(unique[i]);
-    if (result) return result;
-  }
-
-  // Strategy 3: Google Geocoding API fallback (server-side, preserves API key)
+  // Strategy 1: Google Geocoding API (most accurate, server-side)
   try {
     const res = await fetchWithTimeout(
       `/api/geocode?address=${encodeURIComponent(address)}`,
@@ -355,7 +332,21 @@ export async function geocode(
       }
     }
   } catch {
-    /* Google fallback also failed */
+    /* Google unavailable, try free geocoders */
+  }
+
+  // Strategy 2: Nominatim (free fallback)
+  const nom = await tryNominatim(unique[0]);
+  if (nom) return nom;
+
+  // Strategy 3: Photon (free fallback with city verification)
+  const pho = await tryPhoton(unique[0] || normalized, city);
+  if (pho) return pho;
+
+  // Strategy 4: Remaining Nominatim query formats
+  for (let i = 1; i < unique.length; i++) {
+    const result = await tryNominatim(unique[i]);
+    if (result) return result;
   }
 
   return null;
