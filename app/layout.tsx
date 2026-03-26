@@ -14,9 +14,9 @@ const notoSansTC = Noto_Sans_TC({
 const siteUrl = "https://disaster-handbook.vercel.app";
 
 export const metadata: Metadata = {
-  title: "台灣家庭防災手冊產生器 | Taiwan Family Emergency Handbook",
+  title: "我家附近的避難所在哪？ | Taiwan Emergency Handbook",
   description:
-    "免費產生個人化防災手冊 PDF。包含最近避難所、防空避難處、醫療院所、緊急聯絡、物資清單與情境應對指南。所有資料在瀏覽器中處理，不會上傳。",
+    "輸入地址，3 秒找到你家最近的避難收容所、防空洞、醫院和 AED。免費產生個人化防災手冊 PDF，所有資料在瀏覽器中處理，不會上傳。",
   keywords: [
     "防災",
     "避難所",
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Taiwan Family Emergency Handbook" }],
   openGraph: {
-    title: "台灣家庭防災手冊產生器",
+    title: "我家附近的避難所在哪？",
     description:
-      "輸入地址，立即產生你家專屬的防災手冊 PDF — 最近避難所、集合點、緊急電話、物資清單一次搞定。",
+      "輸入地址，3 秒找到最近的避難收容所、防空洞、醫院和 AED — 還能產生你家專屬防災手冊 PDF。",
     url: siteUrl,
     siteName: "台灣家庭防災手冊",
     locale: "zh_TW",
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "台灣家庭防災手冊產生器",
-    description: "輸入地址，立即產生你家專屬的防災手冊 PDF。",
+    title: "我家附近的避難所在哪？",
+    description: "輸入地址，3 秒找到最近的避難所、防空洞、醫院和 AED。",
   },
   metadataBase: new URL(siteUrl),
   other: {
@@ -62,9 +62,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "台灣家庭防災手冊產生器",
+  name: "我家附近的避難所在哪？",
   description:
-    "免費線上工具：輸入地址即可產生個人化防災手冊 PDF，包含最近避難所、防空避難處、醫療院所、緊急聯絡資訊與物資清單。",
+    "免費線上工具：輸入地址即可找到最近的避難所、防空洞、醫院和 AED，並產生個人化防災手冊 PDF。",
   url: siteUrl,
   applicationCategory: "UtilityApplication",
   operatingSystem: "Web",
