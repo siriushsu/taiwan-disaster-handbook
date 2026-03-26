@@ -394,10 +394,27 @@ export async function findNearby(lat: number, lng: number) {
   const allAirRaid = [...airCandidates, ...mrtCandidates];
   const nearAirRaid = findNearest(allAirRaid, lat, lng, 3);
 
-  // Nearest medical (prioritize hospitals with ER)
+  // Nearest medical: prioritize hospitals > clinics > pharmacies
   const hospitalsWithER = medical.filter((m) => m.hasER);
   const nearERHospital = findNearest(hospitalsWithER, lat, lng, 1);
-  const nearMedical = findNearest(medical, lat, lng, 3);
+
+  const hospitals = medical.filter((m) => m.type === "hospital");
+  const clinics = medical.filter((m) => m.type === "clinic");
+  const nearHospitals = findNearest(hospitals, lat, lng, 2);
+  const nearClinics = findNearest(clinics, lat, lng, 3);
+
+  // Merge and deduplicate, keeping closest 5 total
+  const allMedical = [...nearHospitals, ...nearClinics];
+  const seen = new Set<string>();
+  const nearMedical = allMedical
+    .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity))
+    .filter((m) => {
+      const key = `${m.name}_${m.address}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 5);
 
   // Nearest AED
   const aedCandidates = aedRaw
