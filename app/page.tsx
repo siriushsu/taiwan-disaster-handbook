@@ -1135,8 +1135,24 @@ export default function Home() {
                 <span className="text-primary shrink-0">3/26</span>
                 <span>
                   {locale === "en"
-                    ? "Address geocoding now falls back to Google when free geocoders fail"
-                    : "地址定位新增 Google 備援，免費定位失敗時自動切換確保結果正確"}
+                    ? "Address geocoding upgraded to Google-first for precise results"
+                    : "地址定位改為 Google 優先，定位精度提升至門牌等級"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "New emergency contact card — view on phone or screenshot, with family locations and tap-to-call"
+                    : "新增緊急聯絡卡 — 手機直接看或截圖，含家人位置與一鍵撥號"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "UX improvements: cleaner search flow, phone field for members, darker input text"
+                    : "操作優化：搜尋結果後自動收起表單、成員可填手機號碼、輸入文字更清晰"}
                 </span>
               </li>
               <li className="flex gap-2">
