@@ -395,7 +395,7 @@ export default function Home() {
               [
                 ["6,300+", T("hero_stat_shelters")],
                 ["71,000+", T("hero_stat_airraid")],
-                ["8,500+", T("hero_stat_medical")],
+                ["16,200+", T("hero_stat_medical")],
                 ["15,000+", T("hero_stat_aed")],
               ] as const
             ).map(([num, label]) => (
@@ -1078,48 +1078,56 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/3/20" : "資料更新：2026/3/20"}
+              {locale === "en" ? "Data: 2026/3/26" : "資料更新：2026/3/26"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
               <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/20</span>
+                <span className="text-primary shrink-0">3/26</span>
                 <span>
                   {locale === "en"
-                    ? "Added 83,000+ shelter/air raid/medical data points covering all of Taiwan; MRT stations as air raid shelters"
-                    : "全台避難收容、防空避難、醫療院所資料突破 83,000 筆；捷運站納入防空避難選項"}
+                    ? "Medical data expanded to 16,200+ facilities with Google-precise coordinates (building-level accuracy)"
+                    : "醫療院所資料擴充至 16,200+ 筆，全部使用 Google 精確定位（門牌等級）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 770 fire stations and 1,686 police stations with phone numbers"
+                    : "新增全國 770 個消防隊、1,686 個派出所資料（含電話）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Auto-update now runs weekly — shelters, medical, AED, fire & police stations"
+                    : "資料自動更新改為每週 — 避難所、醫療、AED、消防、派出所全部涵蓋"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Address geocoding now falls back to Google when free geocoders fail"
+                    : "地址定位新增 Google 備援，免費定位失敗時自動切換確保結果正確"}
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">3/20</span>
                 <span>
                   {locale === "en"
-                    ? "Improved address geocoding accuracy — dual geocoder with building-level precision"
-                    : "地址定位精度大幅提升 — 雙 geocoder 交叉比對，可定位至門牌等級"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/20</span>
-                <span>
-                  {locale === "en"
-                    ? "New compact Quick Response Card in PDF — 4 disaster scenarios on 1 page"
-                    : "PDF 新增精簡版緊急行動卡 — 4 種災害應變一頁搞定"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/20</span>
-                <span>
-                  {locale === "en"
-                    ? "LINE browser detection with manual instructions; improved share text"
-                    : "LINE 內建瀏覽器偵測與手動操作提示；分享文字優化"}
+                    ? "Added 83,000+ shelter/air raid data points; MRT stations as air raid shelters"
+                    : "全台避難收容、防空避難資料突破 83,000 筆；捷運站納入防空避難選項"}
                 </span>
               </li>
             </ul>
             <p className="mt-3 text-[10px] text-text-faint">
               {locale === "en"
-                ? "Data sources: Ministry of the Interior, county/city open data platforms. Auto-updated monthly."
-                : "資料來源：內政部消防署、各縣市政府開放資料平台。每月自動更新。"}
+                ? "Data sources: MOHW, NHI, National Fire Agency, NPA, county/city open data. Auto-updated weekly."
+                : "資料來源：衛福部、健保署、消防署、警政署、各縣市政府開放資料。每週自動更新。"}
             </p>
           </div>
         </details>
