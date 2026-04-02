@@ -396,7 +396,7 @@ export default function Home() {
               [
                 ["6,300+", T("hero_stat_shelters")],
                 ["71,000+", T("hero_stat_airraid")],
-                ["16,200+", T("hero_stat_medical")],
+                ["16,900+", T("hero_stat_medical")],
                 ["15,000+", T("hero_stat_aed")],
               ] as const
             ).map(([num, label]) => (
@@ -1102,17 +1102,17 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/3/26" : "資料更新：2026/3/26"}
+              {locale === "en" ? "Data: 2026/4/2" : "資料更新：2026/4/2"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
               <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/26</span>
+                <span className="text-primary shrink-0">4/2</span>
                 <span>
                   {locale === "en"
-                    ? "Medical data expanded to 16,200+ facilities with Google-precise coordinates (building-level accuracy)"
-                    : "醫療院所資料擴充至 16,200+ 筆，全部使用 Google 精確定位（門牌等級）"}
+                    ? "Weekly data refresh: medical facilities updated to 16,900+ (all with precise coordinates)"
+                    : "每週資料更新：醫療院所更新至 16,900+ 筆（全部精確定位），含金門連江離島"}
                 </span>
               </li>
               <li className="flex gap-2">
