@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-30T08:21:09.953Z",
+  "timestamp": "2026-04-06T08:15:52.980Z",
   "dryRun": false,
   "results": {
     "shelters": {
@@ -8,23 +8,22 @@
       "total": 6358
     },
     "airRaid": {
-      "added": 241,
-      "updated": 262,
-      "failed": 16,
+      "added": 0,
+      "updated": 0,
+      "failed": 15,
       "total": 71587
     },
     "medical": {
-      "total": 16924,
-      "added": 15760,
-      "removed": 15041
+      "total": 16936,
+      "added": 14,
+      "removed": 2
     },
     "aed": {
       "total": 0,
       "error": "download failed"
     },
     "fireStations": {
-      "total": 0,
-      "error": "fetch failed"
+      "total": 770
     },
     "policeStations": {
       "total": 0,
