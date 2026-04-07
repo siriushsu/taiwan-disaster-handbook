@@ -14,6 +14,7 @@ interface Props {
   onRemove: (index: number) => void;
   canRemove: boolean;
   locale?: string;
+  onOpenMap?: (target: "daily" | "address", index: number) => void;
 }
 
 export default function MemberForm({
@@ -23,6 +24,7 @@ export default function MemberForm({
   onRemove,
   canRemove,
   locale = "zh-TW",
+  onOpenMap,
 }: Props) {
   const isEn = locale === "en";
   const update = (field: keyof Member, value: unknown) =>
@@ -177,13 +179,24 @@ export default function MemberForm({
           </select>
         </div>
         {member.dailyCity && (
-          <input
-            type="text"
-            value={member.dailyAddress}
-            onChange={(e) => update("dailyAddress", e.target.value)}
-            placeholder="詳細地址（選填，填了會多查一組避難所）"
-            className={INPUT}
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={member.dailyAddress}
+              onChange={(e) => update("dailyAddress", e.target.value)}
+              placeholder="詳細地址（選填，填了會多查一組避難所）"
+              className={`${INPUT} flex-1`}
+            />
+            {onOpenMap && (
+              <button
+                type="button"
+                onClick={() => onOpenMap("daily", index)}
+                className="border-2 border-primary text-primary px-3 py-2 rounded-lg text-sm font-semibold hover:bg-primary-light transition-colors shrink-0"
+              >
+                📍
+              </button>
+            )}
+          </div>
         )}
         {member.dailyCity && member.dailyLocation !== "上班" && (
           <input
@@ -266,13 +279,24 @@ export default function MemberForm({
               <label className="block text-sm font-medium text-text-muted mb-1">
                 詳細地址
               </label>
-              <input
-                type="text"
-                value={member.address}
-                onChange={(e) => update("address", e.target.value)}
-                placeholder="例：中山路一段 100 號"
-                className={INPUT}
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={member.address}
+                  onChange={(e) => update("address", e.target.value)}
+                  placeholder="例：中山路一段 100 號"
+                  className={`${INPUT} flex-1`}
+                />
+                {onOpenMap && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenMap("address", index)}
+                    className="border-2 border-primary text-primary px-3 py-2 rounded-lg text-sm font-semibold hover:bg-primary-light transition-colors shrink-0"
+                  >
+                    📍
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

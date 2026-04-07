@@ -74,6 +74,8 @@ export default function Home() {
     aed: AedLocation[]; erHospital: MedicalFacility[];
     fireStation: import("@/types").FireStation[]; policeStation: import("@/types").PoliceStation[];
   } | null>(null);
+  // Track which member field opened the map (for filling back address)
+  const [mapTarget, setMapTarget] = useState<{ type: "main" | "daily" | "address"; memberIndex: number } | null>(null);
   // Quick lookup state
   const [quickCity, setQuickCity] = useState("臺北市");
   const [quickDistrict, setQuickDistrict] = useState("");
@@ -736,9 +738,32 @@ export default function Home() {
       {/* === MAP MODE === */}
       {mode === "map" && (
         <MapExplorer
-          onBack={() => setMode("landing")}
+          onBack={() => { setMode(mapTarget ? "form" : "landing"); setMapTarget(null); }}
           onUseLocation={async (lat, lng) => {
-            // Store pre-queried data so generateHandbook can skip geocoding for this address
+            const coordStr = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+            if (mapTarget?.type === "daily") {
+              // Fill back daily address for a specific member
+              const m = { ...form.members[mapTarget.memberIndex] };
+              m.dailyAddress = coordStr;
+              if (!m.dailyLocation) m.dailyLocation = "上班";
+              updateMember(mapTarget.memberIndex, m);
+              setMapTarget(null);
+              setMode("form");
+              return;
+            }
+
+            if (mapTarget?.type === "address") {
+              // Fill back different address for a specific member
+              const m = { ...form.members[mapTarget.memberIndex] };
+              m.address = coordStr;
+              updateMember(mapTarget.memberIndex, m);
+              setMapTarget(null);
+              setMode("form");
+              return;
+            }
+
+            // Default: main address — store pre-queried data
             const { findNearby } = await import("@/lib/client-lookup");
             const result = await findNearby(lat, lng);
             setMapLocation({
@@ -751,8 +776,8 @@ export default function Home() {
               fireStation: result.fireStation || [],
               policeStation: result.policeStation || [],
             });
-            // Go to form flow step 2 (family members)
-            updateForm("address", `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+            updateForm("address", coordStr);
+            setMapTarget(null);
             setMode("form");
             setStep(2);
           }}
@@ -849,13 +874,22 @@ export default function Home() {
                   <label className="block text-sm font-medium text-text-muted mb-1">
                     {T("address")}
                   </label>
-                  <input
-                    type="text"
-                    value={form.address}
-                    onChange={(e) => updateForm("address", e.target.value)}
-                    placeholder={T("address_placeholder")}
-                    className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={form.address}
+                      onChange={(e) => updateForm("address", e.target.value)}
+                      placeholder={T("address_placeholder")}
+                      className="flex-1 border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMode("map")}
+                      className="border-2 border-primary text-primary px-3 py-2 rounded-lg text-sm font-semibold hover:bg-primary-light transition-colors shrink-0"
+                    >
+                      📍
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -1073,6 +1107,10 @@ export default function Home() {
                       }
                       canRemove={form.members.length > 1}
                       locale={locale}
+                      onOpenMap={(target, idx) => {
+                        setMapTarget({ type: target, memberIndex: idx });
+                        setMode("map");
+                      }}
                     />
                   ))}
                 </div>
@@ -1180,11 +1218,27 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/4/2" : "資料更新：2026/4/2"}
+              {locale === "en" ? "Data: 2026/4/7" : "資料更新：2026/4/7"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/7</span>
+                <span>
+                  {locale === "en"
+                    ? "Interactive map: tap anywhere to find nearby shelters, clinics, fire stations — all address fields support map pick"
+                    : "互動地圖：點擊任意位置查看附近避難設施。所有地址欄位都支援地圖點選定位"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/7</span>
+                <span>
+                  {locale === "en"
+                    ? "Clickable header: tap title on any page to return home"
+                    : "點擊標題即可回到首頁，流程更順暢"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/2</span>
                 <span>
