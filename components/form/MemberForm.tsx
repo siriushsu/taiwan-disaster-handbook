@@ -140,9 +140,20 @@ export default function MemberForm({
 
       {/* 白天地點 */}
       <div className="border-t border-border pt-3 space-y-2">
-        <label className="block text-sm font-medium text-text-muted">
-          白天上班/上學地點（選填）
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-text-muted">
+            白天上班/上學地點（選填）
+          </label>
+          {onOpenMap && (
+            <button
+              type="button"
+              onClick={() => onOpenMap("daily", index)}
+              className="text-xs text-primary font-medium hover:text-primary-dark transition-colors"
+            >
+              📍 地圖選取
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <select
             value={member.dailyCity}
@@ -179,24 +190,13 @@ export default function MemberForm({
           </select>
         </div>
         {member.dailyCity && (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={member.dailyAddress}
-              onChange={(e) => update("dailyAddress", e.target.value)}
-              placeholder="詳細地址（選填，填了會多查一組避難所）"
-              className={`${INPUT} flex-1`}
-            />
-            {onOpenMap && (
-              <button
-                type="button"
-                onClick={() => onOpenMap("daily", index)}
-                className="border-2 border-primary text-primary px-3 py-2 rounded-lg text-sm font-semibold hover:bg-primary-light transition-colors shrink-0"
-              >
-                📍
-              </button>
-            )}
-          </div>
+          <input
+            type="text"
+            value={member.dailyAddress}
+            onChange={(e) => update("dailyAddress", e.target.value)}
+            placeholder="詳細地址（選填，填了會多查一組避難所）"
+            className={INPUT}
+          />
         )}
         {member.dailyCity && member.dailyLocation !== "上班" && (
           <input
@@ -221,15 +221,26 @@ export default function MemberForm({
 
       {/* 不同住址 */}
       <div className="border-t border-border pt-3">
-        <label className="flex items-center gap-2 text-sm text-text-muted">
-          <input
-            type="checkbox"
-            checked={member.hasDifferentAddress}
-            onChange={(e) => update("hasDifferentAddress", e.target.checked)}
-            className="rounded"
-          />
-          此成員住址與主住家不同
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 text-sm text-text-muted">
+            <input
+              type="checkbox"
+              checked={member.hasDifferentAddress}
+              onChange={(e) => update("hasDifferentAddress", e.target.checked)}
+              className="rounded"
+            />
+            此成員住址與主住家不同
+          </label>
+          {member.hasDifferentAddress && onOpenMap && (
+            <button
+              type="button"
+              onClick={() => onOpenMap("address", index)}
+              className="text-xs text-primary font-medium hover:text-primary-dark transition-colors"
+            >
+              📍 地圖選取
+            </button>
+          )}
+        </div>
 
         {member.hasDifferentAddress && (
           <div className="mt-3 space-y-2">

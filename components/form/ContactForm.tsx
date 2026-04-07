@@ -1,15 +1,18 @@
 'use client'
 import type { EmergencyContact } from '@/types'
 
+const INPUT = "w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+
 interface Props {
   index: number
   contact: EmergencyContact
   onChange: (index: number, updated: EmergencyContact) => void
   onRemove: (index: number) => void
   canRemove: boolean
+  onOpenMap?: (index: number) => void
 }
 
-export default function ContactForm({ index, contact, onChange, onRemove, canRemove }: Props) {
+export default function ContactForm({ index, contact, onChange, onRemove, canRemove, onOpenMap }: Props) {
   const update = (field: keyof EmergencyContact, value: unknown) =>
     onChange(index, { ...contact, [field]: value })
 
@@ -36,7 +39,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.name}
             onChange={e => update('name', e.target.value)}
             placeholder="例：王大明"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            className={INPUT}
           />
         </div>
         <div>
@@ -46,7 +49,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.relation}
             onChange={e => update('relation', e.target.value)}
             placeholder="例：父親、鄰居"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            className={INPUT}
           />
         </div>
       </div>
@@ -59,7 +62,7 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.phone}
             onChange={e => update('phone', e.target.value)}
             placeholder="0912-345-678"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            className={INPUT}
           />
         </div>
         <div>
@@ -69,9 +72,31 @@ export default function ContactForm({ index, contact, onChange, onRemove, canRem
             value={contact.phoneBackup}
             onChange={e => update('phoneBackup', e.target.value)}
             placeholder="02-1234-5678"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
+            className={INPUT}
           />
         </div>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-text-muted">地址（選填）</label>
+          {onOpenMap && (
+            <button
+              type="button"
+              onClick={() => onOpenMap(index)}
+              className="text-xs text-primary font-medium hover:text-primary-dark transition-colors"
+            >
+              📍 地圖選取
+            </button>
+          )}
+        </div>
+        <input
+          type="text"
+          value={contact.address || ''}
+          onChange={e => update('address', e.target.value)}
+          placeholder="例：臺中市西區民生路100號"
+          className={INPUT}
+        />
       </div>
 
       <label className="flex items-center gap-2 text-sm text-text-muted">

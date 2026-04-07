@@ -28,6 +28,7 @@ export interface EmergencyContact {
   phone: string;
   phoneBackup: string;
   isOutOfCity: boolean;
+  address?: string;
 }
 
 // 表單完整資料

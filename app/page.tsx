@@ -75,7 +75,7 @@ export default function Home() {
     fireStation: import("@/types").FireStation[]; policeStation: import("@/types").PoliceStation[];
   } | null>(null);
   // Track which member field opened the map (for filling back address)
-  const [mapTarget, setMapTarget] = useState<{ type: "main" | "daily" | "address"; memberIndex: number } | null>(null);
+  const [mapTarget, setMapTarget] = useState<{ type: "main" | "daily" | "address" | "contact"; memberIndex: number } | null>(null);
   // Quick lookup state
   const [quickCity, setQuickCity] = useState("臺北市");
   const [quickDistrict, setQuickDistrict] = useState("");
@@ -759,6 +759,17 @@ export default function Home() {
               return;
             }
 
+            if (mapTarget?.type === "contact") {
+              // Fill back address for emergency contact
+              const c = { ...form.contacts[mapTarget.memberIndex] };
+              c.address = coordStr;
+              updateContact(mapTarget.memberIndex, c);
+              setMapTarget(null);
+              setMode("form");
+              setStep(3);
+              return;
+            }
+
             // Default: main address — store pre-queried data
             const { findNearby } = await import("@/lib/client-lookup");
             const result = await findNearby(lat, lng);
@@ -1164,6 +1175,10 @@ export default function Home() {
                         }))
                       }
                       canRemove={form.contacts.length > 1}
+                      onOpenMap={(idx) => {
+                        setMapTarget({ type: "contact", memberIndex: idx });
+                        setMode("map");
+                      }}
                     />
                   ))}
                 </div>
