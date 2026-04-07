@@ -60,10 +60,10 @@ function memberAddr(m: Member, householdAddr: string) {
 const s = StyleSheet.create({
   page: {
     fontFamily: "NotoSansTC",
-    padding: "28 36",
-    fontSize: 10,
+    padding: "22 32",
+    fontSize: 9,
     color: "#2D2A26",
-    lineHeight: 1.5,
+    lineHeight: 1.4,
   },
   footer: {
     position: "absolute",
@@ -75,14 +75,14 @@ const s = StyleSheet.create({
   },
   footerText: { fontSize: 7.5, color: "#9C9691" },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "bold",
     color: "#0D7377",
     borderBottomWidth: 1,
     borderBottomColor: "#E6F3F3",
-    paddingBottom: 3,
-    marginBottom: 6,
-    marginTop: 10,
+    paddingBottom: 2,
+    marginBottom: 3,
+    marginTop: 6,
   },
   twoCol: { flexDirection: "row", gap: 10 },
   col: { flex: 1 },
@@ -226,48 +226,48 @@ const s = StyleSheet.create({
   // location
   locHeader: {
     backgroundColor: "#0D7377",
-    padding: "10 14",
+    padding: "8 12",
     borderRadius: 6,
-    marginBottom: 10,
+    marginBottom: 6,
   },
-  locTitle: { fontSize: 14, fontWeight: "bold", color: "#ffffff" },
-  locAddr: { fontSize: 9, color: "#ffffff", opacity: 0.75, marginTop: 2 },
+  locTitle: { fontSize: 13, fontWeight: "bold", color: "#ffffff" },
+  locAddr: { fontSize: 8, color: "#ffffff", opacity: 0.75, marginTop: 1 },
   shelterCard: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
-    paddingBottom: 5,
+    marginBottom: 2,
+    paddingBottom: 2,
     borderBottomWidth: 1,
     borderBottomColor: "#F7F5F3",
   },
   shelterNum: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: "#065A5C",
     color: "#fff",
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: "bold",
     textAlign: "center",
-    paddingTop: 4,
-    marginRight: 8,
+    paddingTop: 3,
+    marginRight: 6,
     flexShrink: 0,
   },
   shelterInfo: { flex: 1 },
-  shelterName: { fontWeight: "bold", fontSize: 10.5 },
-  shelterAddr: { color: "#6B6560", fontSize: 8.5 },
-  shelterDist: { color: "#1A8A5C", fontSize: 8.5 },
-  shelterTag: { fontSize: 7.5, color: "#8b5cf6", marginTop: 1 },
+  shelterName: { fontWeight: "bold", fontSize: 9 },
+  shelterAddr: { color: "#6B6560", fontSize: 7.5 },
+  shelterDist: { color: "#1A8A5C", fontSize: 7.5 },
+  shelterTag: { fontSize: 6.5, color: "#8b5cf6", marginTop: 1 },
   medCard: {
     flexDirection: "row",
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderBottomWidth: 1,
     borderBottomColor: "#F7F5F3",
   },
-  meetBox: { flexDirection: "row", gap: 8, marginTop: 4 },
-  meetCard: { flex: 1, borderRadius: 6, padding: "8 10" },
-  meetLabel: { fontSize: 8, fontWeight: "bold", marginBottom: 2 },
-  meetValue: { fontSize: 9.5, fontWeight: "bold" },
+  meetBox: { flexDirection: "row", gap: 6, marginTop: 2 },
+  meetCard: { flex: 1, borderRadius: 6, padding: "5 8" },
+  meetLabel: { fontSize: 7, fontWeight: "bold", marginBottom: 1 },
+  meetValue: { fontSize: 8.5, fontWeight: "bold" },
   // personal card
   pCard: {
     borderWidth: 1.5,
@@ -610,9 +610,9 @@ function LocationPage({
       )}
       <Text
         style={{
-          fontSize: 8.5,
+          fontSize: 7.5,
           color: "#6B6560",
-          marginBottom: biMode !== "zh" ? 1 : 4,
+          marginBottom: biMode !== "zh" ? 1 : 2,
         }}
       >
         {pt(biMode, "loc_meeting_desc")}
@@ -641,7 +641,7 @@ function LocationPage({
             {mainShelter?.name ?? pt(biMode, "loc_fallback_primary")}
           </Text>
           {mainShelter?.address ? (
-            <Text style={{ fontSize: 8, color: "#6B6560", marginTop: 2 }}>
+            <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
               {mainShelter.address}
             </Text>
           ) : null}
@@ -670,7 +670,7 @@ function LocationPage({
             {backupShelter?.name ?? pt(biMode, "loc_fallback_backup")}
           </Text>
           {backupShelter?.address ? (
-            <Text style={{ fontSize: 8, color: "#6B6560", marginTop: 2 }}>
+            <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
               {backupShelter.address}
             </Text>
           ) : null}
@@ -690,11 +690,11 @@ function LocationPage({
           {ptEn("loc_shelters")}
         </Text>
       )}
-      <Text style={{ fontSize: 7, color: "#9C9691", marginBottom: 4 }}>
+      <Text style={{ fontSize: 6, color: "#9C9691", marginBottom: 2 }}>
         {pt(biMode, "loc_qr_hint")}
       </Text>
       {natural.length > 0 ? (
-        natural.slice(0, 3).map((sh: Shelter, i: number) => (
+        natural.slice(0, 5).map((sh: Shelter, i: number) => (
           <View key={i} style={s.shelterCard}>
             <Text style={s.shelterNum}>{i + 1}</Text>
             <View style={s.shelterInfo}>
@@ -729,7 +729,7 @@ function LocationPage({
               /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
               <Image
                 src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
-                style={{ width: 36, height: 36, flexShrink: 0 }}
+                style={{ width: 28, height: 28, flexShrink: 0 }}
               />
             ) : null}
           </View>
@@ -770,7 +770,7 @@ function LocationPage({
                 /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
                 <Image
                   src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
-                  style={{ width: 36, height: 36, flexShrink: 0 }}
+                  style={{ width: 28, height: 28, flexShrink: 0 }}
                 />
               ) : null}
             </View>
@@ -787,7 +787,7 @@ function LocationPage({
               {ptEn("loc_medical")}
             </Text>
           )}
-          {loc.medical.slice(0, 2).map((m: MedicalFacility, i: number) => (
+          {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
             <View key={i} style={s.medCard}>
               <Text style={[s.shelterNum, { backgroundColor: "#059669" }]}>
                 {i + 1}
@@ -814,7 +814,7 @@ function LocationPage({
                 /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
                 <Image
                   src={qrUrl(mapsUrl(m.lat, m.lng), 80)}
-                  style={{ width: 36, height: 36, flexShrink: 0 }}
+                  style={{ width: 28, height: 28, flexShrink: 0 }}
                 />
               ) : null}
             </View>
@@ -833,7 +833,7 @@ function LocationPage({
               Nearest AED (Automated External Defibrillator)
             </Text>
           )}
-          {(loc.aed ?? []).slice(0, 1).map(
+          {(loc.aed ?? []).slice(0, 2).map(
             (
               a: {
                 name: string;
