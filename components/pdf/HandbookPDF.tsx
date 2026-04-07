@@ -694,7 +694,7 @@ function LocationPage({
         {pt(biMode, "loc_qr_hint")}
       </Text>
       {natural.length > 0 ? (
-        natural.map((sh: Shelter, i: number) => (
+        natural.slice(0, 3).map((sh: Shelter, i: number) => (
           <View key={i} style={s.shelterCard}>
             <Text style={s.shelterNum}>{i + 1}</Text>
             <View style={s.shelterInfo}>
@@ -787,7 +787,7 @@ function LocationPage({
               {ptEn("loc_medical")}
             </Text>
           )}
-          {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
+          {loc.medical.slice(0, 2).map((m: MedicalFacility, i: number) => (
             <View key={i} style={s.medCard}>
               <Text style={[s.shelterNum, { backgroundColor: "#059669" }]}>
                 {i + 1}
@@ -833,7 +833,7 @@ function LocationPage({
               Nearest AED (Automated External Defibrillator)
             </Text>
           )}
-          {(loc.aed ?? []).slice(0, 2).map(
+          {(loc.aed ?? []).slice(0, 1).map(
             (
               a: {
                 name: string;
@@ -1375,7 +1375,8 @@ export default function HandbookPDF({
         <Footer label={pt(biMode, "action_footer")} biMode={biMode} />
       </Page>
 
-      {/* ─── PAGE 3: FAMILY REUNION & COMMUNICATION PLAN ─── */}
+      {/* ─── PAGE 3: FAMILY REUNION & COMMUNICATION PLAN (skip if no named members) ─── */}
+      {allMembers.length > 0 && (
       <Page size="A4" style={s.page}>
         <Text
           style={[
@@ -1611,6 +1612,7 @@ export default function HandbookPDF({
 
         <Footer label={pt(biMode, "reunion_title")} biMode={biMode} />
       </Page>
+      )}
 
       {/* ─── PAGES 4+: LOCATION EVACUATION GUIDES ─── */}
       {data.locations.map((loc, i) => (
@@ -1622,7 +1624,8 @@ export default function HandbookPDF({
         />
       ))}
 
-      {/* ─── COMBINED: MEMBER OVERVIEW ─── */}
+      {/* ─── COMBINED: MEMBER OVERVIEW (skip if no named members) ─── */}
+      {allMembers.length > 0 && (
       <Page size="A4" style={s.page}>
         <Text
           style={[
@@ -1787,6 +1790,7 @@ export default function HandbookPDF({
         )}
         <Footer label={pt(biMode, "member_footer")} biMode={biMode} />
       </Page>
+      )}
 
       {/* ─── FOREIGN NATIONAL INFO ─── */}
       {household.isForeignNational &&
