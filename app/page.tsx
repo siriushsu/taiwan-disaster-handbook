@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import MemberForm from "@/components/form/MemberForm";
 import ContactForm from "@/components/form/ContactForm";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
@@ -18,6 +19,11 @@ import type {
   AedLocation,
 } from "@/types";
 import { APP_VERSION } from "@/lib/version";
+
+const MapExplorer = dynamic(() => import("@/components/InteractiveMap"), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 z-50 bg-white flex items-center justify-center"><p>載入地圖...</p></div>,
+});
 
 const defaultMember = (): Member => ({
   name: "",
@@ -54,7 +60,7 @@ export default function Home() {
   const T = (key: Parameters<typeof t>[1], vars?: Record<string, string>) =>
     t(locale, key, vars);
   // "landing" = hero page, "quick" = quick lookup, "form" = full form
-  const [mode, setMode] = useState<"landing" | "quick" | "form">("landing");
+  const [mode, setMode] = useState<"landing" | "quick" | "form" | "map">("landing");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
@@ -427,12 +433,18 @@ export default function Home() {
               {T("hero_cta_demo")}
             </button>
             <button
-              onClick={() => setMode("form")}
-              className="flex-1 border border-border text-text-muted py-3 rounded-xl text-sm hover:bg-surface transition-colors"
+              onClick={() => setMode("map")}
+              className="flex-1 border-2 border-primary text-primary py-3 rounded-xl font-semibold text-sm hover:bg-primary-light transition-colors"
             >
-              {T("hero_cta_full")}
+              {locale === "en" ? "Find on Map" : "在地圖上找"}
             </button>
           </div>
+          <button
+            onClick={() => setMode("form")}
+            className="w-full border border-border text-text-muted py-3 rounded-xl text-sm hover:bg-surface transition-colors"
+          >
+            {T("hero_cta_full")}
+          </button>
 
           <p className="text-center text-xs text-text-faint">
             {T("privacy_notice")}
@@ -680,6 +692,50 @@ export default function Home() {
             {locale === "en" ? "Back" : "返回首頁"}
           </button>
         </div>
+      )}
+
+      {/* === MAP MODE === */}
+      {mode === "map" && (
+        <MapExplorer
+          onBack={() => setMode("landing")}
+          onUseLocation={async (lat, lng) => {
+            setMode("form");
+            // Pre-fill city/district from reverse geocode isn't needed,
+            // the user will fill the form. But we store the geo for later.
+            setLoading(true);
+            setLoadingMsg(locale === "en" ? "Looking up address..." : "查詢地址中...");
+            try {
+              const { findNearby } = await import("@/lib/client-lookup");
+              const result = await findNearby(lat, lng);
+              const data: HandbookData = {
+                household: form,
+                locations: [{
+                  label: locale === "en" ? "Selected Location" : "選取的位置",
+                  address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+                  city: "",
+                  district: "",
+                  geo: { lat, lng, formattedAddress: `${lat.toFixed(5)}, ${lng.toFixed(5)}` },
+                  shelters: result.shelters,
+                  airRaid: result.airRaid,
+                  medical: result.medical,
+                  aed: result.aed,
+                  erHospital: result.erHospital,
+                  fireStation: result.fireStation,
+                  policeStation: result.policeStation,
+                }],
+                generatedAt: new Date().toISOString(),
+              };
+              sessionStorage.setItem("handbookData", JSON.stringify(data));
+              window.location.href = "/handbook";
+            } catch {
+              setError(locale === "en" ? "Failed to load data" : "查詢失敗");
+            } finally {
+              setLoading(false);
+              setLoadingMsg("");
+            }
+          }}
+          locale={locale}
+        />
       )}
 
       {/* === FULL FORM MODE === */}
