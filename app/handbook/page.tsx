@@ -251,7 +251,9 @@ export default function HandbookPage() {
     <main className="min-h-screen bg-surface">
       <div className="bg-primary text-white py-6 px-4">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-bold">您的防災手冊已準備好</h1>
+          <h1 className="text-2xl font-bold">
+            <Link href="/" className="hover:opacity-80">您的防災手冊已準備好</Link>
+          </h1>
           <p className="text-white/75 mt-1 text-sm">
             下載前可修改避難所資訊，確保內容正確
           </p>

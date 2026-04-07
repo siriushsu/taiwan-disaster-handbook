@@ -67,6 +67,13 @@ export default function Home() {
   const [error, setError] = useState("");
   const [showSupport, setShowSupport] = useState(false);
   const [isLineApp, setIsLineApp] = useState(false);
+  // Pre-queried location from map click (bypasses geocoding in generateHandbook)
+  const [mapLocation, setMapLocation] = useState<{
+    lat: number; lng: number;
+    shelters: Shelter[]; airRaid: Shelter[]; medical: MedicalFacility[];
+    aed: AedLocation[]; erHospital: MedicalFacility[];
+    fireStation: import("@/types").FireStation[]; policeStation: import("@/types").PoliceStation[];
+  } | null>(null);
   // Quick lookup state
   const [quickCity, setQuickCity] = useState("臺北市");
   const [quickDistrict, setQuickDistrict] = useState("");
@@ -222,6 +229,29 @@ export default function Home() {
         setLoadingMsg(
           `查詢地址 ${i + 1}/${addressTargets.length}：${t.label}...`,
         );
+
+        // Use pre-queried map data for the primary address if available
+        if (i === 0 && mapLocation) {
+          locations.push({
+            label: t.label,
+            memberName: t.memberName,
+            address: t.address,
+            city: t.city,
+            district: t.district,
+            housingType: t.housingType,
+            floor: t.floor,
+            geo: { lat: mapLocation.lat, lng: mapLocation.lng, formattedAddress: t.address },
+            shelters: mapLocation.shelters,
+            airRaid: mapLocation.airRaid,
+            medical: mapLocation.medical,
+            aed: mapLocation.aed,
+            erHospital: mapLocation.erHospital,
+            fireStation: mapLocation.fireStation,
+            policeStation: mapLocation.policeStation,
+          });
+          continue;
+        }
+
         const {
           geo,
           shelters,
@@ -344,7 +374,8 @@ export default function Home() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <h1
-              className={`font-bold ${mode === "landing" ? "text-2xl" : "text-lg"}`}
+              className={`font-bold ${mode === "landing" ? "text-2xl" : "text-lg"} ${mode !== "landing" ? "cursor-pointer hover:opacity-80" : ""}`}
+              onClick={mode !== "landing" ? () => { setMode("landing"); setStep(1); setQuickResult(null); setMapLocation(null); } : undefined}
             >
               {mode === "landing"
                 ? T("site_title")
@@ -517,17 +548,25 @@ export default function Home() {
                   placeholder={T("address_placeholder")}
                   className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                 />
-                <button
-                  onClick={quickLookup}
-                  disabled={quickLoading || !quickAddress}
-                  className="w-full bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
-                >
-                  {quickLoading
-                    ? T("quick_searching")
-                    : locale === "en"
-                      ? "Search"
-                      : "搜尋附近避難設施"}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={quickLookup}
+                    disabled={quickLoading || !quickAddress}
+                    className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
+                  >
+                    {quickLoading
+                      ? T("quick_searching")
+                      : locale === "en"
+                        ? "Search"
+                        : "搜尋"}
+                  </button>
+                  <button
+                    onClick={() => setMode("map")}
+                    className="border-2 border-primary text-primary px-4 py-3 rounded-lg font-semibold text-sm hover:bg-primary-light transition-colors whitespace-nowrap"
+                  >
+                    {locale === "en" ? "📍 Map" : "📍 地圖"}
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -699,40 +738,23 @@ export default function Home() {
         <MapExplorer
           onBack={() => setMode("landing")}
           onUseLocation={async (lat, lng) => {
+            // Store pre-queried data so generateHandbook can skip geocoding for this address
+            const { findNearby } = await import("@/lib/client-lookup");
+            const result = await findNearby(lat, lng);
+            setMapLocation({
+              lat, lng,
+              shelters: result.shelters,
+              airRaid: result.airRaid,
+              medical: result.medical,
+              aed: result.aed || [],
+              erHospital: result.erHospital || [],
+              fireStation: result.fireStation || [],
+              policeStation: result.policeStation || [],
+            });
+            // Go to form flow step 2 (family members)
+            updateForm("address", `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
             setMode("form");
-            // Pre-fill city/district from reverse geocode isn't needed,
-            // the user will fill the form. But we store the geo for later.
-            setLoading(true);
-            setLoadingMsg(locale === "en" ? "Looking up address..." : "查詢地址中...");
-            try {
-              const { findNearby } = await import("@/lib/client-lookup");
-              const result = await findNearby(lat, lng);
-              const data: HandbookData = {
-                household: form,
-                locations: [{
-                  label: locale === "en" ? "Selected Location" : "選取的位置",
-                  address: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-                  city: "",
-                  district: "",
-                  geo: { lat, lng, formattedAddress: `${lat.toFixed(5)}, ${lng.toFixed(5)}` },
-                  shelters: result.shelters,
-                  airRaid: result.airRaid,
-                  medical: result.medical,
-                  aed: result.aed,
-                  erHospital: result.erHospital,
-                  fireStation: result.fireStation,
-                  policeStation: result.policeStation,
-                }],
-                generatedAt: new Date().toISOString(),
-              };
-              sessionStorage.setItem("handbookData", JSON.stringify(data));
-              window.location.href = "/handbook";
-            } catch {
-              setError(locale === "en" ? "Failed to load data" : "查詢失敗");
-            } finally {
-              setLoading(false);
-              setLoadingMsg("");
-            }
+            setStep(2);
           }}
           locale={locale}
         />
