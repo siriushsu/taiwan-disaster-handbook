@@ -371,25 +371,18 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-surface">
-      {/* 頁首 */}
-      <div className="bg-primary text-white py-6 px-4">
+      {/* 頁首 — Notion-style white header */}
+      <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <h1
-              className={`font-bold ${mode === "landing" ? "text-2xl" : "text-lg"} ${mode !== "landing" ? "cursor-pointer hover:opacity-80" : ""}`}
+              className={`font-bold text-primary ${mode === "landing" ? "text-xl" : "text-base"} ${mode !== "landing" ? "cursor-pointer hover:opacity-70 transition-opacity" : ""}`}
               onClick={mode !== "landing" ? () => { setMode("landing"); setStep(1); setQuickResult(null); setMapLocation(null); } : undefined}
             >
-              {mode === "landing"
-                ? T("site_title")
-                : locale === "en"
-                  ? "Taiwan Emergency Handbook"
-                  : "台灣家庭防災手冊"}
+              {locale === "en" ? "Taiwan Emergency Handbook" : "台灣家庭防災手冊"}
             </h1>
             <LocaleSwitcher locale={locale} onChange={setLocale} />
           </div>
-          {mode === "landing" && (
-            <p className="text-white/75 mt-1 text-sm">{T("site_desc")}</p>
-          )}
         </div>
       </div>
 
@@ -429,6 +422,13 @@ export default function Home() {
       {/* === LANDING MODE === */}
       {mode === "landing" && (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+          {/* Hero text */}
+          <div className="text-center space-y-2 pt-2">
+            <h2 className="text-2xl font-bold text-text">{T("site_title")}</h2>
+            <p className="text-sm text-text-muted">{T("site_desc")}</p>
+            <p className="text-xs text-text-faint">{T("privacy_notice")}</p>
+          </div>
+
           {/* Data stats */}
           <div className="grid grid-cols-2 gap-3">
             {(
@@ -441,7 +441,7 @@ export default function Home() {
             ).map(([num, label]) => (
               <div
                 key={label}
-                className="bg-white rounded-xl border border-border p-3 text-center"
+                className="bg-white rounded-xl border border-border p-3 text-center shadow-card"
               >
                 <p className="text-xl font-bold text-primary">{num}</p>
                 <p className="text-xs text-text-muted mt-0.5">{label}</p>
@@ -452,7 +452,7 @@ export default function Home() {
           {/* Primary CTA */}
           <button
             onClick={() => setMode("quick")}
-            className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-md hover:bg-primary-dark transition-colors"
+            className="w-full bg-primary text-white py-4 rounded-xl font-semibold text-lg hover:bg-primary-dark transition-all active:scale-[0.98]"
           >
             {T("hero_cta_quick")}
           </button>
@@ -461,27 +461,23 @@ export default function Home() {
           <div className="flex gap-3">
             <button
               onClick={runDemo}
-              className="flex-1 border-2 border-primary text-primary py-3 rounded-xl font-semibold text-sm hover:bg-primary-light transition-colors"
+              className="flex-1 border border-border text-text py-3 rounded-xl font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
             >
               {T("hero_cta_demo")}
             </button>
             <button
               onClick={() => setMode("map")}
-              className="flex-1 border-2 border-primary text-primary py-3 rounded-xl font-semibold text-sm hover:bg-primary-light transition-colors"
+              className="flex-1 border border-border text-text py-3 rounded-xl font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
             >
               {locale === "en" ? "Find on Map" : "在地圖上找"}
             </button>
           </div>
           <button
             onClick={() => setMode("form")}
-            className="w-full border border-border text-text-muted py-3 rounded-xl text-sm hover:bg-surface transition-colors"
+            className="w-full text-text-muted text-sm py-2 hover:text-text transition-colors"
           >
             {T("hero_cta_full")}
           </button>
-
-          <p className="text-center text-xs text-text-faint">
-            {T("privacy_notice")}
-          </p>
         </div>
       )}
 
@@ -1214,7 +1210,7 @@ export default function Home() {
 
       {/* Updates & Footer */}
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
-        <details className="bg-white rounded-xl shadow-sm border border-border">
+        <details className="bg-white rounded-xl shadow-card border border-border">
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
@@ -1307,7 +1303,7 @@ export default function Home() {
 
       {/* Feedback & Footer */}
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
-        <div className="bg-white rounded-xl shadow-sm border border-border p-4 space-y-2">
+        <div className="bg-white rounded-xl shadow-card border border-border p-4 space-y-2">
           <p className="text-xs font-semibold text-text-muted mb-1">
             {locale === "en" ? "Help us improve" : "資料有誤？幫助我們改善"}
           </p>
@@ -1339,7 +1335,7 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-border p-4">
+        <div className="bg-white rounded-xl shadow-card border border-border p-4">
           {!showSupport ? (
             <button
               onClick={() => setShowSupport(true)}

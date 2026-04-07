@@ -249,12 +249,17 @@ export default function HandbookPage() {
 
   return (
     <main className="min-h-screen bg-surface">
-      <div className="bg-primary text-white py-6 px-4">
+      <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-bold">
-            <Link href="/" className="hover:opacity-80">您的防災手冊已準備好</Link>
+          <h1 className="text-base font-bold text-primary">
+            <Link href="/" className="hover:opacity-70 transition-opacity">台灣家庭防災手冊</Link>
           </h1>
-          <p className="text-white/75 mt-1 text-sm">
+        </div>
+      </div>
+      <div className="bg-primary-light py-6 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-xl font-bold text-text">您的防災手冊已準備好</h2>
+          <p className="text-text-muted mt-1 text-sm">
             下載前可修改避難所資訊，確保內容正確
           </p>
         </div>
@@ -262,7 +267,7 @@ export default function HandbookPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
         {/* Download Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6 text-center">
+        <div className="bg-white rounded-xl shadow-card border border-border p-6 text-center">
           <h2 className="text-lg font-bold text-text mb-2">
             {memberName} 家庭防災手冊
           </h2>
@@ -403,7 +408,7 @@ export default function HandbookPage() {
 
         {/* Map */}
         {data.locations[0]?.geo && (
-          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+          <div className="bg-white rounded-xl shadow-card border border-border p-6">
             <h3 className="font-bold text-text mb-3">附近避難設施地圖</h3>
             <ErrorBoundary
               label="ShelterMap"
@@ -425,7 +430,7 @@ export default function HandbookPage() {
         )}
 
         {/* Editable locations */}
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6 space-y-4">
+        <div className="bg-white rounded-xl shadow-card border border-border p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-text">避難所資訊（可修改）</h3>
             <span className="text-xs text-text-faint">
@@ -728,7 +733,7 @@ export default function HandbookPage() {
           ，特別是聯絡電話、用藥、或搬家後請重新產生。
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6 space-y-3">
+        <div className="bg-white rounded-xl shadow-card border border-border p-6 space-y-3">
           <h3 className="font-bold text-text">政府防災資源</h3>
 
           {/* City-specific links */}
@@ -791,7 +796,7 @@ export default function HandbookPage() {
         </div>
 
         {/* Feedback & contribute */}
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-4 space-y-2">
+        <div className="bg-white rounded-2xl shadow-card border border-border p-4 space-y-2">
           <p className="text-xs font-semibold text-text-muted mb-1">
             資料有誤？幫助我們改善
           </p>
@@ -822,7 +827,7 @@ export default function HandbookPage() {
         </div>
 
         {/* Support - collapsed by default */}
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-4">
+        <div className="bg-white rounded-2xl shadow-card border border-border p-4">
           {!showSupport ? (
             <button
               onClick={() => setShowSupport(true)}

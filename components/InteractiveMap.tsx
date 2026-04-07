@@ -160,11 +160,11 @@ export default function InteractiveMap({ onBack, onUseLocation, locale }: Props)
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
       {/* Header */}
-      <div className="bg-primary text-white px-4 py-3 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-sm font-medium">
+      <div className="bg-white border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
+        <button onClick={onBack} className="text-sm font-medium text-primary">
           ← {zh ? '返回' : 'Back'}
         </button>
-        <span className="font-bold text-sm">
+        <span className="font-bold text-sm text-text">
           {zh ? '點擊地圖查看附近設施' : 'Tap map to find nearby'}
         </span>
         <div className="w-10" />
@@ -275,7 +275,7 @@ export default function InteractiveMap({ onBack, onUseLocation, locale }: Props)
           <div className="px-4 pb-4 pt-1 space-y-2">
             <button
               onClick={() => onUseLocation(clickedLat, clickedLng)}
-              className="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm"
+              className="w-full bg-primary text-white py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all active:scale-[0.98]"
             >
               {zh ? '用這個位置製作完整手冊' : 'Create handbook for this location'}
             </button>
