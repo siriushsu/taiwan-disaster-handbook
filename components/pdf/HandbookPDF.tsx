@@ -228,7 +228,7 @@ const s = StyleSheet.create({
     backgroundColor: "#0D7377",
     padding: "8 12",
     borderRadius: 6,
-    marginBottom: 6,
+    marginBottom: 10,
   },
   locTitle: { fontSize: 13, fontWeight: "bold", color: "#ffffff" },
   locAddr: { fontSize: 8, color: "#ffffff", opacity: 0.75, marginTop: 1 },
@@ -583,6 +583,7 @@ function LocationPage({
   const isBasement = /^[Bb]|地下/.test(loc.floor ?? "");
 
   return (
+    <>
     <Page size="A4" style={s.page}>
       <View style={s.locHeader}>
         <Text style={s.locTitle}>
@@ -742,6 +743,17 @@ function LocationPage({
         </View>
       )}
       <Text style={s.shelterTag}>{pt(biMode, "loc_shelters_src")}</Text>
+
+      <Footer label={`${loc.label} - ${pt(biMode, "loc_shelters")}`} biMode={biMode} />
+    </Page>
+
+    {/* Page 2: Air Raid + Medical + AED + Housing-specific tips */}
+    <Page size="A4" style={s.page}>
+      <View style={[s.locHeader, { marginBottom: 8 }]}>
+        <Text style={[s.locTitle, { fontSize: 11 }]}>
+          {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}（{biMode === "en" ? "cont." : "續"}）
+        </Text>
+      </View>
 
       {/* Air defense shelters */}
       {air.length > 0 && (
@@ -975,6 +987,7 @@ function LocationPage({
         biMode={biMode}
       />
     </Page>
+    </>
   );
 }
 

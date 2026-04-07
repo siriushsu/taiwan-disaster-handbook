@@ -739,10 +739,25 @@ export default function Home() {
             const coordStr = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
             if (mapTarget?.type === "daily") {
-              // Fill back daily address for a specific member
+              // Fill back daily address — also try reverse geocode for city/district
               const m = { ...form.members[mapTarget.memberIndex] };
               m.dailyAddress = coordStr;
               if (!m.dailyLocation) m.dailyLocation = "上班";
+              // Set a placeholder city so the address field is visible
+              if (!m.dailyCity) m.dailyCity = "（地圖定位）";
+              try {
+                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                if (res.ok) {
+                  const data = await res.json();
+                  if (data.formattedAddress) {
+                    m.dailyAddress = data.formattedAddress;
+                    // Extract city from formatted address
+                    for (const c of ["臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"]) {
+                      if (data.formattedAddress.includes(c)) { m.dailyCity = c; break; }
+                    }
+                  }
+                }
+              } catch { /* reverse geocode failed, keep coordinates */ }
               updateMember(mapTarget.memberIndex, m);
               setMapTarget(null);
               setMode("form");
@@ -750,9 +765,22 @@ export default function Home() {
             }
 
             if (mapTarget?.type === "address") {
-              // Fill back different address for a specific member
+              // Fill back different address — also try reverse geocode
               const m = { ...form.members[mapTarget.memberIndex] };
               m.address = coordStr;
+              if (!m.city) m.city = "（地圖定位）";
+              try {
+                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                if (res.ok) {
+                  const data = await res.json();
+                  if (data.formattedAddress) {
+                    m.address = data.formattedAddress;
+                    for (const c of ["臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"]) {
+                      if (data.formattedAddress.includes(c)) { m.city = c; break; }
+                    }
+                  }
+                }
+              } catch { /* keep coordinates */ }
               updateMember(mapTarget.memberIndex, m);
               setMapTarget(null);
               setMode("form");
@@ -760,9 +788,16 @@ export default function Home() {
             }
 
             if (mapTarget?.type === "contact") {
-              // Fill back address for emergency contact
+              // Fill back address for emergency contact with reverse geocode
               const c = { ...form.contacts[mapTarget.memberIndex] };
               c.address = coordStr;
+              try {
+                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                if (res.ok) {
+                  const data = await res.json();
+                  if (data.formattedAddress) c.address = data.formattedAddress;
+                }
+              } catch { /* keep coordinates */ }
               updateContact(mapTarget.memberIndex, c);
               setMapTarget(null);
               setMode("form");

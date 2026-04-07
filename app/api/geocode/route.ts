@@ -15,8 +15,16 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const isReverse = req.nextUrl.searchParams.get("reverse") === "1";
+
   try {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=tw&language=zh-TW&key=${GOOGLE_API_KEY}`;
+    let url: string;
+    if (isReverse) {
+      // Reverse geocode: address param is "lat,lng"
+      url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${encodeURIComponent(address)}&language=zh-TW&key=${GOOGLE_API_KEY}`;
+    } else {
+      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=tw&language=zh-TW&key=${GOOGLE_API_KEY}`;
+    }
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     const data = await res.json();
 
