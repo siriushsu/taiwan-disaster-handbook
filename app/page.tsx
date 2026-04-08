@@ -1361,11 +1361,35 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/4/7" : "資料更新：2026/4/7"}
+              {locale === "en" ? "Data: 2026/4/8" : "資料更新：2026/4/8"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Air raid shelters expanded: 71K → 74K+ (merged g0v open data, major fills for Hsinchu, Yilan, Hualien, Kinmen)"
+                    : "防空避難資料擴充：71K → 74K+（整合 g0v 開放資料，新竹市/宜蘭/花蓮/金門大幅補齊）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 1,499 nursing institutions (nursing homes with coordinates) from MOHW"
+                    : "新增 1,499 間護理機構資料（含座標），來源：衛福部護理機構名冊"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/8</span>
+                <span>
+                  {locale === "en"
+                    ? "UX: fixed emergency card font, improved offline support, redesigned share preview image"
+                    : "體驗優化：修復緊急卡片字型、強化離線支援、重新設計社群分享預覽圖"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/7</span>
                 <span>
