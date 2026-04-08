@@ -22,7 +22,11 @@ import { APP_VERSION } from "@/lib/version";
 
 const MapExplorer = dynamic(() => import("@/components/InteractiveMap"), {
   ssr: false,
-  loading: () => <div className="fixed inset-0 z-50 bg-white flex items-center justify-center"><p>載入地圖...</p></div>,
+  loading: () => (
+    <div className="fixed inset-0 z-50 bg-white flex items-center justify-center">
+      <p>載入地圖...</p>
+    </div>
+  ),
 });
 
 const defaultMember = (): Member => ({
@@ -60,7 +64,9 @@ export default function Home() {
   const T = (key: Parameters<typeof t>[1], vars?: Record<string, string>) =>
     t(locale, key, vars);
   // "landing" = hero page, "quick" = quick lookup, "form" = full form
-  const [mode, setMode] = useState<"landing" | "quick" | "form" | "map">("landing");
+  const [mode, setMode] = useState<"landing" | "quick" | "form" | "map">(
+    "landing",
+  );
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
@@ -69,13 +75,21 @@ export default function Home() {
   const [isLineApp, setIsLineApp] = useState(false);
   // Pre-queried location from map click (bypasses geocoding in generateHandbook)
   const [mapLocation, setMapLocation] = useState<{
-    lat: number; lng: number;
-    shelters: Shelter[]; airRaid: Shelter[]; medical: MedicalFacility[];
-    aed: AedLocation[]; erHospital: MedicalFacility[];
-    fireStation: import("@/types").FireStation[]; policeStation: import("@/types").PoliceStation[];
+    lat: number;
+    lng: number;
+    shelters: Shelter[];
+    airRaid: Shelter[];
+    medical: MedicalFacility[];
+    aed: AedLocation[];
+    erHospital: MedicalFacility[];
+    fireStation: import("@/types").FireStation[];
+    policeStation: import("@/types").PoliceStation[];
   } | null>(null);
   // Track which member field opened the map (for filling back address)
-  const [mapTarget, setMapTarget] = useState<{ type: "main" | "daily" | "address" | "contact"; memberIndex: number } | null>(null);
+  const [mapTarget, setMapTarget] = useState<{
+    type: "main" | "daily" | "address" | "contact";
+    memberIndex: number;
+  } | null>(null);
   // Quick lookup state
   const [quickCity, setQuickCity] = useState("臺北市");
   const [quickDistrict, setQuickDistrict] = useState("");
@@ -242,7 +256,11 @@ export default function Home() {
             district: t.district,
             housingType: t.housingType,
             floor: t.floor,
-            geo: { lat: mapLocation.lat, lng: mapLocation.lng, formattedAddress: t.address },
+            geo: {
+              lat: mapLocation.lat,
+              lng: mapLocation.lng,
+              formattedAddress: t.address,
+            },
             shelters: mapLocation.shelters,
             airRaid: mapLocation.airRaid,
             medical: mapLocation.medical,
@@ -366,7 +384,7 @@ export default function Home() {
       address: quickAddress,
     }));
     setMode("form");
-    setStep(1);
+    setStep(2); // Skip address step — already entered in quick lookup
   };
 
   return (
@@ -377,9 +395,20 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <h1
               className={`font-bold text-primary ${mode === "landing" ? "text-xl" : "text-base"} ${mode !== "landing" ? "cursor-pointer hover:opacity-70 transition-opacity" : ""}`}
-              onClick={mode !== "landing" ? () => { setMode("landing"); setStep(1); setQuickResult(null); setMapLocation(null); } : undefined}
+              onClick={
+                mode !== "landing"
+                  ? () => {
+                      setMode("landing");
+                      setStep(1);
+                      setQuickResult(null);
+                      setMapLocation(null);
+                    }
+                  : undefined
+              }
             >
-              {locale === "en" ? "Taiwan Emergency Handbook" : "台灣家庭防災手冊"}
+              {locale === "en"
+                ? "Taiwan Emergency Handbook"
+                : "台灣家庭防災手冊"}
             </h1>
             <LocaleSwitcher locale={locale} onChange={setLocale} />
           </div>
@@ -734,7 +763,10 @@ export default function Home() {
       {/* === MAP MODE === */}
       {mode === "map" && (
         <MapExplorer
-          onBack={() => { setMode(mapTarget ? "form" : "landing"); setMapTarget(null); }}
+          onBack={() => {
+            setMode(mapTarget ? "form" : "landing");
+            setMapTarget(null);
+          }}
           onUseLocation={async (lat, lng) => {
             const coordStr = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
@@ -746,18 +778,48 @@ export default function Home() {
               // Set a placeholder city so the address field is visible
               if (!m.dailyCity) m.dailyCity = "（地圖定位）";
               try {
-                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                const res = await fetch(
+                  `/api/geocode?address=${lat},${lng}&reverse=1`,
+                );
                 if (res.ok) {
                   const data = await res.json();
                   if (data.formattedAddress) {
                     m.dailyAddress = data.formattedAddress;
                     // Extract city from formatted address
-                    for (const c of ["臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"]) {
-                      if (data.formattedAddress.includes(c)) { m.dailyCity = c; break; }
+                    for (const c of [
+                      "臺北市",
+                      "新北市",
+                      "桃園市",
+                      "臺中市",
+                      "臺南市",
+                      "高雄市",
+                      "基隆市",
+                      "新竹市",
+                      "嘉義市",
+                      "新竹縣",
+                      "苗栗縣",
+                      "彰化縣",
+                      "南投縣",
+                      "雲林縣",
+                      "嘉義縣",
+                      "屏東縣",
+                      "宜蘭縣",
+                      "花蓮縣",
+                      "臺東縣",
+                      "澎湖縣",
+                      "金門縣",
+                      "連江縣",
+                    ]) {
+                      if (data.formattedAddress.includes(c)) {
+                        m.dailyCity = c;
+                        break;
+                      }
                     }
                   }
                 }
-              } catch { /* reverse geocode failed, keep coordinates */ }
+              } catch {
+                /* reverse geocode failed, keep coordinates */
+              }
               updateMember(mapTarget.memberIndex, m);
               setMapTarget(null);
               setMode("form");
@@ -770,17 +832,47 @@ export default function Home() {
               m.address = coordStr;
               if (!m.city) m.city = "（地圖定位）";
               try {
-                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                const res = await fetch(
+                  `/api/geocode?address=${lat},${lng}&reverse=1`,
+                );
                 if (res.ok) {
                   const data = await res.json();
                   if (data.formattedAddress) {
                     m.address = data.formattedAddress;
-                    for (const c of ["臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"]) {
-                      if (data.formattedAddress.includes(c)) { m.city = c; break; }
+                    for (const c of [
+                      "臺北市",
+                      "新北市",
+                      "桃園市",
+                      "臺中市",
+                      "臺南市",
+                      "高雄市",
+                      "基隆市",
+                      "新竹市",
+                      "嘉義市",
+                      "新竹縣",
+                      "苗栗縣",
+                      "彰化縣",
+                      "南投縣",
+                      "雲林縣",
+                      "嘉義縣",
+                      "屏東縣",
+                      "宜蘭縣",
+                      "花蓮縣",
+                      "臺東縣",
+                      "澎湖縣",
+                      "金門縣",
+                      "連江縣",
+                    ]) {
+                      if (data.formattedAddress.includes(c)) {
+                        m.city = c;
+                        break;
+                      }
                     }
                   }
                 }
-              } catch { /* keep coordinates */ }
+              } catch {
+                /* keep coordinates */
+              }
               updateMember(mapTarget.memberIndex, m);
               setMapTarget(null);
               setMode("form");
@@ -792,12 +884,16 @@ export default function Home() {
               const c = { ...form.contacts[mapTarget.memberIndex] };
               c.address = coordStr;
               try {
-                const res = await fetch(`/api/geocode?address=${lat},${lng}&reverse=1`);
+                const res = await fetch(
+                  `/api/geocode?address=${lat},${lng}&reverse=1`,
+                );
                 if (res.ok) {
                   const data = await res.json();
                   if (data.formattedAddress) c.address = data.formattedAddress;
                 }
-              } catch { /* keep coordinates */ }
+              } catch {
+                /* keep coordinates */
+              }
               updateContact(mapTarget.memberIndex, c);
               setMapTarget(null);
               setMode("form");
@@ -809,7 +905,8 @@ export default function Home() {
             const { findNearby } = await import("@/lib/client-lookup");
             const result = await findNearby(lat, lng);
             setMapLocation({
-              lat, lng,
+              lat,
+              lng,
               shelters: result.shelters,
               airRaid: result.airRaid,
               medical: result.medical,

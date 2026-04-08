@@ -245,16 +245,23 @@ export default function HandbookPage() {
 
   const memberName = data.household.members[0]?.name || "我的家庭";
   const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, "-")}.pdf`;
-  const hasNamedMembers = data.household.members.some(m => m.name);
+  const hasNamedMembers = data.household.members.some((m) => m.name);
   // Cover(1) + Action Card(1) + Reunion(if members) + Locations + Member Overview(if members) + Foreign(if applicable) + Supply + Phones + Back
-  const pageCount = 2 + (hasNamedMembers ? 2 : 0) + data.locations.length + 3 + (data.household.isForeignNational ? 1 : 0);
+  const pageCount =
+    2 +
+    (hasNamedMembers ? 2 : 0) +
+    data.locations.length +
+    3 +
+    (data.household.isForeignNational ? 1 : 0);
 
   return (
     <main className="min-h-screen bg-surface">
       <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-base font-bold text-primary">
-            <Link href="/" className="hover:opacity-70 transition-opacity">台灣家庭防災手冊</Link>
+            <Link href="/" className="hover:opacity-70 transition-opacity">
+              台灣家庭防災手冊
+            </Link>
           </h1>
         </div>
       </div>
@@ -477,7 +484,7 @@ export default function HandbookPage() {
                         e.key === "Enter" && relocateLocation(locIdx)
                       }
                       placeholder="輸入正確地址，例如：新北市永和區成功路二段191巷2號"
-                      className="flex-1 text-sm border border-blue-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-light"
+                      className="flex-1 text-sm text-text border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-light"
                       disabled={relocateLoading}
                     />
                     <button
