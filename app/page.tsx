@@ -463,7 +463,7 @@ export default function Home() {
             {(
               [
                 ["6,300+", T("hero_stat_shelters")],
-                ["71,000+", T("hero_stat_airraid")],
+                ["74,000+", T("hero_stat_airraid")],
                 ["16,900+", T("hero_stat_medical")],
                 ["15,000+", T("hero_stat_aed")],
               ] as const

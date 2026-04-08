@@ -4,6 +4,7 @@ import type {
   MedicalFacility,
   FireStation,
   PoliceStation,
+  NursingFacility,
 } from "@/types";
 
 /** Haversine distance in meters */
@@ -70,6 +71,7 @@ let aedCache:
   | null = null;
 let fireStationCache: FireStation[] | null = null;
 let policeStationCache: PoliceStation[] | null = null;
+let nursingCache: NursingFacility[] | null = null;
 
 /** Fetch data file from local /data/ path (served by Vercel, always latest) */
 async function fetchData(filename: string): Promise<Response> {
@@ -147,6 +149,15 @@ async function loadPoliceStations(): Promise<PoliceStation[]> {
   const data = await res.json();
   policeStationCache = Array.isArray(data) ? data : [];
   return policeStationCache;
+}
+
+async function loadNursing(): Promise<NursingFacility[]> {
+  if (nursingCache) return nursingCache;
+  const res = await fetchData("taiwan-nursing.json");
+  if (!res.ok) return [];
+  const data = await res.json();
+  nursingCache = Array.isArray(data) ? data : [];
+  return nursingCache;
 }
 
 /** Helper: fetch with timeout */
@@ -354,16 +365,25 @@ export async function geocode(
 
 /** Find nearest shelters, air raid shelters, medical facilities, and AEDs */
 export async function findNearby(lat: number, lng: number) {
-  const [shelters, airRaidRaw, medical, mrtRaw, aedRaw, fireRaw, policeRaw] =
-    await Promise.all([
-      loadShelters(),
-      loadAirRaid(),
-      loadMedical(),
-      loadMrt(),
-      loadAed(),
-      loadFireStations(),
-      loadPoliceStations(),
-    ]);
+  const [
+    shelters,
+    airRaidRaw,
+    medical,
+    mrtRaw,
+    aedRaw,
+    fireRaw,
+    policeRaw,
+    nursingRaw,
+  ] = await Promise.all([
+    loadShelters(),
+    loadAirRaid(),
+    loadMedical(),
+    loadMrt(),
+    loadAed(),
+    loadFireStations(),
+    loadPoliceStations(),
+    loadNursing(),
+  ]);
 
   // Nearest disaster shelters
   const nearShelters = findNearest(shelters, lat, lng, 5);
@@ -485,6 +505,12 @@ export async function findNearby(lat: number, lng: number) {
   );
   const nearPolice = findNearest(policeWithCoords, lat, lng, 1);
 
+  // Nearest nursing home (only 一般護理之家, not home care or postnatal)
+  const nursingHomes = nursingRaw.filter(
+    (n) => n.type === "一般護理之家" && n.lat != null && n.lng != null,
+  ) as (NursingFacility & { lat: number; lng: number })[];
+  const nearNursing = findNearest(nursingHomes, lat, lng, 1);
+
   return {
     shelters: nearShelters,
     airRaid: nearAirRaid,
@@ -493,5 +519,6 @@ export async function findNearby(lat: number, lng: number) {
     aed: nearAed,
     fireStation: nearFire,
     policeStation: nearPolice,
+    nursing: nearNursing,
   };
 }

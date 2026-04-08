@@ -115,6 +115,18 @@ export interface PoliceStation {
   distance?: number;
 }
 
+// 護理機構
+export interface NursingFacility {
+  name: string;
+  address: string;
+  phone: string;
+  type: string; // 居家護理所 | 一般護理之家 | 產後護理之家
+  city: string;
+  lat: number;
+  lng: number;
+  distance?: number;
+}
+
 // Geocoding 結果
 export interface GeoLocation {
   lat: number;
@@ -139,6 +151,7 @@ export interface LocationInfo {
   erHospital?: MedicalFacility[];
   fireStation?: FireStation[];
   policeStation?: PoliceStation[];
+  nursing?: NursingFacility[];
 }
 
 // 手冊生成所需的完整資料
