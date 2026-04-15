@@ -1384,29 +1384,32 @@ export default function HandbookPDF({
             })}
           </View>
           <View style={s.col}>
-            {(["num_msg", "num_mental", "num_disaster"] as const).map(
-              (key, ni) => {
-                const nums = ["1991", "1925", "0800-024-985"];
-                const n = nums[ni];
-                return (
-                  <View key={n} style={s.numRow}>
-                    <Text
-                      style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}
-                    >
-                      {n}
-                    </Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.numLabel}>{pt(biMode, key)}</Text>
-                      {biMode !== "zh" && (
-                        <Text style={{ fontSize: 8, color: "#6B6560" }}>
-                          {ptEn(key)}
-                        </Text>
-                      )}
-                    </View>
+            {(household.isForeignNational
+              ? (["num_labor", "num_protect", "num_disaster"] as const)
+              : (["num_msg", "num_mental", "num_disaster"] as const)
+            ).map((key, ni) => {
+              const nums = household.isForeignNational
+                ? ["1955", "113", "0800-024-985"]
+                : ["1991", "1925", "0800-024-985"];
+              const n = nums[ni];
+              return (
+                <View key={n} style={s.numRow}>
+                  <Text
+                    style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}
+                  >
+                    {n}
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.numLabel}>{pt(biMode, key)}</Text>
+                    {biMode !== "zh" && (
+                      <Text style={{ fontSize: 8, color: "#6B6560" }}>
+                        {ptEn(key)}
+                      </Text>
+                    )}
                   </View>
-                );
-              },
-            )}
+                </View>
+              );
+            })}
           </View>
         </View>
 
@@ -2142,15 +2145,15 @@ export default function HandbookPDF({
                 );
                 if (catPhrases.length === 0) return null;
                 return (
-                  <View key={cat.id} style={{ marginBottom: 4 }}>
+                  <View key={cat.id} style={{ marginBottom: 2 }} wrap={false}>
                     <Text
                       style={{
-                        fontSize: 8,
+                        fontSize: 7.5,
                         fontWeight: "bold",
                         color: "#0d9488",
                         backgroundColor: "#f0fdfa",
-                        padding: "2 4",
-                        marginBottom: 1,
+                        padding: "1.5 4",
+                        marginBottom: 0.5,
                       }}
                     >
                       {pt(
@@ -2164,19 +2167,26 @@ export default function HandbookPDF({
                         key={phrase.id}
                         style={{
                           flexDirection: "row",
-                          paddingVertical: 1,
+                          paddingVertical: 0.5,
                           paddingHorizontal: 4,
                           borderBottomWidth: 0.5,
                           borderBottomColor: "#f1f5f9",
                         }}
                       >
-                        <Text style={{ width: "17%", fontSize: 7 }}>
+                        <Text
+                          style={{
+                            width: "17%",
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
+                          }}
+                        >
                           {phrase.text.zh}
                         </Text>
                         <Text
                           style={{
                             width: "17%",
-                            fontSize: 7,
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
                             color: "#475569",
                           }}
                         >
@@ -2185,7 +2195,8 @@ export default function HandbookPDF({
                         <Text
                           style={{
                             width: "17%",
-                            fontSize: 7,
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
                             color: "#475569",
                           }}
                         >
@@ -2194,7 +2205,8 @@ export default function HandbookPDF({
                         <Text
                           style={{
                             width: "17%",
-                            fontSize: 7,
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
                             color: "#475569",
                           }}
                         >
@@ -2203,7 +2215,8 @@ export default function HandbookPDF({
                         <Text
                           style={{
                             width: "16%",
-                            fontSize: 7,
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
                             color: "#475569",
                             fontFamily: "NotoSansThai",
                           }}
@@ -2213,7 +2226,8 @@ export default function HandbookPDF({
                         <Text
                           style={{
                             width: "16%",
-                            fontSize: 7,
+                            fontSize: 6.5,
+                            lineHeight: 1.15,
                             color: "#475569",
                           }}
                         >

@@ -61,6 +61,8 @@ const TEXT: Record<string, [string, string]> = {
   num_air: ["防空警報", "Air Raid Alert"],
   num_msg: ["災害留言板", "Disaster Message Board"],
   num_mental: ["安心專線", "Mental Health Hotline"],
+  num_labor: ["外籍勞工 24h 專線", "Foreign Worker 24h Hotline"],
+  num_protect: ["婦幼保護專線", "Women & Children Protection"],
   num_disaster: ["災防專線", "Disaster Prevention"],
 
   // Reunion
