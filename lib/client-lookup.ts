@@ -5,6 +5,7 @@ import type {
   FireStation,
   PoliceStation,
   NursingFacility,
+  MigrantHealthCenter,
 } from "@/types";
 
 /** Haversine distance in meters */
@@ -72,6 +73,7 @@ let aedCache:
 let fireStationCache: FireStation[] | null = null;
 let policeStationCache: PoliceStation[] | null = null;
 let nursingCache: NursingFacility[] | null = null;
+let migrantHealthCache: MigrantHealthCenter[] | null = null;
 
 /** Fetch data file from local /data/ path (served by Vercel, always latest) */
 async function fetchData(filename: string): Promise<Response> {
@@ -158,6 +160,15 @@ async function loadNursing(): Promise<NursingFacility[]> {
   const data = await res.json();
   nursingCache = Array.isArray(data) ? data : [];
   return nursingCache;
+}
+
+async function loadMigrantHealth(): Promise<MigrantHealthCenter[]> {
+  if (migrantHealthCache) return migrantHealthCache;
+  const res = await fetchData("taiwan-migrant-health-centers.json");
+  if (!res.ok) return [];
+  const data = await res.json();
+  migrantHealthCache = Array.isArray(data) ? data : [];
+  return migrantHealthCache;
 }
 
 /** Helper: fetch with timeout */
@@ -374,6 +385,7 @@ export async function findNearby(lat: number, lng: number) {
     fireRaw,
     policeRaw,
     nursingRaw,
+    migrantHealthRaw,
   ] = await Promise.all([
     loadShelters(),
     loadAirRaid(),
@@ -383,6 +395,7 @@ export async function findNearby(lat: number, lng: number) {
     loadFireStations(),
     loadPoliceStations(),
     loadNursing(),
+    loadMigrantHealth(),
   ]);
 
   // Nearest disaster shelters
@@ -511,6 +524,12 @@ export async function findNearby(lat: number, lng: number) {
   ) as (NursingFacility & { lat: number; lng: number })[];
   const nearNursing = findNearest(nursingHomes, lat, lng, 1);
 
+  // Nearest migrant worker health centers (top 3)
+  const migrantHealth = migrantHealthRaw.filter(
+    (m) => m.lat != null && m.lng != null,
+  );
+  const nearMigrantHealth = findNearest(migrantHealth, lat, lng, 3);
+
   return {
     shelters: nearShelters,
     airRaid: nearAirRaid,
@@ -520,5 +539,6 @@ export async function findNearby(lat: number, lng: number) {
     fireStation: nearFire,
     policeStation: nearPolice,
     nursing: nearNursing,
+    migrantHealthCenters: nearMigrantHealth,
   };
 }

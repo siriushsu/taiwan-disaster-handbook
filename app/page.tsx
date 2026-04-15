@@ -456,6 +456,18 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-text">{T("site_title")}</h2>
             <p className="text-sm text-text-muted">{T("site_desc")}</p>
             <p className="text-xs text-text-faint">{T("privacy_notice")}</p>
+            <button
+              onClick={() => {
+                setForm((prev) => ({ ...prev, isForeignNational: true }));
+                setMode("form");
+                setStep(1);
+              }}
+              className="text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
+            >
+              {locale === "en"
+                ? "Foreign national? Enable migrant/resident mode →"
+                : "外籍人士？啟用專屬模式 →"}
+            </button>
           </div>
 
           {/* Data stats */}
@@ -1109,16 +1121,27 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm text-text-muted">
+                  <label className="flex items-start gap-2 text-sm text-text-muted">
                     <input
                       type="checkbox"
                       checked={form.isForeignNational}
                       onChange={(e) =>
                         updateForm("isForeignNational", e.target.checked)
                       }
-                      className="rounded"
+                      className="rounded mt-1"
                     />
-                    外籍人士 / Foreign National
+                    <div>
+                      <div>
+                        {locale === "en"
+                          ? "Foreign national (including migrant worker)"
+                          : "外籍人士（含外籍移工）/ Foreign national (incl. migrant worker)"}
+                      </div>
+                      <div className="text-xs text-text-faint mt-0.5 leading-snug">
+                        {locale === "en"
+                          ? "Enables multilingual emergency phrase card, 1955/113 hotlines, representative office info"
+                          : "勾選後會加入多語緊急用語卡、1955/113 專線、駐台辦事處資訊"}
+                      </div>
+                    </div>
                   </label>
                   {form.isForeignNational && (
                     <div className="mt-3 space-y-3 bg-primary-light rounded-lg p-3">

@@ -15,6 +15,7 @@ import type {
   Member,
 } from "@/types";
 import { FOREIGN_RESOURCES, FOREIGN_HOTLINES } from "@/lib/foreign-resources";
+import { MIGRANT_PHRASES, PHRASE_CATEGORIES } from "@/lib/migrant-phrases";
 import { pt, ptEn, type BiMode } from "@/lib/pdf-i18n";
 
 // Fonts served from jsDelivr CDN (free, unlimited bandwidth)
@@ -29,6 +30,18 @@ Font.register({
       fontWeight: "normal",
     },
     { src: `${CDN_FONTS}/NotoSansTC-Bold-subset.ttf?v=2`, fontWeight: "bold" },
+  ],
+});
+
+// Noto Sans Thai — separate registration because Thai glyphs are not in NotoSansTC subset.
+// Loaded from Google Fonts raw file mirror.
+Font.register({
+  family: "NotoSansThai",
+  fonts: [
+    {
+      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-thai@latest/thai-400-normal.ttf",
+      fontWeight: "normal",
+    },
   ],
 });
 
@@ -584,191 +597,120 @@ function LocationPage({
 
   return (
     <>
-    <Page size="A4" style={s.page}>
-      <View style={s.locHeader}>
-        <Text style={s.locTitle}>
-          {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}
-          {biMode !== "zh" ? " / " + ptEn("loc_evac_guide_suffix") : ""}
-        </Text>
-        <Text style={s.locAddr}>{loc.address}</Text>
-        {loc.housingType === "apartment" && loc.floor ? (
-          <Text style={s.locAddr}>
-            {pt(biMode, "loc_apt_building")} {loc.floor}{" "}
-            {pt(biMode, "loc_floor_suffix")}
-            {biMode !== "zh" ? " / Apt Bldg" : ""}
+      <Page size="A4" style={s.page}>
+        <View style={s.locHeader}>
+          <Text style={s.locTitle}>
+            {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}
+            {biMode !== "zh" ? " / " + ptEn("loc_evac_guide_suffix") : ""}
           </Text>
-        ) : null}
-      </View>
-
-      <DirMap loc={loc} mapImg={mapImg} />
-
-      {/* Meeting Points */}
-      <Text style={s.sectionTitle}>{pt(biMode, "loc_meeting")}</Text>
-      {biMode !== "zh" && (
-        <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-          {ptEn("loc_meeting")}
-        </Text>
-      )}
-      <Text
-        style={{
-          fontSize: 7.5,
-          color: "#6B6560",
-          marginBottom: biMode !== "zh" ? 1 : 2,
-        }}
-      >
-        {pt(biMode, "loc_meeting_desc")}
-      </Text>
-      {biMode !== "zh" && (
-        <Text style={{ fontSize: 7.5, color: "#6B6560", marginBottom: 4 }}>
-          {ptEn("loc_meeting_desc")}
-        </Text>
-      )}
-      <View style={s.meetBox}>
-        <View
-          style={[
-            s.meetCard,
-            {
-              backgroundColor: "#E6F3F3",
-              borderWidth: 1,
-              borderColor: "#E6F3F3",
-            },
-          ]}
-        >
-          <Text style={[s.meetLabel, { color: "#0D7377" }]}>
-            {pt(biMode, "loc_primary")}
-            {biMode !== "zh" ? " / " + ptEn("loc_primary") : ""}
-          </Text>
-          <Text style={s.meetValue}>
-            {mainShelter?.name ?? pt(biMode, "loc_fallback_primary")}
-          </Text>
-          {mainShelter?.address ? (
-            <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
-              {mainShelter.address}
-            </Text>
-          ) : null}
-          {mainShelter?.distance ? (
-            <Text style={{ fontSize: 8, color: "#059669", marginTop: 1 }}>
-              {distText(mainShelter.distance)}（{walkMin(mainShelter.distance)}
-              ）
+          <Text style={s.locAddr}>{loc.address}</Text>
+          {loc.housingType === "apartment" && loc.floor ? (
+            <Text style={s.locAddr}>
+              {pt(biMode, "loc_apt_building")} {loc.floor}{" "}
+              {pt(biMode, "loc_floor_suffix")}
+              {biMode !== "zh" ? " / Apt Bldg" : ""}
             </Text>
           ) : null}
         </View>
-        <View
-          style={[
-            s.meetCard,
-            {
-              backgroundColor: "#fff7ed",
-              borderWidth: 1,
-              borderColor: "#fed7aa",
-            },
-          ]}
-        >
-          <Text style={[s.meetLabel, { color: "#c2410c" }]}>
-            {pt(biMode, "loc_backup")}
-            {biMode !== "zh" ? " / " + ptEn("loc_backup") : ""}
-          </Text>
-          <Text style={s.meetValue}>
-            {backupShelter?.name ?? pt(biMode, "loc_fallback_backup")}
-          </Text>
-          {backupShelter?.address ? (
-            <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
-              {backupShelter.address}
-            </Text>
-          ) : null}
-          {backupShelter?.distance ? (
-            <Text style={{ fontSize: 8, color: "#059669", marginTop: 1 }}>
-              {distText(backupShelter.distance)}（
-              {walkMin(backupShelter.distance)}）
-            </Text>
-          ) : null}
-        </View>
-      </View>
 
-      {/* Nearest shelters */}
-      <Text style={s.sectionTitle}>{pt(biMode, "loc_shelters")}</Text>
-      {biMode !== "zh" && (
-        <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-          {ptEn("loc_shelters")}
+        <DirMap loc={loc} mapImg={mapImg} />
+
+        {/* Meeting Points */}
+        <Text style={s.sectionTitle}>{pt(biMode, "loc_meeting")}</Text>
+        {biMode !== "zh" && (
+          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+            {ptEn("loc_meeting")}
+          </Text>
+        )}
+        <Text
+          style={{
+            fontSize: 7.5,
+            color: "#6B6560",
+            marginBottom: biMode !== "zh" ? 1 : 2,
+          }}
+        >
+          {pt(biMode, "loc_meeting_desc")}
         </Text>
-      )}
-      <Text style={{ fontSize: 6, color: "#9C9691", marginBottom: 2 }}>
-        {pt(biMode, "loc_qr_hint")}
-      </Text>
-      {natural.length > 0 ? (
-        natural.slice(0, 5).map((sh: Shelter, i: number) => (
-          <View key={i} style={s.shelterCard}>
-            <Text style={s.shelterNum}>{i + 1}</Text>
-            <View style={s.shelterInfo}>
-              <Text style={s.shelterName}>{sh.name}</Text>
-              {sh.address ? (
-                <Text style={s.shelterAddr}>{sh.address}</Text>
-              ) : null}
-              <Text style={s.shelterDist}>
-                {distText(sh.distance)}（{walkMin(sh.distance)}）
-                {sh.capacity
-                  ? `　${pt(biMode, "loc_capacity_prefix")} ${sh.capacity.toLocaleString()} ${pt(biMode, "loc_capacity_suffix")}`
-                  : ""}
-                {sh.indoor ? `　${pt(biMode, "label_indoor")}` : ""}
+        {biMode !== "zh" && (
+          <Text style={{ fontSize: 7.5, color: "#6B6560", marginBottom: 4 }}>
+            {ptEn("loc_meeting_desc")}
+          </Text>
+        )}
+        <View style={s.meetBox}>
+          <View
+            style={[
+              s.meetCard,
+              {
+                backgroundColor: "#E6F3F3",
+                borderWidth: 1,
+                borderColor: "#E6F3F3",
+              },
+            ]}
+          >
+            <Text style={[s.meetLabel, { color: "#0D7377" }]}>
+              {pt(biMode, "loc_primary")}
+              {biMode !== "zh" ? " / " + ptEn("loc_primary") : ""}
+            </Text>
+            <Text style={s.meetValue}>
+              {mainShelter?.name ?? pt(biMode, "loc_fallback_primary")}
+            </Text>
+            {mainShelter?.address ? (
+              <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
+                {mainShelter.address}
               </Text>
-              {sh.disasterTypes ? (
-                <Text style={s.shelterAddr}>
-                  {pt(biMode, "label_applicable")}：{sh.disasterTypes}
-                </Text>
-              ) : null}
-              {sh.phone ? (
-                <Text style={s.shelterAddr}>
-                  {pt(biMode, "label_mgmt_phone")}：{sh.phone}
-                </Text>
-              ) : null}
-              {sh.vulnerableFriendly ? (
-                <Text style={{ fontSize: 7.5, color: "#059669", marginTop: 1 }}>
-                  {pt(biMode, "label_vulnerable")}
-                </Text>
-              ) : null}
-            </View>
-            {sh.lat && sh.lng ? (
-              /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-              <Image
-                src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
-                style={{ width: 28, height: 28, flexShrink: 0 }}
-              />
+            ) : null}
+            {mainShelter?.distance ? (
+              <Text style={{ fontSize: 8, color: "#059669", marginTop: 1 }}>
+                {distText(mainShelter.distance)}（
+                {walkMin(mainShelter.distance)}）
+              </Text>
             ) : null}
           </View>
-        ))
-      ) : (
-        <View style={s.noDataBox}>
-          <Text style={{ fontSize: 9, color: "#854d0e" }}>
-            {pt(biMode, "loc_no_data")}
-          </Text>
-        </View>
-      )}
-      <Text style={s.shelterTag}>{pt(biMode, "loc_shelters_src")}</Text>
-
-      <Footer label={`${loc.label} - ${pt(biMode, "loc_shelters")}`} biMode={biMode} />
-    </Page>
-
-    {/* Page 2: Air Raid + Medical + AED + Housing-specific tips */}
-    <Page size="A4" style={s.page}>
-      <View style={[s.locHeader, { marginBottom: 8 }]}>
-        <Text style={[s.locTitle, { fontSize: 11 }]}>
-          {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}（{biMode === "en" ? "cont." : "續"}）
-        </Text>
-      </View>
-
-      {/* Air defense shelters */}
-      {air.length > 0 && (
-        <>
-          <Text style={s.sectionTitle}>{pt(biMode, "loc_airraid")}</Text>
-          {biMode !== "zh" && (
-            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-              {ptEn("loc_airraid")}
+          <View
+            style={[
+              s.meetCard,
+              {
+                backgroundColor: "#fff7ed",
+                borderWidth: 1,
+                borderColor: "#fed7aa",
+              },
+            ]}
+          >
+            <Text style={[s.meetLabel, { color: "#c2410c" }]}>
+              {pt(biMode, "loc_backup")}
+              {biMode !== "zh" ? " / " + ptEn("loc_backup") : ""}
             </Text>
-          )}
-          {air.slice(0, 3).map((sh: Shelter, i: number) => (
-            <View key={i} style={s.shelterCard}>
-              <Text style={[s.shelterNum, { backgroundColor: "#8b5cf6" }]}>
-                {i + 1}
+            <Text style={s.meetValue}>
+              {backupShelter?.name ?? pt(biMode, "loc_fallback_backup")}
+            </Text>
+            {backupShelter?.address ? (
+              <Text style={{ fontSize: 7, color: "#6B6560", marginTop: 1 }}>
+                {backupShelter.address}
               </Text>
+            ) : null}
+            {backupShelter?.distance ? (
+              <Text style={{ fontSize: 8, color: "#059669", marginTop: 1 }}>
+                {distText(backupShelter.distance)}（
+                {walkMin(backupShelter.distance)}）
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
+        {/* Nearest shelters */}
+        <Text style={s.sectionTitle}>{pt(biMode, "loc_shelters")}</Text>
+        {biMode !== "zh" && (
+          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+            {ptEn("loc_shelters")}
+          </Text>
+        )}
+        <Text style={{ fontSize: 6, color: "#9C9691", marginBottom: 2 }}>
+          {pt(biMode, "loc_qr_hint")}
+        </Text>
+        {natural.length > 0 ? (
+          natural.slice(0, 5).map((sh: Shelter, i: number) => (
+            <View key={i} style={s.shelterCard}>
+              <Text style={s.shelterNum}>{i + 1}</Text>
               <View style={s.shelterInfo}>
                 <Text style={s.shelterName}>{sh.name}</Text>
                 {sh.address ? (
@@ -776,7 +718,28 @@ function LocationPage({
                 ) : null}
                 <Text style={s.shelterDist}>
                   {distText(sh.distance)}（{walkMin(sh.distance)}）
+                  {sh.capacity
+                    ? `　${pt(biMode, "loc_capacity_prefix")} ${sh.capacity.toLocaleString()} ${pt(biMode, "loc_capacity_suffix")}`
+                    : ""}
+                  {sh.indoor ? `　${pt(biMode, "label_indoor")}` : ""}
                 </Text>
+                {sh.disasterTypes ? (
+                  <Text style={s.shelterAddr}>
+                    {pt(biMode, "label_applicable")}：{sh.disasterTypes}
+                  </Text>
+                ) : null}
+                {sh.phone ? (
+                  <Text style={s.shelterAddr}>
+                    {pt(biMode, "label_mgmt_phone")}：{sh.phone}
+                  </Text>
+                ) : null}
+                {sh.vulnerableFriendly ? (
+                  <Text
+                    style={{ fontSize: 7.5, color: "#059669", marginTop: 1 }}
+                  >
+                    {pt(biMode, "label_vulnerable")}
+                  </Text>
+                ) : null}
               </View>
               {sh.lat && sh.lng ? (
                 /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
@@ -786,207 +749,269 @@ function LocationPage({
                 />
               ) : null}
             </View>
-          ))}
-        </>
-      )}
-
-      {/* Medical */}
-      {loc.medical.length > 0 && (
-        <>
-          <Text style={s.sectionTitle}>{pt(biMode, "loc_medical")}</Text>
-          {biMode !== "zh" && (
-            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-              {ptEn("loc_medical")}
+          ))
+        ) : (
+          <View style={s.noDataBox}>
+            <Text style={{ fontSize: 9, color: "#854d0e" }}>
+              {pt(biMode, "loc_no_data")}
             </Text>
-          )}
-          {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
-            <View key={i} style={s.medCard}>
-              <Text style={[s.shelterNum, { backgroundColor: "#059669" }]}>
-                {i + 1}
-              </Text>
-              <View style={s.shelterInfo}>
-                <Text style={s.shelterName}>{m.name}</Text>
-                {m.address ? (
-                  <Text style={s.shelterAddr}>{m.address}</Text>
-                ) : null}
-                <Text style={s.shelterDist}>
-                  {m.type === "hospital"
-                    ? pt(biMode, "label_hospital")
-                    : pt(biMode, "label_clinic")}
-                  {m.erLevel === "重度"
-                    ? "（重度急救責任醫院）"
-                    : m.hasER
-                      ? pt(biMode, "label_has_er_paren")
-                      : ""}
-                  　{distText(m.distance)}（{walkMin(m.distance)}）
-                  {m.phone ? `　${m.phone}` : ""}
-                </Text>
-              </View>
-              {m.lat && m.lng ? (
-                /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-                <Image
-                  src={qrUrl(mapsUrl(m.lat, m.lng), 80)}
-                  style={{ width: 28, height: 28, flexShrink: 0 }}
-                />
-              ) : null}
-            </View>
-          ))}
-        </>
-      )}
+          </View>
+        )}
+        <Text style={s.shelterTag}>{pt(biMode, "loc_shelters_src")}</Text>
 
-      {/* AED */}
-      {(loc.aed ?? []).length > 0 && (
-        <>
-          <Text style={s.sectionTitle}>
-            {biMode === "en" ? "Nearest AED" : "最近 AED（自動體外心臟電擊器）"}
+        <Footer
+          label={`${loc.label} - ${pt(biMode, "loc_shelters")}`}
+          biMode={biMode}
+        />
+      </Page>
+
+      {/* Page 2: Air Raid + Medical + AED + Housing-specific tips */}
+      <Page size="A4" style={s.page}>
+        <View style={[s.locHeader, { marginBottom: 8 }]}>
+          <Text style={[s.locTitle, { fontSize: 11 }]}>
+            {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}（
+            {biMode === "en" ? "cont." : "續"}）
           </Text>
-          {biMode !== "zh" && (
-            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-              Nearest AED (Automated External Defibrillator)
-            </Text>
-          )}
-          {(loc.aed ?? []).slice(0, 2).map(
-            (
-              a: {
-                name: string;
-                address: string;
-                lat: number;
-                lng: number;
-                location: string;
-                phone: string;
-                distance?: number;
-              },
-              i: number,
-            ) => (
-              <View key={i} style={s.medCard}>
-                <Text style={[s.shelterNum, { backgroundColor: "#dc2626" }]}>
+        </View>
+
+        {/* Air defense shelters */}
+        {air.length > 0 && (
+          <>
+            <Text style={s.sectionTitle}>{pt(biMode, "loc_airraid")}</Text>
+            {biMode !== "zh" && (
+              <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                {ptEn("loc_airraid")}
+              </Text>
+            )}
+            {air.slice(0, 3).map((sh: Shelter, i: number) => (
+              <View key={i} style={s.shelterCard}>
+                <Text style={[s.shelterNum, { backgroundColor: "#8b5cf6" }]}>
                   {i + 1}
                 </Text>
                 <View style={s.shelterInfo}>
-                  <Text style={s.shelterName}>{a.name}</Text>
-                  {a.location ? (
-                    <Text style={s.shelterAddr}>{a.location}</Text>
+                  <Text style={s.shelterName}>{sh.name}</Text>
+                  {sh.address ? (
+                    <Text style={s.shelterAddr}>{sh.address}</Text>
                   ) : null}
                   <Text style={s.shelterDist}>
-                    {distText(a.distance)}（{walkMin(a.distance)}）
-                    {a.phone ? `　${a.phone}` : ""}
+                    {distText(sh.distance)}（{walkMin(sh.distance)}）
                   </Text>
                 </View>
-              </View>
-            ),
-          )}
-        </>
-      )}
-
-      {/* Apartment-specific evacuation */}
-      {loc.housingType === "apartment" && (
-        <>
-          <Text style={s.sectionTitle}>{pt(biMode, "loc_apt_title")}</Text>
-          {biMode !== "zh" && (
-            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-              {ptEn("loc_apt_title")}
-            </Text>
-          )}
-          <View
-            style={[
-              s.warningBox,
-              {
-                backgroundColor: "#fef2f2",
-                borderWidth: 1,
-                borderColor: "#fecaca",
-              },
-            ]}
-          >
-            {[
-              [
-                isBasement
-                  ? `${pt(biMode, "apt_basement_prefix")} ${loc.floor} ${pt(biMode, "loc_floor_suffix")}。${pt(biMode, "apt_basement_eq")}`
-                  : `${pt(biMode, "apt_1_pre")} ${loc.floor || "?"} ${pt(biMode, "apt_1_post")}`,
-                isBasement
-                  ? `${ptEn("apt_basement_prefix")} ${loc.floor} ${ptEn("loc_floor_suffix")}. ${ptEn("apt_basement_eq")}`
-                  : `${ptEn("apt_1_pre")} ${loc.floor || "?"} ${ptEn("apt_1_post")}`,
-              ],
-              [
-                isBasement
-                  ? pt(biMode, "apt_basement_flood")
-                  : pt(biMode, "apt_2"),
-                isBasement ? ptEn("apt_basement_flood") : ptEn("apt_2"),
-              ],
-              [pt(biMode, "apt_3"), ptEn("apt_3")],
-              [pt(biMode, "apt_4"), ptEn("apt_4")],
-              [
-                `${pt(biMode, "apt_go_to_meeting")}${mainShelter?.name ?? pt(biMode, "loc_fallback_plaza")}`,
-                `${ptEn("apt_go_to_meeting")}${mainShelter?.name ?? ptEn("loc_fallback_plaza")}`,
-              ],
-            ].map(([zh, en], i) => (
-              <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                <Text style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}>
-                  {"·"}
-                </Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 9 }}>{zh}</Text>
-                  {biMode !== "zh" && (
-                    <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-                      {en}
-                    </Text>
-                  )}
-                </View>
+                {sh.lat && sh.lng ? (
+                  /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
+                  <Image
+                    src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
+                    style={{ width: 28, height: 28, flexShrink: 0 }}
+                  />
+                ) : null}
               </View>
             ))}
-          </View>
-        </>
-      )}
+          </>
+        )}
 
-      {loc.housingType === "house" && (
-        <>
-          <Text style={s.sectionTitle}>{pt(biMode, "loc_house_title")}</Text>
-          {biMode !== "zh" && (
-            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-              {ptEn("loc_house_title")}
-            </Text>
-          )}
-          <View
-            style={[
-              s.warningBox,
-              {
-                backgroundColor: "#fef2f2",
-                borderWidth: 1,
-                borderColor: "#fecaca",
-              },
-            ]}
-          >
-            {[
-              [pt(biMode, "house_1"), ptEn("house_1")],
-              [pt(biMode, "house_2"), ptEn("house_2")],
-              [pt(biMode, "house_3"), ptEn("house_3")],
-              [
-                `${pt(biMode, "house_4_prefix")}${mainShelter?.name ?? pt(biMode, "loc_fallback_plaza")}`,
-                `${ptEn("house_4_prefix")}${mainShelter?.name ?? ptEn("loc_fallback_plaza")}`,
-              ],
-            ].map(([zh, en], i) => (
-              <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                <Text style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}>
-                  {"·"}
+        {/* Medical */}
+        {loc.medical.length > 0 && (
+          <>
+            <Text style={s.sectionTitle}>{pt(biMode, "loc_medical")}</Text>
+            {biMode !== "zh" && (
+              <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                {ptEn("loc_medical")}
+              </Text>
+            )}
+            {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
+              <View key={i} style={s.medCard}>
+                <Text style={[s.shelterNum, { backgroundColor: "#059669" }]}>
+                  {i + 1}
                 </Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 9 }}>{zh}</Text>
-                  {biMode !== "zh" && (
-                    <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-                      {en}
-                    </Text>
-                  )}
+                <View style={s.shelterInfo}>
+                  <Text style={s.shelterName}>{m.name}</Text>
+                  {m.address ? (
+                    <Text style={s.shelterAddr}>{m.address}</Text>
+                  ) : null}
+                  <Text style={s.shelterDist}>
+                    {m.type === "hospital"
+                      ? pt(biMode, "label_hospital")
+                      : pt(biMode, "label_clinic")}
+                    {m.erLevel === "重度"
+                      ? "（重度急救責任醫院）"
+                      : m.hasER
+                        ? pt(biMode, "label_has_er_paren")
+                        : ""}
+                    　{distText(m.distance)}（{walkMin(m.distance)}）
+                    {m.phone ? `　${m.phone}` : ""}
+                  </Text>
                 </View>
+                {m.lat && m.lng ? (
+                  /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
+                  <Image
+                    src={qrUrl(mapsUrl(m.lat, m.lng), 80)}
+                    style={{ width: 28, height: 28, flexShrink: 0 }}
+                  />
+                ) : null}
               </View>
             ))}
-          </View>
-        </>
-      )}
+          </>
+        )}
 
-      <Footer
-        label={`${loc.label} ${pt(biMode, "loc_evac_guide_footer")}`}
-        biMode={biMode}
-      />
-    </Page>
+        {/* AED */}
+        {(loc.aed ?? []).length > 0 && (
+          <>
+            <Text style={s.sectionTitle}>
+              {biMode === "en"
+                ? "Nearest AED"
+                : "最近 AED（自動體外心臟電擊器）"}
+            </Text>
+            {biMode !== "zh" && (
+              <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                Nearest AED (Automated External Defibrillator)
+              </Text>
+            )}
+            {(loc.aed ?? []).slice(0, 2).map(
+              (
+                a: {
+                  name: string;
+                  address: string;
+                  lat: number;
+                  lng: number;
+                  location: string;
+                  phone: string;
+                  distance?: number;
+                },
+                i: number,
+              ) => (
+                <View key={i} style={s.medCard}>
+                  <Text style={[s.shelterNum, { backgroundColor: "#dc2626" }]}>
+                    {i + 1}
+                  </Text>
+                  <View style={s.shelterInfo}>
+                    <Text style={s.shelterName}>{a.name}</Text>
+                    {a.location ? (
+                      <Text style={s.shelterAddr}>{a.location}</Text>
+                    ) : null}
+                    <Text style={s.shelterDist}>
+                      {distText(a.distance)}（{walkMin(a.distance)}）
+                      {a.phone ? `　${a.phone}` : ""}
+                    </Text>
+                  </View>
+                </View>
+              ),
+            )}
+          </>
+        )}
+
+        {/* Apartment-specific evacuation */}
+        {loc.housingType === "apartment" && (
+          <>
+            <Text style={s.sectionTitle}>{pt(biMode, "loc_apt_title")}</Text>
+            {biMode !== "zh" && (
+              <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                {ptEn("loc_apt_title")}
+              </Text>
+            )}
+            <View
+              style={[
+                s.warningBox,
+                {
+                  backgroundColor: "#fef2f2",
+                  borderWidth: 1,
+                  borderColor: "#fecaca",
+                },
+              ]}
+            >
+              {[
+                [
+                  isBasement
+                    ? `${pt(biMode, "apt_basement_prefix")} ${loc.floor} ${pt(biMode, "loc_floor_suffix")}。${pt(biMode, "apt_basement_eq")}`
+                    : `${pt(biMode, "apt_1_pre")} ${loc.floor || "?"} ${pt(biMode, "apt_1_post")}`,
+                  isBasement
+                    ? `${ptEn("apt_basement_prefix")} ${loc.floor} ${ptEn("loc_floor_suffix")}. ${ptEn("apt_basement_eq")}`
+                    : `${ptEn("apt_1_pre")} ${loc.floor || "?"} ${ptEn("apt_1_post")}`,
+                ],
+                [
+                  isBasement
+                    ? pt(biMode, "apt_basement_flood")
+                    : pt(biMode, "apt_2"),
+                  isBasement ? ptEn("apt_basement_flood") : ptEn("apt_2"),
+                ],
+                [pt(biMode, "apt_3"), ptEn("apt_3")],
+                [pt(biMode, "apt_4"), ptEn("apt_4")],
+                [
+                  `${pt(biMode, "apt_go_to_meeting")}${mainShelter?.name ?? pt(biMode, "loc_fallback_plaza")}`,
+                  `${ptEn("apt_go_to_meeting")}${mainShelter?.name ?? ptEn("loc_fallback_plaza")}`,
+                ],
+              ].map(([zh, en], i) => (
+                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
+                  <Text
+                    style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}
+                  >
+                    {"·"}
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 9 }}>{zh}</Text>
+                    {biMode !== "zh" && (
+                      <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                        {en}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {loc.housingType === "house" && (
+          <>
+            <Text style={s.sectionTitle}>{pt(biMode, "loc_house_title")}</Text>
+            {biMode !== "zh" && (
+              <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                {ptEn("loc_house_title")}
+              </Text>
+            )}
+            <View
+              style={[
+                s.warningBox,
+                {
+                  backgroundColor: "#fef2f2",
+                  borderWidth: 1,
+                  borderColor: "#fecaca",
+                },
+              ]}
+            >
+              {[
+                [pt(biMode, "house_1"), ptEn("house_1")],
+                [pt(biMode, "house_2"), ptEn("house_2")],
+                [pt(biMode, "house_3"), ptEn("house_3")],
+                [
+                  `${pt(biMode, "house_4_prefix")}${mainShelter?.name ?? pt(biMode, "loc_fallback_plaza")}`,
+                  `${ptEn("house_4_prefix")}${mainShelter?.name ?? ptEn("loc_fallback_plaza")}`,
+                ],
+              ].map(([zh, en], i) => (
+                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
+                  <Text
+                    style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}
+                  >
+                    {"·"}
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 9 }}>{zh}</Text>
+                    {biMode !== "zh" && (
+                      <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                        {en}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        <Footer
+          label={`${loc.label} ${pt(biMode, "loc_evac_guide_footer")}`}
+          biMode={biMode}
+        />
+      </Page>
     </>
   );
 }
@@ -1390,241 +1415,246 @@ export default function HandbookPDF({
 
       {/* ─── PAGE 3: FAMILY REUNION & COMMUNICATION PLAN (skip if no named members) ─── */}
       {allMembers.length > 0 && (
-      <Page size="A4" style={s.page}>
-        <Text
-          style={[
-            s.scenarioTitle,
-            { borderBottomColor: "#3b82f6", color: "#0D7377" },
-          ]}
-        >
-          {pt(biMode, "reunion_title")}
-        </Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 8, color: "#0D7377", marginBottom: 2 }}>
-            {ptEn("reunion_title")}
+        <Page size="A4" style={s.page}>
+          <Text
+            style={[
+              s.scenarioTitle,
+              { borderBottomColor: "#3b82f6", color: "#0D7377" },
+            ]}
+          >
+            {pt(biMode, "reunion_title")}
           </Text>
-        )}
-        <Text
-          style={{
-            fontSize: 9,
-            color: "#6B6560",
-            marginBottom: biMode !== "zh" ? 2 : 8,
-          }}
-        >
-          {pt(biMode, "reunion_desc")}
-        </Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 8, color: "#6B6560", marginBottom: 6 }}>
-            {ptEn("reunion_desc")}
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 8, color: "#0D7377", marginBottom: 2 }}>
+              {ptEn("reunion_title")}
+            </Text>
+          )}
+          <Text
+            style={{
+              fontSize: 9,
+              color: "#6B6560",
+              marginBottom: biMode !== "zh" ? 2 : 8,
+            }}
+          >
+            {pt(biMode, "reunion_desc")}
           </Text>
-        )}
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 8, color: "#6B6560", marginBottom: 6 }}>
+              {ptEn("reunion_desc")}
+            </Text>
+          )}
 
-        {/* Each member's location and nearest shelter */}
-        <Text style={s.sectionTitle}>{pt(biMode, "reunion_members")}</Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-            {ptEn("reunion_members")}
-          </Text>
-        )}
-        {allMembers.map((m, i) => {
-          const addr = memberAddr(m, fullAddr);
-          const loc = m.hasDifferentAddress
-            ? data.locations.find((l) => l.memberName === m.name)
-            : mainLocation;
-          const nearestShelter = loc?.shelters[0];
-          return (
-            <View key={i} style={s.reunionBox}>
-              <Text style={s.reunionName}>{m.name}</Text>
-              <View style={s.reunionRow}>
-                <Text style={s.reunionLabel}>
-                  {pt(biMode, "reunion_addr")}
-                  {biMode !== "zh" ? "/" + ptEn("reunion_addr") : ""}
-                </Text>
-                <Text style={s.reunionValue}>{addr}</Text>
-              </View>
-              <View style={s.reunionRow}>
-                <Text style={s.reunionLabel}>
-                  {pt(biMode, "reunion_shelter")}
-                  {biMode !== "zh" ? "/" + ptEn("reunion_shelter") : ""}
-                </Text>
-                <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
-                  {nearestShelter?.name ?? pt(biMode, "reunion_query_office")}
-                  {nearestShelter?.distance
-                    ? ` （${distText(nearestShelter.distance)}）`
-                    : ""}
-                </Text>
-              </View>
-              {m.isMobilityImpaired && (
-                <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>
-                    {pt(biMode, "reunion_special_needs")}
-                    {biMode !== "zh" ? "/" + ptEn("reunion_special_needs") : ""}
-                  </Text>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={[
-                        s.reunionValue,
-                        { color: "#C93B3B", fontWeight: "bold" },
-                      ]}
-                    >
-                      {pt(biMode, "reunion_mobility")}
-                    </Text>
-                    {biMode !== "zh" && (
-                      <Text style={{ fontSize: 7.5, color: "#C93B3B" }}>
-                        {ptEn("reunion_mobility")}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              )}
-              {m.medications && (
-                <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>
-                    {pt(biMode, "reunion_meds")}
-                    {biMode !== "zh" ? "/" + ptEn("reunion_meds") : ""}
-                  </Text>
-                  <Text style={s.reunionValue}>{m.medications}</Text>
-                </View>
-              )}
-            </View>
-          );
-        })}
-
-        {/* Communication Plan */}
-        <Text style={s.sectionTitle}>{pt(biMode, "comm_title")}</Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-            {ptEn("comm_title")}
-          </Text>
-        )}
-        <View style={[s.tipBox]}>
-          {(
-            [
-              "comm_1",
-              "comm_2_text",
-              "comm_3",
-              outOfCityContact
-                ? "comm_4_with_contact_pre"
-                : "comm_4_no_contact",
-              "comm_5",
-            ] as string[]
-          ).map((key, i) => {
-            const zhText =
-              i === 3
-                ? outOfCityContact
-                  ? `${pt(biMode, "comm_4_with_contact_pre")} ${outOfCityContact.name}（${outOfCityContact.phone}）${pt(biMode, "comm_4_with_contact_post")}`
-                  : pt(biMode, "comm_4_no_contact")
-                : pt(biMode, key);
-            const enText =
-              i === 3
-                ? outOfCityContact
-                  ? `${ptEn("comm_4_with_contact_pre")} ${outOfCityContact.name} (${outOfCityContact.phone})${ptEn("comm_4_with_contact_post")}`
-                  : ptEn("comm_4_no_contact")
-                : ptEn(key);
+          {/* Each member's location and nearest shelter */}
+          <Text style={s.sectionTitle}>{pt(biMode, "reunion_members")}</Text>
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+              {ptEn("reunion_members")}
+            </Text>
+          )}
+          {allMembers.map((m, i) => {
+            const addr = memberAddr(m, fullAddr);
+            const loc = m.hasDifferentAddress
+              ? data.locations.find((l) => l.memberName === m.name)
+              : mainLocation;
+            const nearestShelter = loc?.shelters[0];
             return (
-              <View key={i} style={{ marginBottom: 2 }}>
-                <Text style={s.tipText}>{zhText}</Text>
-                {biMode !== "zh" && (
-                  <Text
-                    style={[s.tipText, { fontSize: 7.5, color: "#6B6560" }]}
-                  >
-                    {enText}
+              <View key={i} style={s.reunionBox}>
+                <Text style={s.reunionName}>{m.name}</Text>
+                <View style={s.reunionRow}>
+                  <Text style={s.reunionLabel}>
+                    {pt(biMode, "reunion_addr")}
+                    {biMode !== "zh" ? "/" + ptEn("reunion_addr") : ""}
                   </Text>
+                  <Text style={s.reunionValue}>{addr}</Text>
+                </View>
+                <View style={s.reunionRow}>
+                  <Text style={s.reunionLabel}>
+                    {pt(biMode, "reunion_shelter")}
+                    {biMode !== "zh" ? "/" + ptEn("reunion_shelter") : ""}
+                  </Text>
+                  <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
+                    {nearestShelter?.name ?? pt(biMode, "reunion_query_office")}
+                    {nearestShelter?.distance
+                      ? ` （${distText(nearestShelter.distance)}）`
+                      : ""}
+                  </Text>
+                </View>
+                {m.isMobilityImpaired && (
+                  <View style={s.reunionRow}>
+                    <Text style={s.reunionLabel}>
+                      {pt(biMode, "reunion_special_needs")}
+                      {biMode !== "zh"
+                        ? "/" + ptEn("reunion_special_needs")
+                        : ""}
+                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={[
+                          s.reunionValue,
+                          { color: "#C93B3B", fontWeight: "bold" },
+                        ]}
+                      >
+                        {pt(biMode, "reunion_mobility")}
+                      </Text>
+                      {biMode !== "zh" && (
+                        <Text style={{ fontSize: 7.5, color: "#C93B3B" }}>
+                          {ptEn("reunion_mobility")}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                )}
+                {m.medications && (
+                  <View style={s.reunionRow}>
+                    <Text style={s.reunionLabel}>
+                      {pt(biMode, "reunion_meds")}
+                      {biMode !== "zh" ? "/" + ptEn("reunion_meds") : ""}
+                    </Text>
+                    <Text style={s.reunionValue}>{m.medications}</Text>
+                  </View>
                 )}
               </View>
             );
           })}
-        </View>
 
-        {/* When phone doesn't work */}
-        <Text style={s.sectionTitle}>{pt(biMode, "nophone_title")}</Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-            {ptEn("nophone_title")}
-          </Text>
-        )}
-        <View
-          style={[
-            s.warningBox,
-            {
-              backgroundColor: "#fef2f2",
-              borderWidth: 1,
-              borderColor: "#fecaca",
-            },
-          ]}
-        >
-          {(
-            [
-              "nophone_1",
-              "nophone_2",
-              "nophone_3",
-              "nophone_4",
-              "nophone_5",
-            ] as const
-          ).map((key, i) => (
-            <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-              <Text style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}>
-                {"·"}
-              </Text>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
-                {biMode !== "zh" && (
-                  <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-                    {ptEn(key)}
-                  </Text>
-                )}
+          {/* Communication Plan */}
+          <Text style={s.sectionTitle}>{pt(biMode, "comm_title")}</Text>
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+              {ptEn("comm_title")}
+            </Text>
+          )}
+          <View style={[s.tipBox]}>
+            {(
+              [
+                "comm_1",
+                "comm_2_text",
+                "comm_3",
+                outOfCityContact
+                  ? "comm_4_with_contact_pre"
+                  : "comm_4_no_contact",
+                "comm_5",
+              ] as string[]
+            ).map((key, i) => {
+              const zhText =
+                i === 3
+                  ? outOfCityContact
+                    ? `${pt(biMode, "comm_4_with_contact_pre")} ${outOfCityContact.name}（${outOfCityContact.phone}）${pt(biMode, "comm_4_with_contact_post")}`
+                    : pt(biMode, "comm_4_no_contact")
+                  : pt(biMode, key);
+              const enText =
+                i === 3
+                  ? outOfCityContact
+                    ? `${ptEn("comm_4_with_contact_pre")} ${outOfCityContact.name} (${outOfCityContact.phone})${ptEn("comm_4_with_contact_post")}`
+                    : ptEn("comm_4_no_contact")
+                  : ptEn(key);
+              return (
+                <View key={i} style={{ marginBottom: 2 }}>
+                  <Text style={s.tipText}>{zhText}</Text>
+                  {biMode !== "zh" && (
+                    <Text
+                      style={[s.tipText, { fontSize: 7.5, color: "#6B6560" }]}
+                    >
+                      {enText}
+                    </Text>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+
+          {/* When phone doesn't work */}
+          <Text style={s.sectionTitle}>{pt(biMode, "nophone_title")}</Text>
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+              {ptEn("nophone_title")}
+            </Text>
+          )}
+          <View
+            style={[
+              s.warningBox,
+              {
+                backgroundColor: "#fef2f2",
+                borderWidth: 1,
+                borderColor: "#fecaca",
+              },
+            ]}
+          >
+            {(
+              [
+                "nophone_1",
+                "nophone_2",
+                "nophone_3",
+                "nophone_4",
+                "nophone_5",
+              ] as const
+            ).map((key, i) => (
+              <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
+                <Text style={{ color: "#C93B3B", marginRight: 5, fontSize: 9 }}>
+                  {"·"}
+                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
+                  {biMode !== "zh" && (
+                    <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+                      {ptEn(key)}
+                    </Text>
+                  )}
+                </View>
               </View>
+            ))}
+          </View>
+
+          {/* Emergency Contacts */}
+          <Text style={s.sectionTitle}>{pt(biMode, "contacts_title")}</Text>
+          {biMode !== "zh" && (
+            <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
+              {ptEn("contacts_title")}
+            </Text>
+          )}
+          {allContacts.map((c, i) => (
+            <View key={i} style={s.contactCard}>
+              <Text style={s.contactName}>
+                {c.name}
+                {pt(biMode, "label_contact_relation_wrap")}
+                {c.relation}
+                {pt(biMode, "label_contact_relation_wrap_end")}
+              </Text>
+              <Text style={s.contactPhone}>{c.phone}</Text>
+              {c.phoneBackup ? (
+                <Text style={s.contactMeta}>
+                  {pt(biMode, "reunion_contact_backup")}
+                  {biMode !== "zh" ? "/" + ptEn("reunion_contact_backup") : ""}
+                  ：{c.phoneBackup}
+                </Text>
+              ) : null}
+              {c.isOutOfCity && (
+                <View>
+                  <Text
+                    style={[
+                      s.contactMeta,
+                      { color: "#d4882a", fontWeight: "bold" },
+                    ]}
+                  >
+                    {pt(biMode, "reunion_out_of_city")}
+                  </Text>
+                  {biMode !== "zh" && (
+                    <Text
+                      style={[
+                        s.contactMeta,
+                        { color: "#d4882a", fontSize: 7.5 },
+                      ]}
+                    >
+                      {ptEn("reunion_out_of_city")}
+                    </Text>
+                  )}
+                </View>
+              )}
             </View>
           ))}
-        </View>
 
-        {/* Emergency Contacts */}
-        <Text style={s.sectionTitle}>{pt(biMode, "contacts_title")}</Text>
-        {biMode !== "zh" && (
-          <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-            {ptEn("contacts_title")}
-          </Text>
-        )}
-        {allContacts.map((c, i) => (
-          <View key={i} style={s.contactCard}>
-            <Text style={s.contactName}>
-              {c.name}
-              {pt(biMode, "label_contact_relation_wrap")}
-              {c.relation}
-              {pt(biMode, "label_contact_relation_wrap_end")}
-            </Text>
-            <Text style={s.contactPhone}>{c.phone}</Text>
-            {c.phoneBackup ? (
-              <Text style={s.contactMeta}>
-                {pt(biMode, "reunion_contact_backup")}
-                {biMode !== "zh" ? "/" + ptEn("reunion_contact_backup") : ""}：
-                {c.phoneBackup}
-              </Text>
-            ) : null}
-            {c.isOutOfCity && (
-              <View>
-                <Text
-                  style={[
-                    s.contactMeta,
-                    { color: "#d4882a", fontWeight: "bold" },
-                  ]}
-                >
-                  {pt(biMode, "reunion_out_of_city")}
-                </Text>
-                {biMode !== "zh" && (
-                  <Text
-                    style={[s.contactMeta, { color: "#d4882a", fontSize: 7.5 }]}
-                  >
-                    {ptEn("reunion_out_of_city")}
-                  </Text>
-                )}
-              </View>
-            )}
-          </View>
-        ))}
-
-        <Footer label={pt(biMode, "reunion_title")} biMode={biMode} />
-      </Page>
+          <Footer label={pt(biMode, "reunion_title")} biMode={biMode} />
+        </Page>
       )}
 
       {/* ─── PAGES 4+: LOCATION EVACUATION GUIDES ─── */}
@@ -1639,170 +1669,172 @@ export default function HandbookPDF({
 
       {/* ─── COMBINED: MEMBER OVERVIEW (skip if no named members) ─── */}
       {allMembers.length > 0 && (
-      <Page size="A4" style={s.page}>
-        <Text
-          style={[
-            s.scenarioTitle,
-            { borderBottomColor: "#3b82f6", color: "#0D7377" },
-          ]}
-        >
-          {pt(biMode, "member_title")}
-        </Text>
-        <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 6 }}>
-          {pt(biMode, "member_desc_full")}
-        </Text>
+        <Page size="A4" style={s.page}>
+          <Text
+            style={[
+              s.scenarioTitle,
+              { borderBottomColor: "#3b82f6", color: "#0D7377" },
+            ]}
+          >
+            {pt(biMode, "member_title")}
+          </Text>
+          <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 6 }}>
+            {pt(biMode, "member_desc_full")}
+          </Text>
 
-        {allMembers.map((m, i) => {
-          const addr = memberAddr(m, fullAddr);
-          const loc = m.hasDifferentAddress
-            ? data.locations.find((l) => l.memberName === m.name)
-            : mainLocation;
-          const shelter = loc?.shelters[0];
-          const emergContact = outOfCityContact ?? allContacts[0];
-          return (
-            <View key={i} style={s.pCard}>
-              <View style={s.pCardHeader}>
-                <Text style={s.pCardName}>{m.name}</Text>
-                <Text style={s.pCardBlood}>
-                  {pt(biMode, "label_blood_type")} {m.bloodType}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 2 }}>
-                <View style={{ flex: 1 }}>
+          {allMembers.map((m, i) => {
+            const addr = memberAddr(m, fullAddr);
+            const loc = m.hasDifferentAddress
+              ? data.locations.find((l) => l.memberName === m.name)
+              : mainLocation;
+            const shelter = loc?.shelters[0];
+            const emergContact = outOfCityContact ?? allContacts[0];
+            return (
+              <View key={i} style={s.pCard}>
+                <View style={s.pCardHeader}>
+                  <Text style={s.pCardName}>{m.name}</Text>
+                  <Text style={s.pCardBlood}>
+                    {pt(biMode, "label_blood_type")} {m.bloodType}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", marginTop: 2 }}>
+                  <View style={{ flex: 1 }}>
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>
+                        {pt(biMode, "label_addr")}
+                      </Text>
+                      <Text style={s.pCardValue}>{addr}</Text>
+                    </View>
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>
+                        {pt(biMode, "label_meeting_point")}
+                      </Text>
+                      <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
+                        {shelter?.name ?? "—"}
+                        {shelter?.distance
+                          ? `（${distText(shelter.distance)}）`
+                          : ""}
+                      </Text>
+                    </View>
+                    {m.birthYear ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_age")}
+                        </Text>
+                        <Text style={s.pCardValue}>
+                          {m.birthYear} {pt(biMode, "label_born")}（
+                          {new Date().getFullYear() - Number(m.birthYear)}{" "}
+                          {pt(biMode, "label_years_old")}）
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    {m.medications ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_medication")}
+                        </Text>
+                        <Text
+                          style={[
+                            s.pCardValue,
+                            { fontWeight: "bold", color: "#C93B3B" },
+                          ]}
+                        >
+                          {m.medications}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {m.allergies ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_allergy")}
+                        </Text>
+                        <Text
+                          style={[
+                            s.pCardValue,
+                            { fontWeight: "bold", color: "#C93B3B" },
+                          ]}
+                        >
+                          {m.allergies}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {m.hasChronic ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_chronic")}
+                        </Text>
+                        <Text style={[s.pCardValue, { color: "#C93B3B" }]}>
+                          {pt(biMode, "label_has_yes")}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {m.isMobilityImpaired ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_mobility")}
+                        </Text>
+                        <Text style={[s.pCardValue, { color: "#C93B3B" }]}>
+                          {pt(biMode, "label_mobility_impaired")}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {m.specialNeeds ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_needs")}
+                        </Text>
+                        <Text style={s.pCardValue}>{m.specialNeeds}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                </View>
+                <View
+                  style={{
+                    borderTopWidth: 1,
+                    borderTopColor: "#e5e7eb",
+                    marginTop: 3,
+                    paddingTop: 3,
+                  }}
+                >
                   <View style={s.pCardRow}>
-                    <Text style={s.pCardLabel}>{pt(biMode, "label_addr")}</Text>
-                    <Text style={s.pCardValue}>{addr}</Text>
+                    <Text style={s.pCardLabel}>
+                      {pt(biMode, "label_emergency_contact")}
+                    </Text>
+                    <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
+                      {emergContact
+                        ? `${emergContact.name} ${emergContact.phone}`
+                        : "＿＿＿＿＿＿"}
+                    </Text>
                   </View>
                   <View style={s.pCardRow}>
                     <Text style={s.pCardLabel}>
-                      {pt(biMode, "label_meeting_point")}
+                      {pt(biMode, "label_emergency_phone")}
                     </Text>
-                    <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
-                      {shelter?.name ?? "—"}
-                      {shelter?.distance
-                        ? `（${distText(shelter.distance)}）`
-                        : ""}
+                    <Text style={s.pCardValue}>
+                      {pt(biMode, "member_emerg_numbers")}
                     </Text>
                   </View>
-                  {m.birthYear ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_age")}
-                      </Text>
-                      <Text style={s.pCardValue}>
-                        {m.birthYear} {pt(biMode, "label_born")}（
-                        {new Date().getFullYear() - Number(m.birthYear)}{" "}
-                        {pt(biMode, "label_years_old")}）
-                      </Text>
-                    </View>
-                  ) : null}
-                </View>
-                <View style={{ flex: 1 }}>
-                  {m.medications ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_medication")}
-                      </Text>
-                      <Text
-                        style={[
-                          s.pCardValue,
-                          { fontWeight: "bold", color: "#C93B3B" },
-                        ]}
-                      >
-                        {m.medications}
-                      </Text>
-                    </View>
-                  ) : null}
-                  {m.allergies ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_allergy")}
-                      </Text>
-                      <Text
-                        style={[
-                          s.pCardValue,
-                          { fontWeight: "bold", color: "#C93B3B" },
-                        ]}
-                      >
-                        {m.allergies}
-                      </Text>
-                    </View>
-                  ) : null}
-                  {m.hasChronic ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_chronic")}
-                      </Text>
-                      <Text style={[s.pCardValue, { color: "#C93B3B" }]}>
-                        {pt(biMode, "label_has_yes")}
-                      </Text>
-                    </View>
-                  ) : null}
-                  {m.isMobilityImpaired ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_mobility")}
-                      </Text>
-                      <Text style={[s.pCardValue, { color: "#C93B3B" }]}>
-                        {pt(biMode, "label_mobility_impaired")}
-                      </Text>
-                    </View>
-                  ) : null}
-                  {m.specialNeeds ? (
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_needs")}
-                      </Text>
-                      <Text style={s.pCardValue}>{m.specialNeeds}</Text>
-                    </View>
-                  ) : null}
                 </View>
               </View>
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderTopColor: "#e5e7eb",
-                  marginTop: 3,
-                  paddingTop: 3,
-                }}
-              >
-                <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>
-                    {pt(biMode, "label_emergency_contact")}
-                  </Text>
-                  <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
-                    {emergContact
-                      ? `${emergContact.name} ${emergContact.phone}`
-                      : "＿＿＿＿＿＿"}
-                  </Text>
-                </View>
-                <View style={s.pCardRow}>
-                  <Text style={s.pCardLabel}>
-                    {pt(biMode, "label_emergency_phone")}
-                  </Text>
-                  <Text style={s.pCardValue}>
-                    {pt(biMode, "member_emerg_numbers")}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          );
-        })}
+            );
+          })}
 
-        {mainHospital && (
-          <View style={[s.tipBox, { marginTop: 4 }]}>
-            <Text style={s.tipText}>
-              {pt(biMode, "label_nearest_medical")}：{mainHospital.name}
-              {mainHospital.hasER ? pt(biMode, "label_has_er_paren") : ""}
-              {mainHospital.distance
-                ? `　${distText(mainHospital.distance)}`
-                : ""}
-              {mainHospital.phone ? `　${mainHospital.phone}` : ""}
-            </Text>
-          </View>
-        )}
-        <Footer label={pt(biMode, "member_footer")} biMode={biMode} />
-      </Page>
+          {mainHospital && (
+            <View style={[s.tipBox, { marginTop: 4 }]}>
+              <Text style={s.tipText}>
+                {pt(biMode, "label_nearest_medical")}：{mainHospital.name}
+                {mainHospital.hasER ? pt(biMode, "label_has_er_paren") : ""}
+                {mainHospital.distance
+                  ? `　${distText(mainHospital.distance)}`
+                  : ""}
+                {mainHospital.phone ? `　${mainHospital.phone}` : ""}
+              </Text>
+            </View>
+          )}
+          <Footer label={pt(biMode, "member_footer")} biMode={biMode} />
+        </Page>
       )}
 
       {/* ─── FOREIGN NATIONAL INFO ─── */}
@@ -1962,7 +1994,238 @@ export default function HandbookPDF({
                 ))}
               </View>
 
+              {/* Migrant Worker Health Centers (conditional) */}
+              {(() => {
+                const centers = mainLocation?.migrantHealthCenters ?? [];
+                if (centers.length === 0) return null;
+                return (
+                  <View>
+                    <Text
+                      style={[
+                        s.sectionTitle,
+                        {
+                          color: "#0369a1",
+                          borderBottomColor: "#bae6fd",
+                          marginTop: 6,
+                        },
+                      ]}
+                    >
+                      {pt(biMode, "migrant_health_title")}
+                      {biMode !== "zh"
+                        ? " / " + ptEn("migrant_health_title")
+                        : ""}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 7.5,
+                        color: "#64748b",
+                        marginBottom: 3,
+                      }}
+                    >
+                      {pt(biMode, "migrant_health_desc")}
+                    </Text>
+                    {centers.slice(0, 3).map((c, i) => (
+                      <View key={i} style={s.contactCard}>
+                        <Text
+                          style={{
+                            fontSize: 9,
+                            fontWeight: "bold",
+                            color: "#0369a1",
+                          }}
+                        >
+                          {c.name}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 8,
+                            color: "#475569",
+                            marginTop: 1,
+                          }}
+                        >
+                          {c.address}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 8.5,
+                            color: "#c2410c",
+                            marginTop: 1,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {c.phone}
+                          {c.distance ? `　（${distText(c.distance)}）` : ""}
+                        </Text>
+                        {c.hours ? (
+                          <Text
+                            style={{
+                              fontSize: 7,
+                              color: "#64748b",
+                              marginTop: 1,
+                            }}
+                          >
+                            {c.hours}
+                          </Text>
+                        ) : null}
+                      </View>
+                    ))}
+                  </View>
+                );
+              })()}
+
               <Footer label="Foreign Nationals Info" biMode={biMode} />
+            </Page>
+          );
+        })()}
+
+      {/* ─── EMERGENCY PHRASE CARD (conditional on isForeignNational) ─── */}
+      {household.isForeignNational &&
+        (() => {
+          return (
+            <Page size="A4" style={s.page}>
+              <Text
+                style={[
+                  s.scenarioTitle,
+                  { borderBottomColor: "#0ea5e9", color: "#0369a1" },
+                ]}
+              >
+                {pt(biMode, "phrase_card_title")} / {ptEn("phrase_card_title")}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 8,
+                  color: "#b45309",
+                  marginBottom: 3,
+                  fontWeight: "bold",
+                }}
+              >
+                ⚠ {pt(biMode, "phrase_card_draft")}
+              </Text>
+              <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 6 }}>
+                {pt(biMode, "phrase_card_sub")}
+              </Text>
+
+              {/* Header row with language labels */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#f0f9ff",
+                  padding: "3 4",
+                  borderRadius: 3,
+                  marginBottom: 2,
+                }}
+              >
+                {[
+                  { w: 17, label: "中文" },
+                  { w: 17, label: "English" },
+                  { w: 17, label: "Tiếng Việt" },
+                  { w: 17, label: "Bahasa" },
+                  { w: 16, label: "ไทย" },
+                  { w: 16, label: "Filipino" },
+                ].map((col, i) => (
+                  <Text
+                    key={i}
+                    style={{
+                      width: `${col.w}%`,
+                      fontSize: 6.5,
+                      fontWeight: "bold",
+                      color: "#0369a1",
+                    }}
+                  >
+                    {col.label}
+                  </Text>
+                ))}
+              </View>
+
+              {PHRASE_CATEGORIES.map((cat) => {
+                const catPhrases = MIGRANT_PHRASES.filter(
+                  (p) => p.category === cat.id,
+                );
+                if (catPhrases.length === 0) return null;
+                return (
+                  <View key={cat.id} style={{ marginBottom: 4 }}>
+                    <Text
+                      style={{
+                        fontSize: 8,
+                        fontWeight: "bold",
+                        color: "#0d9488",
+                        backgroundColor: "#f0fdfa",
+                        padding: "2 4",
+                        marginBottom: 1,
+                      }}
+                    >
+                      {pt(
+                        biMode,
+                        `phrase_cat_${cat.id}` as Parameters<typeof pt>[1],
+                      )}{" "}
+                      / {cat.en}
+                    </Text>
+                    {catPhrases.map((phrase) => (
+                      <View
+                        key={phrase.id}
+                        style={{
+                          flexDirection: "row",
+                          paddingVertical: 1,
+                          paddingHorizontal: 4,
+                          borderBottomWidth: 0.5,
+                          borderBottomColor: "#f1f5f9",
+                        }}
+                      >
+                        <Text style={{ width: "17%", fontSize: 7 }}>
+                          {phrase.text.zh}
+                        </Text>
+                        <Text
+                          style={{
+                            width: "17%",
+                            fontSize: 7,
+                            color: "#475569",
+                          }}
+                        >
+                          {phrase.text.en}
+                        </Text>
+                        <Text
+                          style={{
+                            width: "17%",
+                            fontSize: 7,
+                            color: "#475569",
+                          }}
+                        >
+                          {phrase.text.vi}
+                        </Text>
+                        <Text
+                          style={{
+                            width: "17%",
+                            fontSize: 7,
+                            color: "#475569",
+                          }}
+                        >
+                          {phrase.text.id}
+                        </Text>
+                        <Text
+                          style={{
+                            width: "16%",
+                            fontSize: 7,
+                            color: "#475569",
+                            fontFamily: "NotoSansThai",
+                          }}
+                        >
+                          {phrase.text.th}
+                        </Text>
+                        <Text
+                          style={{
+                            width: "16%",
+                            fontSize: 7,
+                            color: "#475569",
+                          }}
+                        >
+                          {phrase.text.fil}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })}
+
+              <Footer label="Emergency Phrase Card (DRAFT)" biMode={biMode} />
             </Page>
           );
         })()}

@@ -115,6 +115,19 @@ export interface PoliceStation {
   distance?: number;
 }
 
+// 外籍移工健康服務中心
+export interface MigrantHealthCenter {
+  name: string;
+  address: string;
+  phone: string;
+  city: string;
+  lat: number;
+  lng: number;
+  languages?: string[];
+  hours?: string;
+  distance?: number;
+}
+
 // 護理機構
 export interface NursingFacility {
   name: string;
@@ -152,6 +165,7 @@ export interface LocationInfo {
   fireStation?: FireStation[];
   policeStation?: PoliceStation[];
   nursing?: NursingFacility[];
+  migrantHealthCenters?: MigrantHealthCenter[];
 }
 
 // 手冊生成所需的完整資料

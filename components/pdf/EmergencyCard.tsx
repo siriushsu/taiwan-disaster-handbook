@@ -340,14 +340,22 @@ export default function EmergencyCard({ data, lang }: Props) {
             </View>
           )}
 
-          {/* Emergency numbers */}
+          {/* Emergency numbers — conditional based on migrant mode */}
           <View style={s.emergNumRow}>
-            {[
-              { num: "119", label: zh ? "消防" : "Fire" },
-              { num: "110", label: zh ? "警察" : "Police" },
-              { num: "1991", label: zh ? "災害留言板" : "Disaster Msg" },
-              { num: "1925", label: zh ? "安心專線" : "Crisis Line" },
-            ].map((e, i) => (
+            {(data.household.isForeignNational
+              ? [
+                  { num: "119", label: zh ? "消防" : "Fire" },
+                  { num: "110", label: zh ? "警察" : "Police" },
+                  { num: "1955", label: zh ? "勞工" : "Labor" },
+                  { num: "113", label: zh ? "婦幼" : "Protect" },
+                ]
+              : [
+                  { num: "119", label: zh ? "消防" : "Fire" },
+                  { num: "110", label: zh ? "警察" : "Police" },
+                  { num: "1991", label: zh ? "災害留言板" : "Disaster Msg" },
+                  { num: "1925", label: zh ? "安心專線" : "Crisis Line" },
+                ]
+            ).map((e, i) => (
               <View key={i} style={{ alignItems: "center" }}>
                 <Text style={s.emergNum}>{e.num}</Text>
                 <Text style={s.emergLabel}>{e.label}</Text>
@@ -355,14 +363,50 @@ export default function EmergencyCard({ data, lang }: Props) {
             ))}
           </View>
 
-          {/* Note about 1991 */}
+          {/* Note — different for migrant mode */}
           <View style={s.noteBox}>
             <Text style={s.noteText}>
-              {zh
-                ? "1991 留言：撥打後錄音「我是[姓名]，在[地點]，[狀況]」。家人撥 1991 輸入你的手機號碼即可聽取。"
-                : '1991: Record "I am [name], at [location], [status]". Family dials 1991 + your phone number to listen.'}
+              {data.household.isForeignNational
+                ? zh
+                  ? "1955 外籍勞工專線：24 小時多語服務（中/英/越/印/泰）。113 婦幼保護專線：緊急家暴/性侵通報。"
+                  : "1955 Foreign Worker Hotline: 24hr multilingual (ZH/EN/VI/ID/TH). 113 Protection Hotline: Report abuse/violence."
+                : zh
+                  ? "1991 留言：撥打後錄音「我是[姓名]，在[地點]，[狀況]」。家人撥 1991 輸入你的手機號碼即可聽取。"
+                  : '1991: Record "I am [name], at [location], [status]". Family dials 1991 + your phone number to listen.'}
             </Text>
           </View>
+
+          {/* Migrant worker employer/broker info — only when migrant mode + employer or broker name set */}
+          {data.household.isForeignNational &&
+            (data.household.employerName || data.household.brokerName) && (
+              <View
+                style={{
+                  backgroundColor: "#eff6ff",
+                  borderRadius: 3,
+                  padding: "3 6",
+                  marginTop: 3,
+                }}
+              >
+                {data.household.employerName ? (
+                  <Text style={{ fontSize: 5, color: "#1e40af" }}>
+                    {zh ? "雇主：" : "Employer: "}
+                    {data.household.employerName}
+                    {data.household.employerPhone
+                      ? ` ${data.household.employerPhone}`
+                      : ""}
+                  </Text>
+                ) : null}
+                {data.household.brokerName ? (
+                  <Text style={{ fontSize: 5, color: "#1e40af" }}>
+                    {zh ? "仲介：" : "Broker: "}
+                    {data.household.brokerName}
+                    {data.household.brokerPhone
+                      ? ` ${data.household.brokerPhone}`
+                      : ""}
+                  </Text>
+                ) : null}
+              </View>
+            )}
         </View>
       </Page>
     </Document>
