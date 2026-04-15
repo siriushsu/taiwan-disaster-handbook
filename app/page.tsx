@@ -1384,11 +1384,43 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/4/8" : "資料更新：2026/4/8"}
+              {locale === "en" ? "Data: 2026/4/15" : "資料更新：2026/4/15"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/15</span>
+                <span>
+                  {locale === "en"
+                    ? "Migrant worker mode: multilingual emergency phrase card (ZH/EN/VI/ID/TH/FIL) added to PDF when foreign national checkbox is enabled"
+                    : "外籍移工模式：勾選「外籍人士」後，PDF 會加入多語緊急用語卡（中/英/越/印/泰/菲 6 語對照）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/15</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 113 (Women & Children Protection Hotline) and 1955 to emergency card for foreign nationals"
+                    : "緊急聯絡卡加入 1955 勞工專線與 113 婦幼保護專線（外籍人士模式）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/15</span>
+                <span>
+                  {locale === "en"
+                    ? "Homepage CTA: foreign residents can one-click enable migrant/resident mode"
+                    : "首頁新增「外籍人士？啟用專屬模式」快速連結"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/14</span>
+                <span>
+                  {locale === "en"
+                    ? "Multi-language UI: added beta support for Vietnamese, Indonesian, Thai, and Filipino"
+                    : "介面多語支援：新增越南語、印尼語、泰語、菲律賓語（Beta 測試版）"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/8</span>
                 <span>
