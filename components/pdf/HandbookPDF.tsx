@@ -211,7 +211,13 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#FCEAEA",
   },
-  numBig: { fontSize: 20, fontWeight: "bold", color: "#C93B3B", width: 100 },
+  numBig: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#C93B3B",
+    width: 120,
+    flexShrink: 0,
+  },
   numLabel: { flex: 1, fontSize: 10, color: "#6B6560" },
   // contact card
   contactCard: {
@@ -1892,16 +1898,21 @@ export default function HandbookPDF({
                   <Text
                     style={[
                       s.numBig,
-                      { fontSize: h.number.length > 4 ? 14 : 20 },
+                      {
+                        fontSize: h.number.length > 4 ? 14 : 20,
+                        marginRight: 8,
+                      },
                     ]}
                   >
                     {h.number}
                   </Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={[s.numLabel, { fontWeight: "bold" }]}>
+                    <Text
+                      style={[s.numLabel, { fontWeight: "bold", fontSize: 9 }]}
+                    >
                       {h.name}
                     </Text>
-                    <Text style={{ fontSize: 8, color: "#6B6560" }}>
+                    <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                       {h.nameEn}　{h.note}
                     </Text>
                   </View>
