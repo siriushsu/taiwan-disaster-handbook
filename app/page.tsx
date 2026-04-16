@@ -562,7 +562,7 @@ export default function Home() {
                   >
                     {CITIES.map(([zh, en]) => (
                       <option key={zh} value={zh}>
-                        {locale === "en" ? `${en}` : zh}
+                        {locale === "zh-TW" ? zh : `${en} ${zh}`}
                       </option>
                     ))}
                   </select>
@@ -574,7 +574,9 @@ export default function Home() {
                     <option value="">{T("select_please")}</option>
                     {(DISTRICTS[quickCity] ?? []).map((d) => (
                       <option key={d} value={d}>
-                        {locale === "en" ? `${DISTRICTS_EN[d] || d}` : d}
+                        {locale === "zh-TW"
+                          ? d
+                          : `${DISTRICTS_EN[d] || d} ${d}`}
                       </option>
                     ))}
                   </select>
@@ -997,7 +999,7 @@ export default function Home() {
                   >
                     {CITIES.map(([zh, en]) => (
                       <option key={zh} value={zh}>
-                        {locale === "en" ? `${en} ${zh}` : zh}
+                        {locale === "zh-TW" ? zh : `${en} ${zh}`}
                       </option>
                     ))}
                   </select>
@@ -1015,7 +1017,9 @@ export default function Home() {
                     <option value="">{T("select_please")}</option>
                     {(DISTRICTS[form.city] ?? []).map((d) => (
                       <option key={d} value={d}>
-                        {locale === "en" ? `${DISTRICTS_EN[d] || d} ${d}` : d}
+                        {locale === "zh-TW"
+                          ? d
+                          : `${DISTRICTS_EN[d] || d} ${d}`}
                       </option>
                     ))}
                   </select>

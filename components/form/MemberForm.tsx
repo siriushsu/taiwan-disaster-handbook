@@ -26,7 +26,7 @@ export default function MemberForm({
   locale = "zh-TW",
   onOpenMap,
 }: Props) {
-  const isEn = locale === "en";
+  const isZh = locale === "zh-TW";
   const update = (field: keyof Member, value: unknown) =>
     onChange(index, { ...member, [field]: value });
 
@@ -169,10 +169,10 @@ export default function MemberForm({
             }}
             className={INPUT}
           >
-            <option value="">縣市</option>
+            <option value="">{isZh ? "縣市" : "City 縣市"}</option>
             {CITIES.map(([zh, en]) => (
               <option key={zh} value={zh}>
-                {isEn ? `${en} ${zh}` : zh}
+                {isZh ? zh : `${en} ${zh}`}
               </option>
             ))}
           </select>
@@ -181,10 +181,10 @@ export default function MemberForm({
             onChange={(e) => update("dailyDistrict", e.target.value)}
             className={INPUT}
           >
-            <option value="">區</option>
+            <option value="">{isZh ? "區" : "District 區"}</option>
             {(DISTRICTS[member.dailyCity] ?? []).map((d) => (
               <option key={d} value={d}>
-                {isEn ? `${DISTRICTS_EN[d] || d} ${d}` : d}
+                {isZh ? d : `${DISTRICTS_EN[d] || d} ${d}`}
               </option>
             ))}
           </select>
@@ -247,7 +247,7 @@ export default function MemberForm({
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium text-text-muted mb-1">
-                  縣市
+                  {isZh ? "縣市" : "City 縣市"}
                 </label>
                 <select
                   value={member.city}
@@ -260,27 +260,27 @@ export default function MemberForm({
                   }
                   className={INPUT}
                 >
-                  <option value="">請選擇</option>
+                  <option value="">{isZh ? "請選擇" : "Please select"}</option>
                   {CITIES.map(([zh, en]) => (
                     <option key={zh} value={zh}>
-                      {isEn ? `${en} ${zh}` : zh}
+                      {isZh ? zh : `${en} ${zh}`}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-muted mb-1">
-                  區/鄉/鎮市
+                  {isZh ? "區/鄉/鎮市" : "District 區/鄉/鎮市"}
                 </label>
                 <select
                   value={member.district}
                   onChange={(e) => update("district", e.target.value)}
                   className={INPUT}
                 >
-                  <option value="">請選擇</option>
+                  <option value="">{isZh ? "請選擇" : "Please select"}</option>
                   {(DISTRICTS[member.city] ?? []).map((d) => (
                     <option key={d} value={d}>
-                      {isEn ? `${DISTRICTS_EN[d] || d} ${d}` : d}
+                      {isZh ? d : `${DISTRICTS_EN[d] || d} ${d}`}
                     </option>
                   ))}
                 </select>
@@ -288,7 +288,7 @@ export default function MemberForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1">
-                詳細地址
+                {isZh ? "詳細地址" : "Street Address 詳細地址"}
               </label>
               <div className="flex gap-2">
                 <input
