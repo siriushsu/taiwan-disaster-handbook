@@ -90,5 +90,22 @@
   "error_title": "เกิดข้อผิดพลาด",
   "error_desc": "ขออภัย หน้านี้มีปัญหา กรุณาโหลดใหม่หรือกลับหน้าแรก",
   "reload": "โหลดใหม่",
-  "home": "หน้าแรก"
+  "home": "หน้าแรก",
+  "find_on_map": "ค้นหาบนแผนที่",
+  "map_short": "📍 แผนที่",
+  "change_addr": "เปลี่ยน",
+  "back_to_home": "ย้อนกลับ",
+  "emergency_cta": "🆘 เบอร์ฉุกเฉิน (แตะเพื่อโทร)",
+  "search_btn": "ค้นหา",
+  "stat_shelters_short": "ที่หลบภัย",
+  "stat_airraid_short": "หลุมหลบภัย",
+  "stat_medical_short": "การแพทย์",
+  "stat_aed_short": "AED",
+  "updates_title": "อัปเดตล่าสุด",
+  "updates_data_date": "ข้อมูล",
+  "footer_help_improve": "ช่วยเราปรับปรุง",
+  "footer_report_error": "📍 แจ้งข้อมูลผิด",
+  "footer_feature_request": "💡 แนะนำฟีเจอร์",
+  "footer_open_source": "⭐ โครงการโอเพนซอร์ส — ยินดีรับการสนับสนุน",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →"
 }

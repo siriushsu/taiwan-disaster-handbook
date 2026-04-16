@@ -476,7 +476,7 @@ export default function Home() {
               }}
               className="text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
             >
-              外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →
+              {T("quick_cta_migrant")}
             </button>
           </div>
 
@@ -520,7 +520,7 @@ export default function Home() {
               onClick={() => setMode("map")}
               className="flex-1 border border-border text-text py-3 rounded-xl font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
             >
-              {locale === "en" ? "Find on Map" : "在地圖上找"}
+              {T("find_on_map")}
             </button>
           </div>
           <button
@@ -535,9 +535,7 @@ export default function Home() {
             href="/emergency"
             className="block w-full text-center bg-red-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors active:scale-[0.98]"
           >
-            {locale === "en"
-              ? "🆘 Emergency Numbers (tap to call)"
-              : "🆘 緊急電話（點擊即撥）"}
+            {T("emergency_cta")}
           </a>
         </div>
       )}
@@ -562,7 +560,7 @@ export default function Home() {
                   }}
                   className="text-xs text-primary hover:text-primary-dark underline shrink-0 ml-2"
                 >
-                  {locale === "en" ? "Change" : "換地址"}
+                  {T("change_addr")}
                 </button>
               </div>
             ) : (
@@ -615,17 +613,13 @@ export default function Home() {
                     disabled={quickLoading || !quickAddress}
                     className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold disabled:opacity-40 hover:bg-primary-dark transition-colors"
                   >
-                    {quickLoading
-                      ? T("quick_searching")
-                      : locale === "en"
-                        ? "Search"
-                        : "搜尋"}
+                    {quickLoading ? T("quick_searching") : T("search_btn")}
                   </button>
                   <button
                     onClick={() => setMode("map")}
                     className="border-2 border-primary text-primary px-4 py-3 rounded-lg font-semibold text-sm hover:bg-primary-light transition-colors whitespace-nowrap"
                   >
-                    {locale === "en" ? "📍 Map" : "📍 地圖"}
+                    {T("map_short")}
                   </button>
                 </div>
               </>
@@ -738,7 +732,7 @@ export default function Home() {
                         {quickResult.shelters.length}
                       </p>
                       <p className="text-[10px] text-text-faint">
-                        {locale === "en" ? "Shelters" : "避難所"}
+                        {T("stat_shelters_short")}
                       </p>
                     </div>
                     <div className="text-center">
@@ -746,7 +740,7 @@ export default function Home() {
                         {quickResult.airRaid.length}
                       </p>
                       <p className="text-[10px] text-text-faint">
-                        {locale === "en" ? "Air Raid" : "防空洞"}
+                        {T("stat_airraid_short")}
                       </p>
                     </div>
                     <div className="text-center">
@@ -754,7 +748,7 @@ export default function Home() {
                         {quickResult.medical.length}
                       </p>
                       <p className="text-[10px] text-text-faint">
-                        {locale === "en" ? "Medical" : "醫療"}
+                        {T("stat_medical_short")}
                       </p>
                     </div>
                     <div className="text-center">
@@ -789,7 +783,7 @@ export default function Home() {
             onClick={() => setMode("landing")}
             className="w-full text-text-faint text-xs py-1 hover:text-text-muted transition-colors"
           >
-            {locale === "en" ? "Back" : "返回首頁"}
+            {T("back_to_home")}
           </button>
         </div>
       )}
@@ -1441,9 +1435,9 @@ export default function Home() {
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
         <details className="bg-white rounded-xl shadow-card border border-border">
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
-            <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
+            <span>{T("updates_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/4/16" : "資料更新：2026/4/16"}
+              {T("updates_data_date")}: 2026/4/16
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">

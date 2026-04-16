@@ -90,5 +90,22 @@
   "error_title": "May nangyaring mali",
   "error_desc": "Paumanhin, nagkaroon ng problema ang page. Pakireload o bumalik sa homepage.",
   "reload": "I-reload",
-  "home": "Home"
+  "home": "Home",
+  "find_on_map": "Hanapin sa Mapa",
+  "map_short": "📍 Mapa",
+  "change_addr": "Palitan",
+  "back_to_home": "Bumalik",
+  "emergency_cta": "🆘 Mga Emergency Numbers (i-tap para tumawag)",
+  "search_btn": "Hanapin",
+  "stat_shelters_short": "Silungan",
+  "stat_airraid_short": "Air Raid",
+  "stat_medical_short": "Medikal",
+  "stat_aed_short": "AED",
+  "updates_title": "Mga Kamakailang Update",
+  "updates_data_date": "Data",
+  "footer_help_improve": "Tulungan kami mapabuti",
+  "footer_report_error": "📍 I-report ang maling data",
+  "footer_feature_request": "💡 Mungkahi ng feature",
+  "footer_open_source": "⭐ Open source project — welcome ang kontribusyon",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →"
 }

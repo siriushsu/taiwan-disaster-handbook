@@ -90,5 +90,22 @@
   "error_title": "Terjadi kesalahan",
   "error_desc": "Maaf, halaman mengalami masalah. Silakan muat ulang atau kembali ke beranda.",
   "reload": "Muat ulang",
-  "home": "Beranda"
+  "home": "Beranda",
+  "find_on_map": "Cari di peta",
+  "map_short": "📍 Peta",
+  "change_addr": "Ubah",
+  "back_to_home": "Kembali",
+  "emergency_cta": "🆘 Nomor Darurat (tap untuk menelepon)",
+  "search_btn": "Cari",
+  "stat_shelters_short": "Perlindungan",
+  "stat_airraid_short": "Anti-serangan udara",
+  "stat_medical_short": "Medis",
+  "stat_aed_short": "AED",
+  "updates_title": "Pembaruan Terbaru",
+  "updates_data_date": "Data",
+  "footer_help_improve": "Bantu kami memperbaiki",
+  "footer_report_error": "📍 Laporkan kesalahan data",
+  "footer_feature_request": "💡 Saran fitur",
+  "footer_open_source": "⭐ Proyek open source — kontribusi diterima",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →"
 }

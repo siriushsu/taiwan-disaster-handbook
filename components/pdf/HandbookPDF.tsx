@@ -48,6 +48,13 @@ Font.register({
 /* ── helpers ───────────────────────────────────────── */
 let _lang: BiMode = "zh";
 
+/** Bilingual header: returns "中文 / English" in bi mode, else single language */
+function bi(mode: BiMode, zhKey: string, enText: string): string {
+  if (mode === "en") return enText;
+  if (mode === "zh") return pt(mode, zhKey);
+  return `${pt(mode, zhKey)} / ${enText}`;
+}
+
 function distText(m?: number) {
   if (!m) return "";
   if (_lang === "en") return m < 1000 ? `${m}m` : `${(m / 1000).toFixed(1)}km`;
@@ -601,14 +608,14 @@ function LocationPage({
         <View style={s.locHeader}>
           <Text style={s.locTitle}>
             {loc.label}　{pt(biMode, "loc_evac_guide_suffix")}
-            {biMode !== "zh" ? " / " + ptEn("loc_evac_guide_suffix") : ""}
+            {biMode === "bi" ? " / " + ptEn("loc_evac_guide_suffix") : ""}
           </Text>
           <Text style={s.locAddr}>{loc.address}</Text>
           {loc.housingType === "apartment" && loc.floor ? (
             <Text style={s.locAddr}>
               {pt(biMode, "loc_apt_building")} {loc.floor}{" "}
               {pt(biMode, "loc_floor_suffix")}
-              {biMode !== "zh" ? " / Apt Bldg" : ""}
+              {biMode === "bi" ? " / Apt Bldg" : ""}
             </Text>
           ) : null}
         </View>
@@ -617,7 +624,7 @@ function LocationPage({
 
         {/* Meeting Points */}
         <Text style={s.sectionTitle}>{pt(biMode, "loc_meeting")}</Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("loc_meeting")}
           </Text>
@@ -626,12 +633,12 @@ function LocationPage({
           style={{
             fontSize: 7.5,
             color: "#6B6560",
-            marginBottom: biMode !== "zh" ? 1 : 2,
+            marginBottom: biMode === "bi" ? 1 : 2,
           }}
         >
           {pt(biMode, "loc_meeting_desc")}
         </Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560", marginBottom: 4 }}>
             {ptEn("loc_meeting_desc")}
           </Text>
@@ -649,7 +656,7 @@ function LocationPage({
           >
             <Text style={[s.meetLabel, { color: "#0D7377" }]}>
               {pt(biMode, "loc_primary")}
-              {biMode !== "zh" ? " / " + ptEn("loc_primary") : ""}
+              {biMode === "bi" ? " / " + ptEn("loc_primary") : ""}
             </Text>
             <Text style={s.meetValue}>
               {mainShelter?.name ?? pt(biMode, "loc_fallback_primary")}
@@ -678,7 +685,7 @@ function LocationPage({
           >
             <Text style={[s.meetLabel, { color: "#c2410c" }]}>
               {pt(biMode, "loc_backup")}
-              {biMode !== "zh" ? " / " + ptEn("loc_backup") : ""}
+              {biMode === "bi" ? " / " + ptEn("loc_backup") : ""}
             </Text>
             <Text style={s.meetValue}>
               {backupShelter?.name ?? pt(biMode, "loc_fallback_backup")}
@@ -699,7 +706,7 @@ function LocationPage({
 
         {/* Nearest shelters */}
         <Text style={s.sectionTitle}>{pt(biMode, "loc_shelters")}</Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("loc_shelters")}
           </Text>
@@ -778,7 +785,7 @@ function LocationPage({
         {air.length > 0 && (
           <>
             <Text style={s.sectionTitle}>{pt(biMode, "loc_airraid")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_airraid")}
               </Text>
@@ -813,7 +820,7 @@ function LocationPage({
         {loc.medical.length > 0 && (
           <>
             <Text style={s.sectionTitle}>{pt(biMode, "loc_medical")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_medical")}
               </Text>
@@ -861,7 +868,7 @@ function LocationPage({
                 ? "Nearest AED"
                 : "最近 AED（自動體外心臟電擊器）"}
             </Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 Nearest AED (Automated External Defibrillator)
               </Text>
@@ -903,7 +910,7 @@ function LocationPage({
         {loc.housingType === "apartment" && (
           <>
             <Text style={s.sectionTitle}>{pt(biMode, "loc_apt_title")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_apt_title")}
               </Text>
@@ -948,7 +955,7 @@ function LocationPage({
                   </Text>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 9 }}>{zh}</Text>
-                    {biMode !== "zh" && (
+                    {biMode === "bi" && (
                       <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                         {en}
                       </Text>
@@ -963,7 +970,7 @@ function LocationPage({
         {loc.housingType === "house" && (
           <>
             <Text style={s.sectionTitle}>{pt(biMode, "loc_house_title")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_house_title")}
               </Text>
@@ -995,7 +1002,7 @@ function LocationPage({
                   </Text>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 9 }}>{zh}</Text>
-                    {biMode !== "zh" && (
+                    {biMode === "bi" && (
                       <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                         {en}
                       </Text>
@@ -1155,7 +1162,7 @@ export default function HandbookPDF({
             </Text>
             <Text style={{ color: "#ffffff", fontSize: 11 }}>
               {data.generatedAt}　{pt(biMode, "cover_update")}
-              {biMode !== "zh" ? " / " + ptEn("cover_update") : ""}
+              {biMode === "bi" ? " / " + ptEn("cover_update") : ""}
             </Text>
           </View>
         </View>
@@ -1169,13 +1176,13 @@ export default function HandbookPDF({
           >
             <View style={{ flex: 1 }}>
               <Text>{pt(biMode, "cover_footer")}</Text>
-              {biMode !== "zh" && (
+              {biMode === "bi" && (
                 <Text style={{ fontSize: 8, color: "#ffffff", marginTop: 1 }}>
                   {ptEn("cover_footer")}
                 </Text>
               )}
               <Text style={{ marginTop: 3 }}>{pt(biMode, "cover_qr")}</Text>
-              {biMode !== "zh" && (
+              {biMode === "bi" && (
                 <Text style={{ fontSize: 8, color: "#ffffff", marginTop: 1 }}>
                   {ptEn("cover_qr")}
                 </Text>
@@ -1196,13 +1203,13 @@ export default function HandbookPDF({
       <Page size="A4" style={s.actionPage}>
         <View style={s.actionBanner}>
           <Text style={s.actionBannerText}>{pt(biMode, "action_title")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={[s.actionBannerText, { fontSize: 9, marginTop: 2 }]}>
               {ptEn("action_title")}
             </Text>
           )}
           <Text style={s.actionBannerSub}>{pt(biMode, "action_sub")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={[s.actionBannerSub, { fontSize: 7.5 }]}>
               {ptEn("action_sub")}
             </Text>
@@ -1215,10 +1222,10 @@ export default function HandbookPDF({
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#C93B3B" }]}>
               {pt(biMode, "eq_title")}
-              {biMode !== "zh" ? " / " + ptEn("eq_title") : ""}
+              {biMode === "bi" ? " / " + ptEn("eq_title") : ""}
             </Text>
             <Text style={s.actionBody}>{pt(biMode, "eq_action")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={[s.actionBody, { color: "#6B6560", fontSize: 8.5 }]}>
                 {ptEn("eq_action")}
               </Text>
@@ -1232,10 +1239,10 @@ export default function HandbookPDF({
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#8b5cf6" }]}>
               {pt(biMode, "air_title")}
-              {biMode !== "zh" ? " / " + ptEn("air_title") : ""}
+              {biMode === "bi" ? " / " + ptEn("air_title") : ""}
             </Text>
             <Text style={s.actionBody}>{pt(biMode, "air_action")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={[s.actionBody, { color: "#6B6560", fontSize: 8.5 }]}>
                 {ptEn("air_action")}
               </Text>
@@ -1249,7 +1256,7 @@ export default function HandbookPDF({
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#d4882a" }]}>
               {pt(biMode, "fire_title")}
-              {biMode !== "zh" ? " / " + ptEn("fire_title") : ""}
+              {biMode === "bi" ? " / " + ptEn("fire_title") : ""}
             </Text>
             <Text style={s.actionBody}>
               {household.housingType === "apartment"
@@ -1258,7 +1265,7 @@ export default function HandbookPDF({
                   : `${pt(biMode, "fire_apt_floor_pre")}${household.floor ? ` ${household.floor} ${pt(biMode, "loc_floor_suffix")}` : pt(biMode, "loc_floor_suffix")} ${pt(biMode, "fire_apt_floor_post")}`
                 : pt(biMode, "fire_action_house")}
             </Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={[s.actionBody, { color: "#6B6560", fontSize: 8.5 }]}>
                 {household.housingType === "apartment"
                   ? /^[Bb]|地下/.test(household.floor)
@@ -1276,10 +1283,10 @@ export default function HandbookPDF({
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#3b6fd4" }]}>
               {pt(biMode, "typhoon_title")}
-              {biMode !== "zh" ? " / " + ptEn("typhoon_title") : ""}
+              {biMode === "bi" ? " / " + ptEn("typhoon_title") : ""}
             </Text>
             <Text style={s.actionBody}>{pt(biMode, "typhoon_action")}</Text>
-            {biMode !== "zh" && (
+            {biMode === "bi" && (
               <Text style={[s.actionBody, { color: "#6B6560", fontSize: 8.5 }]}>
                 {ptEn("typhoon_action")}
               </Text>
@@ -1309,7 +1316,7 @@ export default function HandbookPDF({
               }}
             >
               {pt(biMode, "infant_title")}
-              {biMode !== "zh" ? " / " + ptEn("infant_title") : ""}
+              {biMode === "bi" ? " / " + ptEn("infant_title") : ""}
             </Text>
             {(
               [
@@ -1328,7 +1335,7 @@ export default function HandbookPDF({
                   <Text style={{ fontSize: 9, color: "#78350f" }}>
                     {pt(biMode, key)}
                   </Text>
-                  {biMode !== "zh" && (
+                  {biMode === "bi" && (
                     <Text style={{ fontSize: 7.5, color: "#92400e" }}>
                       {ptEn(key)}
                     </Text>
@@ -1343,7 +1350,7 @@ export default function HandbookPDF({
         <View style={s.actionMeet}>
           <Text style={s.actionMeetLabel}>
             {pt(biMode, "meeting_label")}
-            {biMode !== "zh" ? " / " + ptEn("meeting_label") : ""}
+            {biMode === "bi" ? " / " + ptEn("meeting_label") : ""}
           </Text>
           <Text style={s.actionMeetValue}>
             {mainShelter?.name ?? pt(biMode, "meeting_fallback")}
@@ -1373,7 +1380,7 @@ export default function HandbookPDF({
                   <Text style={s.numBig}>{n}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={s.numLabel}>{pt(biMode, key)}</Text>
-                    {biMode !== "zh" && (
+                    {biMode === "bi" && (
                       <Text style={{ fontSize: 8, color: "#6B6560" }}>
                         {ptEn(key)}
                       </Text>
@@ -1401,7 +1408,7 @@ export default function HandbookPDF({
                   </Text>
                   <View style={{ flex: 1 }}>
                     <Text style={s.numLabel}>{pt(biMode, key)}</Text>
-                    {biMode !== "zh" && (
+                    {biMode === "bi" && (
                       <Text style={{ fontSize: 8, color: "#6B6560" }}>
                         {ptEn(key)}
                       </Text>
@@ -1427,7 +1434,7 @@ export default function HandbookPDF({
           >
             {pt(biMode, "reunion_title")}
           </Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 8, color: "#0D7377", marginBottom: 2 }}>
               {ptEn("reunion_title")}
             </Text>
@@ -1436,12 +1443,12 @@ export default function HandbookPDF({
             style={{
               fontSize: 9,
               color: "#6B6560",
-              marginBottom: biMode !== "zh" ? 2 : 8,
+              marginBottom: biMode === "bi" ? 2 : 8,
             }}
           >
             {pt(biMode, "reunion_desc")}
           </Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 8, color: "#6B6560", marginBottom: 6 }}>
               {ptEn("reunion_desc")}
             </Text>
@@ -1449,7 +1456,7 @@ export default function HandbookPDF({
 
           {/* Each member's location and nearest shelter */}
           <Text style={s.sectionTitle}>{pt(biMode, "reunion_members")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("reunion_members")}
             </Text>
@@ -1466,14 +1473,14 @@ export default function HandbookPDF({
                 <View style={s.reunionRow}>
                   <Text style={s.reunionLabel}>
                     {pt(biMode, "reunion_addr")}
-                    {biMode !== "zh" ? "/" + ptEn("reunion_addr") : ""}
+                    {biMode === "bi" ? "/" + ptEn("reunion_addr") : ""}
                   </Text>
                   <Text style={s.reunionValue}>{addr}</Text>
                 </View>
                 <View style={s.reunionRow}>
                   <Text style={s.reunionLabel}>
                     {pt(biMode, "reunion_shelter")}
-                    {biMode !== "zh" ? "/" + ptEn("reunion_shelter") : ""}
+                    {biMode === "bi" ? "/" + ptEn("reunion_shelter") : ""}
                   </Text>
                   <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
                     {nearestShelter?.name ?? pt(biMode, "reunion_query_office")}
@@ -1486,7 +1493,7 @@ export default function HandbookPDF({
                   <View style={s.reunionRow}>
                     <Text style={s.reunionLabel}>
                       {pt(biMode, "reunion_special_needs")}
-                      {biMode !== "zh"
+                      {biMode === "bi"
                         ? "/" + ptEn("reunion_special_needs")
                         : ""}
                     </Text>
@@ -1499,7 +1506,7 @@ export default function HandbookPDF({
                       >
                         {pt(biMode, "reunion_mobility")}
                       </Text>
-                      {biMode !== "zh" && (
+                      {biMode === "bi" && (
                         <Text style={{ fontSize: 7.5, color: "#C93B3B" }}>
                           {ptEn("reunion_mobility")}
                         </Text>
@@ -1511,7 +1518,7 @@ export default function HandbookPDF({
                   <View style={s.reunionRow}>
                     <Text style={s.reunionLabel}>
                       {pt(biMode, "reunion_meds")}
-                      {biMode !== "zh" ? "/" + ptEn("reunion_meds") : ""}
+                      {biMode === "bi" ? "/" + ptEn("reunion_meds") : ""}
                     </Text>
                     <Text style={s.reunionValue}>{m.medications}</Text>
                   </View>
@@ -1522,7 +1529,7 @@ export default function HandbookPDF({
 
           {/* Communication Plan */}
           <Text style={s.sectionTitle}>{pt(biMode, "comm_title")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("comm_title")}
             </Text>
@@ -1554,7 +1561,7 @@ export default function HandbookPDF({
               return (
                 <View key={i} style={{ marginBottom: 2 }}>
                   <Text style={s.tipText}>{zhText}</Text>
-                  {biMode !== "zh" && (
+                  {biMode === "bi" && (
                     <Text
                       style={[s.tipText, { fontSize: 7.5, color: "#6B6560" }]}
                     >
@@ -1568,7 +1575,7 @@ export default function HandbookPDF({
 
           {/* When phone doesn't work */}
           <Text style={s.sectionTitle}>{pt(biMode, "nophone_title")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("nophone_title")}
             </Text>
@@ -1598,7 +1605,7 @@ export default function HandbookPDF({
                 </Text>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 9 }}>{pt(biMode, key)}</Text>
-                  {biMode !== "zh" && (
+                  {biMode === "bi" && (
                     <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                       {ptEn(key)}
                     </Text>
@@ -1610,7 +1617,7 @@ export default function HandbookPDF({
 
           {/* Emergency Contacts */}
           <Text style={s.sectionTitle}>{pt(biMode, "contacts_title")}</Text>
-          {biMode !== "zh" && (
+          {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("contacts_title")}
             </Text>
@@ -1627,7 +1634,7 @@ export default function HandbookPDF({
               {c.phoneBackup ? (
                 <Text style={s.contactMeta}>
                   {pt(biMode, "reunion_contact_backup")}
-                  {biMode !== "zh" ? "/" + ptEn("reunion_contact_backup") : ""}
+                  {biMode === "bi" ? "/" + ptEn("reunion_contact_backup") : ""}
                   ：{c.phoneBackup}
                 </Text>
               ) : null}
@@ -1641,7 +1648,7 @@ export default function HandbookPDF({
                   >
                     {pt(biMode, "reunion_out_of_city")}
                   </Text>
-                  {biMode !== "zh" && (
+                  {biMode === "bi" && (
                     <Text
                       style={[
                         s.contactMeta,
@@ -1854,17 +1861,31 @@ export default function HandbookPDF({
                   { borderBottomColor: "#0ea5e9", color: "#0ea5e9" },
                 ]}
               >
-                {pt(biMode, "foreign_title")} Information for Foreign Nationals
+                {biMode === "en"
+                  ? "Information for Foreign Nationals"
+                  : biMode === "zh"
+                    ? pt(biMode, "foreign_title")
+                    : `${pt(biMode, "foreign_title")} / Information for Foreign Nationals`}
               </Text>
               <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 8 }}>
-                {pt(biMode, "foreign_shelter_open")}
+                {biMode === "en"
+                  ? ptEn("foreign_shelter_open")
+                  : pt(biMode, "foreign_shelter_open")}
               </Text>
-              <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 8 }}>
-                {ptEn("foreign_shelter_open")}
-              </Text>
+              {biMode === "bi" && (
+                <Text
+                  style={{ fontSize: 9, color: "#6B6560", marginBottom: 8 }}
+                >
+                  {ptEn("foreign_shelter_open")}
+                </Text>
+              )}
 
               <Text style={s.sectionTitle}>
-                {pt(biMode, "foreign_hotlines")} Multilingual Hotlines
+                {biMode === "en"
+                  ? "Multilingual Hotlines"
+                  : biMode === "zh"
+                    ? pt(biMode, "foreign_hotlines")
+                    : `${pt(biMode, "foreign_hotlines")} / Multilingual Hotlines`}
               </Text>
               {FOREIGN_HOTLINES.map((h, i) => (
                 <View key={i} style={s.numRow}>
@@ -1890,8 +1911,8 @@ export default function HandbookPDF({
               {res && (
                 <>
                   <Text style={s.sectionTitle}>
-                    {pt(biMode, "foreign_embassy_pre")} Representative Office (
-                    {res.nameNative})
+                    {bi(biMode, "foreign_embassy_pre", "Representative Office")}{" "}
+                    ({res.nameNative})
                   </Text>
                   <View style={s.contactCard}>
                     <Text style={s.contactName}>{res.embassy}</Text>
@@ -1910,7 +1931,7 @@ export default function HandbookPDF({
                           },
                         ]}
                       >
-                        {pt(biMode, "foreign_emergency")} Emergency:{" "}
+                        {bi(biMode, "foreign_emergency", "Emergency")}:{" "}
                         {res.emergencyPhone}
                       </Text>
                     )}
@@ -1921,12 +1942,12 @@ export default function HandbookPDF({
               {(household.employerName || household.brokerName) && (
                 <>
                   <Text style={s.sectionTitle}>
-                    {pt(biMode, "foreign_employer")} Employer / Broker
+                    {bi(biMode, "foreign_employer", "Employer / Broker")}
                   </Text>
                   {household.employerName && (
                     <View style={s.contactCard}>
                       <Text style={s.contactName}>
-                        {pt(biMode, "foreign_employer_label")} Employer：
+                        {bi(biMode, "foreign_employer_label", "Employer")}：
                         {household.employerName}
                       </Text>
                       {household.employerPhone && (
@@ -1939,7 +1960,7 @@ export default function HandbookPDF({
                   {household.brokerName && (
                     <View style={s.contactCard}>
                       <Text style={s.contactName}>
-                        {pt(biMode, "foreign_broker_label")} Broker：
+                        {bi(biMode, "foreign_broker_label", "Broker")}：
                         {household.brokerName}
                       </Text>
                       {household.brokerPhone && (
@@ -1953,7 +1974,7 @@ export default function HandbookPDF({
               )}
 
               <Text style={s.sectionTitle}>
-                {pt(biMode, "foreign_reminders")} Important Reminders
+                {bi(biMode, "foreign_reminders", "Important Reminders")}
               </Text>
               <View
                 style={[
@@ -1965,36 +1986,53 @@ export default function HandbookPDF({
                   },
                 ]}
               >
-                {[
-                  pt(biMode, "foreign_tip_1"),
-                  ptEn("foreign_tip_1"),
-                  pt(biMode, "foreign_tip_2"),
-                  ptEn("foreign_tip_2"),
-                  pt(biMode, "foreign_tip_3"),
-                  ptEn("foreign_tip_3"),
-                  pt(biMode, "foreign_tip_4"),
-                  ptEn("foreign_tip_4"),
-                ].map((t, i) => (
-                  <View
-                    key={i}
-                    style={{ flexDirection: "row", marginBottom: 2 }}
-                  >
-                    <Text
-                      style={{ color: "#0369a1", marginRight: 5, fontSize: 9 }}
+                {(biMode === "bi"
+                  ? [
+                      pt(biMode, "foreign_tip_1"),
+                      ptEn("foreign_tip_1"),
+                      pt(biMode, "foreign_tip_2"),
+                      ptEn("foreign_tip_2"),
+                      pt(biMode, "foreign_tip_3"),
+                      ptEn("foreign_tip_3"),
+                      pt(biMode, "foreign_tip_4"),
+                      ptEn("foreign_tip_4"),
+                    ]
+                  : [
+                      pt(biMode, "foreign_tip_1"),
+                      pt(biMode, "foreign_tip_2"),
+                      pt(biMode, "foreign_tip_3"),
+                      pt(biMode, "foreign_tip_4"),
+                    ]
+                ).map((t, i) => {
+                  // In bi mode: even = zh (main), odd = en (sub)
+                  // In single mode: every line is main
+                  const isSub = biMode === "bi" && i % 2 === 1;
+                  return (
+                    <View
+                      key={i}
+                      style={{ flexDirection: "row", marginBottom: 2 }}
                     >
-                      {i % 2 === 0 ? ">" : "　"}
-                    </Text>
-                    <Text
-                      style={{
-                        flex: 1,
-                        fontSize: i % 2 === 0 ? 9 : 8,
-                        color: i % 2 === 0 ? "#1e293b" : "#64748b",
-                      }}
-                    >
-                      {t}
-                    </Text>
-                  </View>
-                ))}
+                      <Text
+                        style={{
+                          color: "#0369a1",
+                          marginRight: 5,
+                          fontSize: 9,
+                        }}
+                      >
+                        {isSub ? "　" : ">"}
+                      </Text>
+                      <Text
+                        style={{
+                          flex: 1,
+                          fontSize: isSub ? 8 : 9,
+                          color: isSub ? "#64748b" : "#1e293b",
+                        }}
+                      >
+                        {t}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
 
               {/* Migrant Worker Health Centers (conditional) */}
@@ -2014,7 +2052,7 @@ export default function HandbookPDF({
                       ]}
                     >
                       {pt(biMode, "migrant_health_title")}
-                      {biMode !== "zh"
+                      {biMode === "bi"
                         ? " / " + ptEn("migrant_health_title")
                         : ""}
                     </Text>
@@ -2685,7 +2723,7 @@ export default function HandbookPDF({
         </Text>
 
         <Text style={s.sectionTitle}>{pt(biMode, "remind_equip")}</Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_equip")}
           </Text>
@@ -2704,7 +2742,7 @@ export default function HandbookPDF({
         ))}
 
         <Text style={s.sectionTitle}>{pt(biMode, "remind_check")}</Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_check")}
           </Text>
@@ -2731,7 +2769,7 @@ export default function HandbookPDF({
         ))}
 
         <Text style={s.sectionTitle}>{pt(biMode, "remind_memo")}</Text>
-        {biMode !== "zh" && (
+        {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_memo")}
           </Text>

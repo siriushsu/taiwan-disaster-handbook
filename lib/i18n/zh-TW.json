@@ -90,5 +90,22 @@
   "error_title": "發生錯誤",
   "error_desc": "很抱歉，頁面發生問題。請重新整理頁面或返回首頁。",
   "reload": "重新整理",
-  "home": "返回首頁"
+  "home": "返回首頁",
+  "find_on_map": "在地圖上找",
+  "map_short": "📍 地圖",
+  "change_addr": "換地址",
+  "back_to_home": "返回首頁",
+  "emergency_cta": "🆘 緊急電話（點擊即撥）",
+  "search_btn": "搜尋",
+  "stat_shelters_short": "避難所",
+  "stat_airraid_short": "防空洞",
+  "stat_medical_short": "醫療",
+  "stat_aed_short": "AED",
+  "updates_title": "近期更新",
+  "updates_data_date": "資料更新",
+  "footer_help_improve": "資料有誤？幫助我們改善",
+  "footer_report_error": "📍 回報資料錯誤",
+  "footer_feature_request": "💡 功能建議",
+  "footer_open_source": "⭐ 開源專案 — 歡迎貢獻",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker？ →"
 }

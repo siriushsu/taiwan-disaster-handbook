@@ -90,5 +90,22 @@
   "error_title": "Something went wrong",
   "error_desc": "We're sorry, the page encountered an error. Please refresh or return to the homepage.",
   "reload": "Refresh",
-  "home": "Homepage"
+  "home": "Homepage",
+  "find_on_map": "Find on Map",
+  "map_short": "📍 Map",
+  "change_addr": "Change",
+  "back_to_home": "Back",
+  "emergency_cta": "🆘 Emergency Numbers (tap to call)",
+  "search_btn": "Search",
+  "stat_shelters_short": "Shelters",
+  "stat_airraid_short": "Air Raid",
+  "stat_medical_short": "Medical",
+  "stat_aed_short": "AED",
+  "updates_title": "Recent Updates",
+  "updates_data_date": "Data",
+  "footer_help_improve": "Help us improve",
+  "footer_report_error": "📍 Report data error",
+  "footer_feature_request": "💡 Feature request",
+  "footer_open_source": "⭐ Open source project — contributions welcome",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →"
 }

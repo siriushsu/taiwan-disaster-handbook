@@ -90,5 +90,22 @@
   "error_title": "Đã xảy ra lỗi",
   "error_desc": "Xin lỗi, trang gặp sự cố. Vui lòng tải lại hoặc quay về trang chủ.",
   "reload": "Tải lại",
-  "home": "Trang chủ"
+  "home": "Trang chủ",
+  "find_on_map": "Tìm trên bản đồ",
+  "map_short": "📍 Bản đồ",
+  "change_addr": "Đổi",
+  "back_to_home": "Quay lại",
+  "emergency_cta": "🆘 Số điện thoại khẩn cấp (bấm để gọi)",
+  "search_btn": "Tìm kiếm",
+  "stat_shelters_short": "Nơi trú ẩn",
+  "stat_airraid_short": "Hầm phòng không",
+  "stat_medical_short": "Y tế",
+  "stat_aed_short": "AED",
+  "updates_title": "Cập nhật gần đây",
+  "updates_data_date": "Dữ liệu",
+  "footer_help_improve": "Giúp chúng tôi cải thiện",
+  "footer_report_error": "📍 Báo lỗi dữ liệu",
+  "footer_feature_request": "💡 Đề xuất tính năng",
+  "footer_open_source": "⭐ Dự án mã nguồn mở — hoan nghênh đóng góp",
+  "quick_cta_migrant": "外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →"
 }
