@@ -1388,11 +1388,19 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{locale === "en" ? "Recent Updates" : "近期更新"}</span>
             <span className="text-xs font-normal text-text-faint">
-              {locale === "en" ? "Data: 2026/4/15" : "資料更新：2026/4/15"}
+              {locale === "en" ? "Data: 2026/4/16" : "資料更新：2026/4/16"}
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/16</span>
+                <span>
+                  {locale === "en"
+                    ? "City/district dropdowns now show English + Chinese side-by-side for all non-Chinese locales (Vi/Id/Th/Fil)"
+                    : "縣市/區域下拉選單：非中文介面現在同時顯示英文與中文，方便對照"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/15</span>
                 <span>
