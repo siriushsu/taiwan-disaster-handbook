@@ -119,6 +119,7 @@ export default function Home() {
     hasInfant: false,
     infantInfo: "",
     isForeignNational: false,
+    foreignType: "" as "resident" | "worker" | "",
     nationality: "",
     employerName: "",
     employerPhone: "",
@@ -391,10 +392,14 @@ export default function Home() {
     <main className="min-h-screen bg-surface">
       {/* 頁首 — Notion-style white header */}
       {form.isForeignNational && mode === "form" && (
-        <div className="bg-emerald-600 text-white text-center text-xs py-1 font-medium">
-          {locale === "en"
-            ? "🌏 Foreign National Mode — extra resources enabled"
-            : "🌏 外籍人士模式 — 已啟用多語專線與用語卡"}
+        <div
+          className={`${form.foreignType === "worker" ? "bg-emerald-600" : "bg-blue-600"} text-white text-center text-xs py-1 font-medium`}
+        >
+          {form.foreignType === "worker"
+            ? "🌏 外籍移工模式 Migrant Worker Mode — 1955 / 113 / 用語卡 / 雇主資訊"
+            : form.foreignType === "resident"
+              ? "🌏 外籍居民模式 Foreign Resident Mode — 辦事處 / 用語卡"
+              : "🌏 請選擇身分類型 Please select your status below"}
         </div>
       )}
       <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
@@ -471,9 +476,7 @@ export default function Home() {
               }}
               className="text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
             >
-              {locale === "en"
-                ? "Foreign national? Enable migrant/resident mode →"
-                : "外籍人士？啟用專屬模式 →"}
+              外籍人士 / Migrant Worker? →
             </button>
           </div>
 
@@ -1146,26 +1149,56 @@ export default function Home() {
                     <input
                       type="checkbox"
                       checked={form.isForeignNational}
-                      onChange={(e) =>
-                        updateForm("isForeignNational", e.target.checked)
-                      }
+                      onChange={(e) => {
+                        updateForm("isForeignNational", e.target.checked);
+                        if (!e.target.checked) updateForm("foreignType", "");
+                      }}
                       className="rounded mt-1"
                     />
                     <div>
-                      <div>
-                        {locale === "en"
-                          ? "Foreign national (including migrant worker)"
-                          : "外籍人士（含外籍移工）/ Foreign national (incl. migrant worker)"}
-                      </div>
+                      <div>外籍人士 / Foreign National</div>
                       <div className="text-xs text-text-faint mt-0.5 leading-snug">
-                        {locale === "en"
-                          ? "Enables multilingual emergency phrase card, 1955/113 hotlines, representative office info"
-                          : "勾選後會加入多語緊急用語卡、1955/113 專線、駐台辦事處資訊"}
+                        勾選後可選擇身分類型，加入對應的專屬資源
+                        <br />
+                        Check to select your status and enable relevant
+                        resources
                       </div>
                     </div>
                   </label>
                   {form.isForeignNational && (
                     <div className="mt-3 space-y-3 bg-primary-light rounded-lg p-3">
+                      {/* Sub-selection: resident vs worker */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateForm("foreignType", "resident")}
+                          className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all ${
+                            form.foreignType === "resident"
+                              ? "bg-primary text-white border-primary"
+                              : "bg-white text-text-muted border-border hover:border-primary"
+                          }`}
+                        >
+                          <div>外籍居民</div>
+                          <div className="text-xs opacity-75">
+                            Foreign Resident
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateForm("foreignType", "worker")}
+                          className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all ${
+                            form.foreignType === "worker"
+                              ? "bg-emerald-600 text-white border-emerald-600"
+                              : "bg-white text-text-muted border-border hover:border-emerald-600"
+                          }`}
+                        >
+                          <div>外籍移工</div>
+                          <div className="text-xs opacity-75">
+                            Migrant Worker
+                          </div>
+                        </button>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-text-muted mb-1">
                           國籍 Nationality
@@ -1186,66 +1219,71 @@ export default function Home() {
                           <option value="OTHER">其他 / Other</option>
                         </select>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-sm font-medium text-text-muted mb-1">
-                            雇主姓名 Employer
-                          </label>
-                          <input
-                            type="text"
-                            value={form.employerName}
-                            onChange={(e) =>
-                              updateForm("employerName", e.target.value)
-                            }
-                            placeholder="選填 / Optional"
-                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-text-muted mb-1">
-                            雇主電話
-                          </label>
-                          <input
-                            type="tel"
-                            value={form.employerPhone}
-                            onChange={(e) =>
-                              updateForm("employerPhone", e.target.value)
-                            }
-                            placeholder="選填 / Optional"
-                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-sm font-medium text-text-muted mb-1">
-                            仲介姓名 Broker
-                          </label>
-                          <input
-                            type="text"
-                            value={form.brokerName}
-                            onChange={(e) =>
-                              updateForm("brokerName", e.target.value)
-                            }
-                            placeholder="選填 / Optional"
-                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-text-muted mb-1">
-                            仲介電話
-                          </label>
-                          <input
-                            type="tel"
-                            value={form.brokerPhone}
-                            onChange={(e) =>
-                              updateForm("brokerPhone", e.target.value)
-                            }
-                            placeholder="選填 / Optional"
-                            className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
-                          />
-                        </div>
-                      </div>
+                      {/* Employer/Broker fields — only for migrant workers */}
+                      {form.foreignType === "worker" && (
+                        <>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-sm font-medium text-text-muted mb-1">
+                                雇主姓名 Employer
+                              </label>
+                              <input
+                                type="text"
+                                value={form.employerName}
+                                onChange={(e) =>
+                                  updateForm("employerName", e.target.value)
+                                }
+                                placeholder="選填 / Optional"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-text-muted mb-1">
+                                雇主電話
+                              </label>
+                              <input
+                                type="tel"
+                                value={form.employerPhone}
+                                onChange={(e) =>
+                                  updateForm("employerPhone", e.target.value)
+                                }
+                                placeholder="選填 / Optional"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-sm font-medium text-text-muted mb-1">
+                                仲介姓名 Broker
+                              </label>
+                              <input
+                                type="text"
+                                value={form.brokerName}
+                                onChange={(e) =>
+                                  updateForm("brokerName", e.target.value)
+                                }
+                                placeholder="選填 / Optional"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-text-muted mb-1">
+                                仲介電話
+                              </label>
+                              <input
+                                type="tel"
+                                value={form.brokerPhone}
+                                onChange={(e) =>
+                                  updateForm("brokerPhone", e.target.value)
+                                }
+                                placeholder="選填 / Optional"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-primary-light"
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1422,8 +1460,16 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/16</span>
                 <span>
                   {locale === "en"
-                    ? "Foreign national mode: green accent bar shows when active; dropdowns now bilingual"
-                    : "外籍人士模式啟用後顯示綠色提示列；下拉選單改為中英雙語對照"}
+                    ? "Foreign national / migrant worker split: choose your status for tailored resources (employer/broker fields only for workers)"
+                    : "外籍居民 vs 外籍移工區隔：選擇身分後顯示對應資源（雇主/仲介欄位僅移工顯示）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/16</span>
+                <span>
+                  {locale === "en"
+                    ? "Complete UI translations for Vietnamese, Indonesian, Thai, Filipino (92/92 keys each)"
+                    : "越/印/泰/菲介面翻譯補齊（92 個翻譯鍵全部完成）"}
                 </span>
               </li>
               <li className="flex gap-2">

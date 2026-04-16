@@ -43,6 +43,7 @@ export interface HouseholdForm {
   hasInfant: boolean;
   infantInfo: string;
   isForeignNational: boolean;
+  foreignType: "resident" | "worker" | ""; // 外籍居民 vs 外籍移工
   nationality: string; // 'VN' | 'ID' | 'PH' | 'TH' | 'JP' | 'US' | ''
   employerName: string;
   employerPhone: string;
