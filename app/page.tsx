@@ -476,7 +476,7 @@ export default function Home() {
               }}
               className="text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
             >
-              外籍人士 / Migrant Worker? →
+              外籍人士 Foreign Resident / 外籍移工 Migrant Worker? →
             </button>
           </div>
 
