@@ -2093,16 +2093,6 @@ export default function HandbookPDF({
               >
                 {pt(biMode, "phrase_card_title")} / {ptEn("phrase_card_title")}
               </Text>
-              <Text
-                style={{
-                  fontSize: 8,
-                  color: "#b45309",
-                  marginBottom: 3,
-                  fontWeight: "bold",
-                }}
-              >
-                ⚠ {pt(biMode, "phrase_card_draft")}
-              </Text>
               <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 6 }}>
                 {pt(biMode, "phrase_card_sub")}
               </Text>
@@ -2239,7 +2229,7 @@ export default function HandbookPDF({
                 );
               })}
 
-              <Footer label="Emergency Phrase Card (DRAFT)" biMode={biMode} />
+              <Footer label="Emergency Phrase Card" biMode={biMode} />
             </Page>
           );
         })()}

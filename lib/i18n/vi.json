@@ -59,7 +59,7 @@
   "relation": "Quan hệ",
   "phone": "Số điện thoại chính",
   "phone_backup": "Số dự phòng",
-  "out_of_city": "Liên hệ ngoài thành phố (trung chuyển tin nhắn khi thiên tai)",
+  "out_of_city": "Liên hệ ở tỉnh/thành phố khác (trung chuyển tin nhắn khi thiên tai)",
   "add_contact": "+ Thêm liên hệ",
   "generate": "Tạo sổ tay phòng thiên tai",
   "generating": "Đang tạo...",

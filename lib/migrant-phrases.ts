@@ -1,16 +1,16 @@
 /**
  * Emergency phrases for foreign nationals in Taiwan.
  *
- * DRAFT — all non-ZH/EN translations require native-speaker review.
  * Review status per language:
  *   - zh: ✅ (source of truth)
  *   - en: ✅ (direct translation)
- *   - vi: ⚠️ DRAFT (pending Vietnamese native speaker)
- *   - id: ⚠️ DRAFT (pending Indonesian native speaker)
- *   - th: ⚠️ DRAFT (pending Thai native speaker)
- *   - fil: ⚠️ DRAFT (pending Filipino native speaker)
+ *   - vi: ✅ Reviewed (Gemini 2026-04-16, pending native speaker validation)
+ *   - id: ✅ Reviewed (Gemini 2026-04-16, pending native speaker validation)
+ *   - th: ✅ Reviewed (Gemini 2026-04-16, pending native speaker validation)
+ *   - fil: ✅ Reviewed (Gemini 2026-04-16, pending native speaker validation)
  *
- * Send for review via: docs/outreach-email-template.md
+ * Next step: send for native-speaker validation via:
+ * docs/outreach-email-template.md
  * Priority orgs: Hope Workers' Center, One-Forty
  */
 
@@ -87,7 +87,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       en: "I'm pregnant",
       vi: "Tôi đang mang thai",
       id: "Saya hamil",
-      th: "ฉันท้อง",
+      th: "ฉันตั้งครรภ์",
       fil: "Buntis ako",
     },
   },
@@ -99,7 +99,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       en: "I have allergies",
       vi: "Tôi bị dị ứng",
       id: "Saya punya alergi",
-      th: "ฉันมีอาการแพ้",
+      th: "ฉันเป็นภูมิแพ้",
       fil: "May allergy ako",
     },
   },
@@ -122,7 +122,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       zh: "我呼吸困難",
       en: "I can't breathe well",
       vi: "Tôi khó thở",
-      id: "Saya sulit bernapas",
+      id: "Saya sesak napas",
       th: "ฉันหายใจลำบาก",
       fil: "Hirap akong huminga",
     },
@@ -145,12 +145,12 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
     id: "help-me",
     category: "safety",
     text: {
-      zh: "請幫我",
-      en: "Please help me",
-      vi: "Làm ơn giúp tôi",
-      id: "Tolong saya",
-      th: "ช่วยฉันด้วย",
-      fil: "Tulungan po ninyo ako",
+      zh: "救命！請幫我",
+      en: "Help! Please help me",
+      vi: "Cứu tôi với!",
+      id: "Tolong! Bantu saya",
+      th: "ช่วยด้วย! ช่วยฉันที",
+      fil: "Saklolo! Tulungan ninyo ako",
     },
   },
   {
@@ -174,7 +174,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       vi: "Tôi bị mắc kẹt",
       id: "Saya terjebak",
       th: "ฉันติดอยู่",
-      fil: "Naipit ako",
+      fil: "Na-trap ako",
     },
   },
   {
@@ -281,7 +281,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
     text: {
       zh: "我的居留證號碼是",
       en: "My ARC number is",
-      vi: "Số ARC của tôi là",
+      vi: "Số thẻ cư trú (ARC) của tôi là",
       id: "Nomor ARC saya",
       th: "หมายเลข ARC ของฉันคือ",
       fil: "Ang ARC number ko ay",
@@ -308,7 +308,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       vi: "Môi giới của tôi là",
       id: "Agen saya",
       th: "นายหน้าของฉันคือ",
-      fil: "Ang broker ko ay",
+      fil: "Ang agency ko ay",
     },
   },
 
@@ -320,9 +320,9 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       zh: "我沒有領到薪水",
       en: "I haven't been paid",
       vi: "Tôi chưa được trả lương",
-      id: "Saya belum dibayar",
+      id: "Gaji saya belum dibayar",
       th: "ฉันยังไม่ได้รับเงินเดือน",
-      fil: "Hindi pa ako binabayaran",
+      fil: "Hindi pa ako sumasahod",
     },
   },
   {
@@ -331,7 +331,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
     text: {
       zh: "我的護照被拿走了",
       en: "My passport was taken",
-      vi: "Hộ chiếu của tôi bị lấy đi",
+      vi: "Hộ chiếu của tôi bị giữ",
       id: "Paspor saya diambil",
       th: "พาสปอร์ตของฉันถูกยึด",
       fil: "Kinuha ang pasaporte ko",
@@ -368,8 +368,8 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       zh: "我被虐待",
       en: "I'm being abused",
       vi: "Tôi bị ngược đãi",
-      id: "Saya diperlakukan buruk",
-      th: "ฉันถูกทารุณ",
+      id: "Saya dianiaya",
+      th: "ฉันถูกทำร้าย",
       fil: "Inaabuso ako",
     },
   },
@@ -396,7 +396,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       vi: "Nơi trú ẩn ở đâu?",
       id: "Di mana tempat perlindungan?",
       th: "ศูนย์หลบภัยอยู่ที่ไหน",
-      fil: "Nasaan ang silungan?",
+      fil: "Nasaan ang evacuation center?",
     },
   },
   {
@@ -454,7 +454,7 @@ export const MIGRANT_PHRASES: MigrantPhrase[] = [
       zh: "我需要充電",
       en: "I need to charge my phone",
       vi: "Tôi cần sạc điện thoại",
-      id: "Saya perlu mengisi baterai",
+      id: "Saya perlu mengecas HP",
       th: "ฉันต้องชาร์จมือถือ",
       fil: "Kailangan kong mag-charge ng phone",
     },

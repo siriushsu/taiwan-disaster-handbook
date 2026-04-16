@@ -1452,6 +1452,14 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/16</span>
                 <span>
                   {locale === "en"
+                    ? "Translation review (Gemini): 16 fixes applied across vi/id/th/fil — more idiomatic for migrants in Taiwan. DRAFT watermark removed."
+                    : "翻譯審校（Gemini）：越/印/泰/菲 16 處修正，更符合在台移工實際用語。DRAFT 警示已移除。"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/16</span>
+                <span>
+                  {locale === "en"
                     ? "New /emergency page: large tap-to-call buttons for 119/110/1955/113, works offline"
                     : "新增緊急電話頁：大按鈕一鍵撥打 119/110/1955/113，離線可用"}
                 </span>
