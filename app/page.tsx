@@ -390,6 +390,13 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-surface">
       {/* 頁首 — Notion-style white header */}
+      {form.isForeignNational && mode === "form" && (
+        <div className="bg-emerald-600 text-white text-center text-xs py-1 font-medium">
+          {locale === "en"
+            ? "🌏 Foreign National Mode — extra resources enabled"
+            : "🌏 外籍人士模式 — 已啟用多語專線與用語卡"}
+        </div>
+      )}
       <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
@@ -519,6 +526,16 @@ export default function Home() {
           >
             {T("hero_cta_full")}
           </button>
+
+          {/* Emergency quick link */}
+          <a
+            href="/emergency"
+            className="block w-full text-center bg-red-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors active:scale-[0.98]"
+          >
+            {locale === "en"
+              ? "🆘 Emergency Numbers (tap to call)"
+              : "🆘 緊急電話（點擊即撥）"}
+          </a>
         </div>
       )}
 
@@ -1397,8 +1414,16 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/16</span>
                 <span>
                   {locale === "en"
-                    ? "City/district dropdowns now show English + Chinese side-by-side for all non-Chinese locales (Vi/Id/Th/Fil)"
-                    : "縣市/區域下拉選單：非中文介面現在同時顯示英文與中文，方便對照"}
+                    ? "New /emergency page: large tap-to-call buttons for 119/110/1955/113, works offline"
+                    : "新增緊急電話頁：大按鈕一鍵撥打 119/110/1955/113，離線可用"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/16</span>
+                <span>
+                  {locale === "en"
+                    ? "Foreign national mode: green accent bar shows when active; dropdowns now bilingual"
+                    : "外籍人士模式啟用後顯示綠色提示列；下拉選單改為中英雙語對照"}
                 </span>
               </li>
               <li className="flex gap-2">
