@@ -2120,17 +2120,17 @@ export default function HandbookPDF({
               </Text>
               {FOREIGN_HOTLINES.map((h, i) => (
                 <View key={i} style={s.numRow}>
-                  <Text
-                    style={[
-                      s.numBig,
-                      {
+                  <View style={{ width: 150, flexShrink: 0 }}>
+                    <Text
+                      style={{
                         fontSize: h.number.length > 4 ? 14 : 20,
-                        marginRight: 8,
-                      },
-                    ]}
-                  >
-                    {h.number}
-                  </Text>
+                        fontWeight: "bold",
+                        color: "#C93B3B",
+                      }}
+                    >
+                      {h.number}
+                    </Text>
+                  </View>
                   <View style={{ flex: 1 }}>
                     <Text
                       style={[s.numLabel, { fontWeight: "bold", fontSize: 9 }]}
