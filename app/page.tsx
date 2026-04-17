@@ -1437,11 +1437,35 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_data_date")}: 2026/4/16
+              {T("updates_data_date")}: 2026/4/17
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/17</span>
+                <span>
+                  {locale === "en"
+                    ? "New usage guide page in PDF for foreign nationals: explains which page to show to locals/drivers vs read yourself, 4 emergency scenarios mapped to handbook pages"
+                    : "外籍人士 PDF 新增「使用說明頁」：哪一頁給路人/司機看、哪一頁自己看，4 種情境對應到手冊指定頁數"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/17</span>
+                <span>
+                  {locale === "en"
+                    ? "QR code hint clarified: foreign nationals can show shelter page to locals — they can help navigate"
+                    : "QR Code 提示文字改進：外籍人士可把避難所頁指給路人看，請他們帶你去"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/17</span>
+                <span>
+                  {locale === "en"
+                    ? "Fixed PDF text overlap on Foreign Nationals page (hotline column widths, language-aware rendering)"
+                    : "修復 PDF 外籍人士頁文字重疊問題（熱線欄位寬度、依語言顯示對應翻譯）"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/16</span>
                 <span>
