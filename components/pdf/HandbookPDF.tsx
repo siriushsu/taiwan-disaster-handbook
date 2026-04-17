@@ -215,8 +215,9 @@ const s = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#C93B3B",
-    width: 120,
+    width: 145,
     flexShrink: 0,
+    paddingRight: 8,
   },
   numLabel: { flex: 1, fontSize: 10, color: "#6B6560" },
   // contact card
@@ -2134,10 +2135,11 @@ export default function HandbookPDF({
                     <Text
                       style={[s.numLabel, { fontWeight: "bold", fontSize: 9 }]}
                     >
-                      {h.name}
+                      {biMode === "en" ? h.nameEn : h.name}
                     </Text>
                     <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
-                      {h.nameEn}　{h.note}
+                      {biMode === "bi" ? `${h.nameEn}　` : ""}
+                      {h.note}
                     </Text>
                   </View>
                 </View>
