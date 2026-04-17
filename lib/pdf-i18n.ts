@@ -144,8 +144,8 @@ const TEXT: Record<string, [string, string]> = {
     "Source: Ministry of Interior Fire Bureau Open Data",
   ],
   loc_qr_hint: [
-    "掃 QR 碼可開啟 Google Maps 導航",
-    "Scan QR code for Google Maps navigation",
+    "掃 QR 碼可開啟 Google Maps 導航。外籍人士：把此頁指給司機或路人看，他們能帶你去。",
+    "Scan QR code for Google Maps navigation. Foreign nationals: show this page to a driver or local — they can take you there.",
   ],
   loc_airraid: [
     "防空避難所（軍事衝突用）",

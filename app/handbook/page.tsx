@@ -246,13 +246,13 @@ export default function HandbookPage() {
   const memberName = data.household.members[0]?.name || "我的家庭";
   const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, "-")}.pdf`;
   const hasNamedMembers = data.household.members.some((m) => m.name);
-  // Cover(1) + Action Card(1) + Reunion(if members) + Locations(x2 each) + Member Overview(if members) + Foreign(+phrase card) + Supply + Phones + Back
+  // Cover(1) + Usage(if foreign) + Action Card(1) + Reunion(if members) + Locations(x2 each) + Member Overview(if members) + Foreign(+phrase card) + Supply + Phones + Back
   const pageCount =
     2 +
     (hasNamedMembers ? 2 : 0) +
     data.locations.length +
     3 +
-    (data.household.isForeignNational ? 2 : 0);
+    (data.household.isForeignNational ? 3 : 0);
 
   return (
     <main className="min-h-screen bg-surface">

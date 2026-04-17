@@ -1205,6 +1205,230 @@ export default function HandbookPDF({
         </View>
       </Page>
 
+      {/* ─── USAGE GUIDE PAGE (conditional on isForeignNational) ─── */}
+      {household.isForeignNational && (
+        <Page size="A4" style={s.page}>
+          <Text
+            style={[
+              s.scenarioTitle,
+              { borderBottomColor: "#0ea5e9", color: "#0369a1" },
+            ]}
+          >
+            使用說明 / How to Use This Handbook
+          </Text>
+          <Text style={{ fontSize: 7, color: "#64748b", marginBottom: 2 }}>
+            Hướng dẫn sử dụng · Cara penggunaan · วิธีใช้ · Paano gamitin
+          </Text>
+          <Text
+            style={{
+              fontSize: 9,
+              color: "#374151",
+              marginBottom: 10,
+              lineHeight: 1.4,
+            }}
+          >
+            遇到緊急狀況時，翻到對應頁面。有些頁面是給你自己看的，有些是給幫助你的台灣人看的。
+            {"\n"}
+            In an emergency, open the relevant page. Some pages are for you to
+            read; others are for Taiwanese people helping you.
+          </Text>
+
+          {/* Two-column: for self / for helpers */}
+          <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#eff6ff",
+                borderRadius: 6,
+                padding: 8,
+                borderWidth: 1,
+                borderColor: "#bfdbfe",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  fontWeight: "bold",
+                  color: "#1e40af",
+                  marginBottom: 3,
+                }}
+              >
+                📱 給你自己看
+              </Text>
+              <Text
+                style={{ fontSize: 7.5, color: "#1e40af", marginBottom: 4 }}
+              >
+                For yourself
+              </Text>
+              <Text style={{ fontSize: 8, color: "#1e3a8a", lineHeight: 1.35 }}>
+                · 緊急行動卡 Action Card{"\n"}· 家庭團聚計畫 Reunion Plan{"\n"}·
+                外籍人士頁 Foreign Nationals Info{"\n"}· 緊急聯絡卡 Emergency
+                Card{"\n"}· 物資清單 Supply Checklist
+              </Text>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#f0fdf4",
+                borderRadius: 6,
+                padding: 8,
+                borderWidth: 1,
+                borderColor: "#bbf7d0",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  fontWeight: "bold",
+                  color: "#15803d",
+                  marginBottom: 3,
+                }}
+              >
+                🫱 給台灣人看
+              </Text>
+              <Text
+                style={{ fontSize: 7.5, color: "#15803d", marginBottom: 4 }}
+              >
+                For Taiwanese helpers
+              </Text>
+              <Text style={{ fontSize: 8, color: "#14532d", lineHeight: 1.35 }}>
+                · 避難所地圖 Shelter Map{"\n"}
+                &nbsp;&nbsp;（地址是中文，給司機/路人看）{"\n"}· 緊急用語卡
+                Phrase Card{"\n"}
+                &nbsp;&nbsp;（指給對方看，不用開口）{"\n"}· 住宅避難建議
+                Evacuation Tips
+              </Text>
+            </View>
+          </View>
+
+          {/* Scenario guide */}
+          <Text style={s.sectionTitle}>
+            四種情況，翻到哪一頁 / 4 Scenarios &amp; Which Page
+          </Text>
+          <View style={{ gap: 4, marginBottom: 10 }}>
+            {[
+              {
+                icon: "🚨",
+                zh: "地震／火災／颱風當下",
+                en: "During earthquake / fire / typhoon",
+                page: "緊急行動卡 Action Card",
+              },
+              {
+                icon: "🚕",
+                zh: "需要有人帶你去避難所或醫院",
+                en: "Someone needs to take you to a shelter or hospital",
+                page: "避難所地圖（給司機看中文地址）Shelter Map (show Chinese address)",
+              },
+              {
+                icon: "🏥",
+                zh: "在醫院或派出所，無法用中文溝通",
+                en: "At hospital or police station, cannot speak Chinese",
+                page: "緊急用語卡（指給對方看）Phrase Card (point to what you need)",
+              },
+              {
+                icon: "📞",
+                zh: "需要打電話求助",
+                en: "Need to call for help",
+                page: "外籍人士頁 Foreign Nationals Info（1955 / 113 / 辦事處 Office）",
+              },
+            ].map((item, i) => (
+              <View
+                key={i}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  backgroundColor: "#fafafa",
+                  borderRadius: 4,
+                  padding: 6,
+                  borderLeftWidth: 3,
+                  borderLeftColor: "#0ea5e9",
+                }}
+              >
+                <Text style={{ fontSize: 14, marginRight: 6 }}>
+                  {item.icon}
+                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontSize: 9,
+                      fontWeight: "bold",
+                      color: "#1e293b",
+                    }}
+                  >
+                    {item.zh}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 7.5, color: "#64748b", marginTop: 1 }}
+                  >
+                    {item.en}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 8,
+                      color: "#0369a1",
+                      marginTop: 2,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    → {item.page}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Important tips */}
+          <Text style={s.sectionTitle}>重要提醒 / Important Reminders</Text>
+          <View
+            style={{
+              backgroundColor: "#fef3c7",
+              borderRadius: 6,
+              padding: 8,
+              borderWidth: 1,
+              borderColor: "#fcd34d",
+            }}
+          >
+            {[
+              {
+                zh: "找不到路？翻到「避難所地圖」頁，指給路人看，他們會幫你導航。",
+                en: "Lost? Open the Shelter Map page, show it to any local — they will help you.",
+              },
+              {
+                zh: "1955 可以用越南語 / 印尼語 / 泰語 / 英語通話，24 小時免費。",
+                en: "1955 supports Vietnamese / Indonesian / Thai / English, 24/7 free.",
+              },
+              {
+                zh: "避難所對所有人開放 — 不查身分證、不管國籍。",
+                en: "Shelters are open to everyone — no ID check, no nationality required.",
+              },
+              {
+                zh: "保持冷靜。翻頁指給對方看就好，不用開口說中文。",
+                en: "Stay calm. Just point to a page — you don't need to speak Chinese.",
+              },
+            ].map((tip, i) => (
+              <View key={i} style={{ marginBottom: 3 }}>
+                <Text
+                  style={{
+                    fontSize: 8.5,
+                    color: "#78350f",
+                    fontWeight: "bold",
+                  }}
+                >
+                  · {tip.zh}
+                </Text>
+                <Text
+                  style={{ fontSize: 7.5, color: "#92400e", marginLeft: 6 }}
+                >
+                  {tip.en}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <Footer label="Usage Guide / 使用說明" biMode={biMode} />
+        </Page>
+      )}
+
       {/* ─── PAGE 2: EMERGENCY ACTION CARD ─── */}
       <Page size="A4" style={s.actionPage}>
         <View style={s.actionBanner}>
