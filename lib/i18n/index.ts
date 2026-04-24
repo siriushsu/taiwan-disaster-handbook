@@ -40,7 +40,7 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   "zh-TW": "中文",
   en: "English",
   vi: "Tiếng Việt",
-  id: "Indonesia",
+  id: "Bahasa Indonesia",
   th: "ไทย",
   fil: "Filipino",
 };
