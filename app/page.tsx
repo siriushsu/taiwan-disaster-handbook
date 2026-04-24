@@ -489,7 +489,7 @@ export default function Home() {
                 setMode("form");
                 setStep(1);
               }}
-              className="text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
+              className="inline-flex items-center justify-center min-h-[44px] px-3 text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
             >
               {T("quick_cta_migrant")}
             </button>
@@ -540,7 +540,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => setMode("form")}
-            className="w-full text-text-muted text-sm py-2 hover:text-text transition-colors"
+            className="w-full text-text-muted text-sm min-h-[44px] py-2 hover:text-text transition-colors"
           >
             {T("hero_cta_full")}
           </button>
@@ -1661,7 +1661,7 @@ export default function Home() {
             href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center border border-warning/30 bg-warning/10 text-warning py-2 rounded-lg text-sm hover:bg-warning/15 transition-colors"
+            className="flex items-center justify-center min-h-[44px] border border-warning/30 bg-warning/10 text-warning px-3 rounded-lg text-sm hover:bg-warning/15 transition-colors"
           >
             {locale === "en" ? "📍 Report data error" : "📍 回報資料錯誤"}
           </a>
@@ -1669,7 +1669,7 @@ export default function Home() {
             href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors"
+            className="flex items-center justify-center min-h-[44px] border border-border text-text-muted px-3 rounded-lg text-sm hover:bg-surface transition-colors"
           >
             {locale === "en" ? "💡 Feature request" : "💡 功能建議"}
           </a>
@@ -1677,7 +1677,7 @@ export default function Home() {
             href="https://github.com/siriushsu/taiwan-disaster-handbook"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center text-text-faint text-xs py-1 hover:underline"
+            className="flex items-center justify-center min-h-[44px] text-text-faint text-xs px-3 hover:underline"
           >
             {locale === "en"
               ? "⭐ Open source project — contributions welcome"
@@ -1689,7 +1689,7 @@ export default function Home() {
           {!showSupport ? (
             <button
               onClick={() => setShowSupport(true)}
-              className="w-full text-center text-sm text-accent hover:text-accent-dark font-medium transition-colors"
+              className="w-full flex items-center justify-center min-h-[44px] text-sm text-accent hover:text-accent-dark font-medium transition-colors"
             >
               {locale === "en"
                 ? "☕ Enjoying this? Buy the developer a coffee"
