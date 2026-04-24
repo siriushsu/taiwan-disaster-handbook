@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import MemberForm from "@/components/form/MemberForm";
 import ContactForm from "@/components/form/ContactForm";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
@@ -541,6 +542,23 @@ export default function Home() {
                 <p className="text-xs text-text-muted mt-0.5">{label}</p>
               </div>
             ))}
+          </div>
+
+          {/* PDF preview — shows users exactly what artifact they'll get,
+              before they commit to the primary CTA. Pre-rendered at build
+              time via `npm run gen:pdf-preview`. */}
+          <div className="bg-white rounded-xl border border-border p-4 shadow-card">
+            <p className="text-xs text-text-faint mb-2">
+              {T("preview_caption")}
+            </p>
+            <Image
+              src="/pdf-preview.png"
+              alt="PDF handbook preview"
+              width={1191}
+              height={1684}
+              className="rounded-md border border-border/50 w-full h-auto"
+              priority
+            />
           </div>
 
           {/* Primary CTA */}
