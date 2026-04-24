@@ -2295,6 +2295,130 @@ export default function HandbookPDF({
               </Text>
             </View>
           )}
+
+          {/* Tear-off wallet card — standard business-card proportions (240×154pt
+              ≈ 85×54mm). Carries the single household address, meeting point,
+              out-of-city contact, and each member's blood type plus one alert
+              (chronic meds or allergy), so the cardholder has the essentials
+              an ER needs without the full A4 sheet. */}
+          {(() => {
+            const emergContact = outOfCityContact ?? allContacts[0];
+            const shelter = mainLocation?.shelters[0];
+            return (
+              <View
+                style={{
+                  marginTop: 14,
+                  width: 240,
+                  height: 154,
+                  padding: "10 12",
+                  borderWidth: 1.2,
+                  borderColor: "#9C9691",
+                  borderStyle: "dashed",
+                  borderRadius: 4,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 7,
+                    color: "#9C9691",
+                    marginBottom: 4,
+                  }}
+                >
+                  ✂ {pt(biMode, "wallet_title")}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 9,
+                    fontWeight: "bold",
+                    color: "#0D9488",
+                    marginBottom: 2,
+                  }}
+                >
+                  {pt(biMode, "wallet_addr")}：{fullAddr}
+                </Text>
+                {shelter ? (
+                  <Text
+                    style={{
+                      fontSize: 7.5,
+                      marginBottom: 1,
+                    }}
+                  >
+                    {pt(biMode, "wallet_meeting")}：{shelter.name}
+                    {shelter.distance
+                      ? `（${distText(shelter.distance)}）`
+                      : ""}
+                  </Text>
+                ) : null}
+                {emergContact ? (
+                  <Text
+                    style={{
+                      fontSize: 7.5,
+                      marginBottom: 3,
+                    }}
+                  >
+                    {pt(biMode, "wallet_emerg")}：{emergContact.name}{" "}
+                    {emergContact.phone}
+                  </Text>
+                ) : null}
+                <Text
+                  style={{
+                    fontSize: 6.5,
+                    color: "#6B6560",
+                    marginBottom: 2,
+                  }}
+                >
+                  {pt(biMode, "wallet_members")}
+                </Text>
+                {allMembers.map((m, i) => {
+                  const alert =
+                    m.medications ||
+                    m.allergies ||
+                    (m.hasChronic ? pt(biMode, "label_chronic") : "") ||
+                    (m.isMobilityImpaired
+                      ? pt(biMode, "label_mobility_impaired")
+                      : "");
+                  return (
+                    <View
+                      key={i}
+                      style={{ flexDirection: "row", marginBottom: 1 }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 7.5,
+                          fontWeight: "bold",
+                          width: 58,
+                        }}
+                      >
+                        {m.name}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 7.5,
+                          color: "#C93B3B",
+                          fontWeight: "bold",
+                          width: 22,
+                        }}
+                      >
+                        {m.bloodType}
+                      </Text>
+                      {alert ? (
+                        <Text
+                          style={{
+                            fontSize: 7,
+                            color: "#C93B3B",
+                            flex: 1,
+                          }}
+                        >
+                          {alert}
+                        </Text>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+
           <Footer label={pt(biMode, "member_footer")} biMode={biMode} />
         </Page>
       )}

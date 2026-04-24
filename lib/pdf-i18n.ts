@@ -136,6 +136,14 @@ const TEXT: Record<string, [string, string]> = {
     "掃描右側 QR 可打開地圖查詢其他附近收容所；或撥打 119 詢問目前開放的避難地點。",
     "Scan the QR to open the map and find other nearby shelters. You can also dial 119 to ask which shelters are currently open.",
   ],
+  wallet_title: [
+    "家庭緊急卡　沿虛線剪下放進皮夾",
+    "Family Emergency Card — cut along dashed line, keep in wallet",
+  ],
+  wallet_addr: ["住址", "Home"],
+  wallet_meeting: ["集合點", "Meeting"],
+  wallet_emerg: ["外縣市聯絡人", "Out-of-city contact"],
+  wallet_members: ["家人血型與注意", "Family blood types & alerts"],
   loc_dir: ["方位速查（從住家出發）", "Direction Guide (from home)"],
   loc_meeting: ["家人集合點", "Family Meeting Point"],
   loc_meeting_desc: [
