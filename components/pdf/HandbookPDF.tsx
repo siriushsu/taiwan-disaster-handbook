@@ -1954,13 +1954,82 @@ export default function HandbookPDF({
             {pt(biMode, "member_desc_full")}
           </Text>
 
+          {/* Shared info — everything that's identical across all members
+              (emergency contact + hotlines, plus home address/shelter when
+              no member has a different address). Pulled out of the cards to
+              reclaim vertical space for per-member differentiators. */}
+          {(() => {
+            const emergContact = outOfCityContact ?? allContacts[0];
+            const anyDifferentAddr = allMembers.some(
+              (m) => m.hasDifferentAddress,
+            );
+            const sharedShelter = mainLocation?.shelters[0];
+            return (
+              <View
+                style={{
+                  backgroundColor: "#F7F5F3",
+                  borderRadius: 6,
+                  padding: "8 12",
+                  marginBottom: 6,
+                  borderWidth: 1,
+                  borderColor: "#E8E4E0",
+                }}
+              >
+                {!anyDifferentAddr && (
+                  <>
+                    <View style={s.pCardRow}>
+                      <Text style={s.pCardLabel}>
+                        {pt(biMode, "label_addr")}
+                      </Text>
+                      <Text style={s.pCardValue}>{fullAddr}</Text>
+                    </View>
+                    {sharedShelter ? (
+                      <View style={s.pCardRow}>
+                        <Text style={s.pCardLabel}>
+                          {pt(biMode, "label_meeting_point")}
+                        </Text>
+                        <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
+                          {sharedShelter.name}
+                          {sharedShelter.distance
+                            ? `（${distText(sharedShelter.distance)}）`
+                            : ""}
+                        </Text>
+                      </View>
+                    ) : null}
+                  </>
+                )}
+                <View style={s.pCardRow}>
+                  <Text style={s.pCardLabel}>
+                    {pt(biMode, "label_emergency_contact")}
+                  </Text>
+                  <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
+                    {emergContact
+                      ? `${emergContact.name} ${emergContact.phone}`
+                      : "＿＿＿＿＿＿"}
+                  </Text>
+                </View>
+                <View style={s.pCardRow}>
+                  <Text style={s.pCardLabel}>
+                    {pt(biMode, "label_emergency_phone")}
+                  </Text>
+                  <Text style={s.pCardValue}>
+                    {pt(biMode, "member_emerg_numbers")}
+                  </Text>
+                </View>
+              </View>
+            );
+          })()}
+
           {allMembers.map((m, i) => {
+            const memberHasOwnAddr = m.hasDifferentAddress;
             const addr = memberAddr(m, fullAddr);
-            const loc = m.hasDifferentAddress
+            const loc = memberHasOwnAddr
               ? data.locations.find((l) => l.memberName === m.name)
               : mainLocation;
             const shelter = loc?.shelters[0];
-            const emergContact = outOfCityContact ?? allContacts[0];
+            const anyDifferentAddr = allMembers.some(
+              (mm) => mm.hasDifferentAddress,
+            );
             return (
               <View key={i} style={s.pCard}>
                 <View style={s.pCardHeader}>
@@ -1971,32 +2040,37 @@ export default function HandbookPDF({
                 </View>
                 <View style={{ flexDirection: "row", marginTop: 2 }}>
                   <View style={{ flex: 1 }}>
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_addr")}
-                      </Text>
-                      <Text style={s.pCardValue}>{addr}</Text>
-                    </View>
-                    <View style={s.pCardRow}>
-                      <Text style={s.pCardLabel}>
-                        {pt(biMode, "label_meeting_point")}
-                      </Text>
-                      <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
-                        {shelter?.name ?? "—"}
-                        {shelter?.distance
-                          ? `（${distText(shelter.distance)}）`
-                          : ""}
-                      </Text>
-                    </View>
+                    {/* Only show address + shelter per-member when some member
+                        has a different address (otherwise shared above). */}
+                    {anyDifferentAddr && (
+                      <>
+                        <View style={s.pCardRow}>
+                          <Text style={s.pCardLabel}>
+                            {pt(biMode, "label_addr")}
+                          </Text>
+                          <Text style={s.pCardValue}>{addr}</Text>
+                        </View>
+                        <View style={s.pCardRow}>
+                          <Text style={s.pCardLabel}>
+                            {pt(biMode, "label_meeting_point")}
+                          </Text>
+                          <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
+                            {shelter?.name ?? "—"}
+                            {shelter?.distance
+                              ? `（${distText(shelter.distance)}）`
+                              : ""}
+                          </Text>
+                        </View>
+                      </>
+                    )}
                     {m.birthYear ? (
                       <View style={s.pCardRow}>
                         <Text style={s.pCardLabel}>
                           {pt(biMode, "label_age")}
                         </Text>
                         <Text style={s.pCardValue}>
-                          {m.birthYear} {pt(biMode, "label_born")}（
                           {new Date().getFullYear() - Number(m.birthYear)}{" "}
-                          {pt(biMode, "label_years_old")}）
+                          {pt(biMode, "label_years_old")}
                         </Text>
                       </View>
                     ) : null}
@@ -2060,33 +2134,6 @@ export default function HandbookPDF({
                         <Text style={s.pCardValue}>{m.specialNeeds}</Text>
                       </View>
                     ) : null}
-                  </View>
-                </View>
-                <View
-                  style={{
-                    borderTopWidth: 1,
-                    borderTopColor: "#e5e7eb",
-                    marginTop: 3,
-                    paddingTop: 3,
-                  }}
-                >
-                  <View style={s.pCardRow}>
-                    <Text style={s.pCardLabel}>
-                      {pt(biMode, "label_emergency_contact")}
-                    </Text>
-                    <Text style={[s.pCardValue, { fontWeight: "bold" }]}>
-                      {emergContact
-                        ? `${emergContact.name} ${emergContact.phone}`
-                        : "＿＿＿＿＿＿"}
-                    </Text>
-                  </View>
-                  <View style={s.pCardRow}>
-                    <Text style={s.pCardLabel}>
-                      {pt(biMode, "label_emergency_phone")}
-                    </Text>
-                    <Text style={s.pCardValue}>
-                      {pt(biMode, "member_emerg_numbers")}
-                    </Text>
                   </View>
                 </View>
               </View>
