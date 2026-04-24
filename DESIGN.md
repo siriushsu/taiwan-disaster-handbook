@@ -57,6 +57,24 @@
   - Info: `#2B7AB5` / bg `#E8F0F8`
 - **Dark mode strategy:** Invert surfaces (dark warm backgrounds), reduce primary saturation 15%, lighten text to warm off-white `#E8E4E0`. Keep accent terracotta as-is — it reads well on dark.
 
+## Emergency Mode
+
+A distinct visual mode used on the `/emergency` route (offline one-tap dial page) and for the identity-mode banner in migrant mode. **Deliberate departure** from the main restrained palette — emergency situations benefit from high-saturation color-coding so users in panic can identify the right button fast.
+
+- **Rationale:** Every tile is a one-tap `tel:` link that takes the user out of the app, into a phone call. Colors are categorical (fire / police / worker / protect / attn / health) not decorative.
+- **Background:** `#0F172A` (dark navy) — high contrast, easier to read outdoors/at night, signals "different mode"
+- **Tiles (CSS vars: `--color-emergency-*`):**
+  - Fire/Ambulance 119 — `#DC2626` (red-600)
+  - Police 110 — `#1D4ED8` (blue-700)
+  - Migrant Worker Hotline 1955 — `#059669` (emerald-600)
+  - Women & Children 113 — `#E11D48` (rose-600) — _not purple; rose carries recognizable protection semantics without the AI-slop signature_
+  - Disaster Message 1991 — `#D97706` (amber-600)
+  - CDC Health 1922 — `#0D9488` (teal-600, = primary)
+- **Identity-mode banner tokens (`--color-mode-*`):**
+  - Worker mode — `#059669` (same as 1955 emergency tile, visually ties migrant banner to the worker hotline)
+  - Resident mode — `#2B7AB5` (same as Info semantic color — softer civic blue, keeps banner inside the documented palette)
+- **When NOT to use this mode:** any normal form, result, or information page. Emergency Mode is for "urgent action, minimal chrome, works offline" only.
+
 ## Spacing
 
 - **Base unit:** 4px
