@@ -144,6 +144,20 @@ const TEXT: Record<string, [string, string]> = {
   wallet_meeting: ["集合點", "Meeting"],
   wallet_emerg: ["外縣市聯絡人", "Out-of-city contact"],
   wallet_members: ["家人血型與注意", "Family blood types & alerts"],
+  refresh_title: [
+    "定期更換 — 別讓備品過期",
+    "Refresh schedule — don't let stock expire",
+  ],
+  refresh_water: ["水　每 6 個月", "Water — every 6 months"],
+  refresh_battery: ["電池／行動電源　每年", "Batteries / power banks — yearly"],
+  refresh_meds: [
+    "藥品／急救用品　每年檢查效期",
+    "Meds / first aid — check expiry yearly",
+  ],
+  refresh_food: [
+    "罐頭與乾糧　建議 1 年內",
+    "Canned / dry food — within 1 year",
+  ],
   loc_dir: ["方位速查（從住家出發）", "Direction Guide (from home)"],
   loc_meeting: ["家人集合點", "Family Meeting Point"],
   loc_meeting_desc: [

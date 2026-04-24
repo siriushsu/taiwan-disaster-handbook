@@ -1866,34 +1866,74 @@ export default function HandbookPDF({
               {ptEn("reunion_members")}
             </Text>
           )}
+          {/* Shared address + shelter block when every member lives at the
+              same address (the common case). Avoids repeating four identical
+              rows of "台北市信義路五段7號 / 信義國小". */}
+          {(() => {
+            const anyDiff = allMembers.some((m) => m.hasDifferentAddress);
+            const sharedShelter = mainLocation?.shelters[0];
+            if (anyDiff) return null;
+            return (
+              <View style={s.reunionBox}>
+                <View style={s.reunionRow}>
+                  <Text style={s.reunionLabel}>
+                    {pt(biMode, "reunion_addr")}
+                    {biMode === "bi" ? "/" + ptEn("reunion_addr") : ""}
+                  </Text>
+                  <Text style={s.reunionValue}>{fullAddr}</Text>
+                </View>
+                {sharedShelter ? (
+                  <View style={s.reunionRow}>
+                    <Text style={s.reunionLabel}>
+                      {pt(biMode, "reunion_shelter")}
+                      {biMode === "bi" ? "/" + ptEn("reunion_shelter") : ""}
+                    </Text>
+                    <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
+                      {sharedShelter.name}
+                      {sharedShelter.distance
+                        ? ` （${distText(sharedShelter.distance)}）`
+                        : ""}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            );
+          })()}
+
           {allMembers.map((m, i) => {
             const addr = memberAddr(m, fullAddr);
             const loc = m.hasDifferentAddress
               ? data.locations.find((l) => l.memberName === m.name)
               : mainLocation;
             const nearestShelter = loc?.shelters[0];
+            const anyDiff = allMembers.some((mm) => mm.hasDifferentAddress);
             return (
               <View key={i} style={s.reunionBox}>
                 <Text style={s.reunionName}>{m.name}</Text>
-                <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>
-                    {pt(biMode, "reunion_addr")}
-                    {biMode === "bi" ? "/" + ptEn("reunion_addr") : ""}
-                  </Text>
-                  <Text style={s.reunionValue}>{addr}</Text>
-                </View>
-                <View style={s.reunionRow}>
-                  <Text style={s.reunionLabel}>
-                    {pt(biMode, "reunion_shelter")}
-                    {biMode === "bi" ? "/" + ptEn("reunion_shelter") : ""}
-                  </Text>
-                  <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
-                    {nearestShelter?.name ?? pt(biMode, "reunion_query_office")}
-                    {nearestShelter?.distance
-                      ? ` （${distText(nearestShelter.distance)}）`
-                      : ""}
-                  </Text>
-                </View>
+                {anyDiff && (
+                  <>
+                    <View style={s.reunionRow}>
+                      <Text style={s.reunionLabel}>
+                        {pt(biMode, "reunion_addr")}
+                        {biMode === "bi" ? "/" + ptEn("reunion_addr") : ""}
+                      </Text>
+                      <Text style={s.reunionValue}>{addr}</Text>
+                    </View>
+                    <View style={s.reunionRow}>
+                      <Text style={s.reunionLabel}>
+                        {pt(biMode, "reunion_shelter")}
+                        {biMode === "bi" ? "/" + ptEn("reunion_shelter") : ""}
+                      </Text>
+                      <Text style={[s.reunionValue, { fontWeight: "bold" }]}>
+                        {nearestShelter?.name ??
+                          pt(biMode, "reunion_query_office")}
+                        {nearestShelter?.distance
+                          ? ` （${distText(nearestShelter.distance)}）`
+                          : ""}
+                      </Text>
+                    </View>
+                  </>
+                )}
                 {m.isMobilityImpaired && (
                   <View style={s.reunionRow}>
                     <Text style={s.reunionLabel}>
@@ -3008,6 +3048,54 @@ export default function HandbookPDF({
         <View style={[s.tipBox, { marginTop: 4 }]}>
           <Text style={s.tipText}>{pt(biMode, "supply_tip")}</Text>
         </View>
+
+        {/* Refresh schedule — the thing users forget. Water expires, batteries
+            leak, meds lose potency. Pairs with the half-yearly 定期檢查 on the
+            next page (3 月 / 9 月). */}
+        <View
+          style={{
+            marginTop: 10,
+            padding: "10 12",
+            borderRadius: 6,
+            backgroundColor: "#F0FDFA",
+            borderWidth: 1,
+            borderColor: "#CCFBF1",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "bold",
+              color: "#0D9488",
+              marginBottom: 4,
+            }}
+          >
+            {pt(biMode, "refresh_title")}
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {[
+              pt(biMode, "refresh_water"),
+              pt(biMode, "refresh_battery"),
+              pt(biMode, "refresh_meds"),
+              pt(biMode, "refresh_food"),
+            ].map((t, i) => (
+              <View
+                key={i}
+                style={{
+                  width: "50%",
+                  flexDirection: "row",
+                  marginBottom: 3,
+                }}
+              >
+                <Text style={{ fontSize: 9, color: "#0D9488", marginRight: 4 }}>
+                  •
+                </Text>
+                <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
         <Footer label={pt(biMode, "supply_title")} biMode={biMode} />
       </Page>
 
