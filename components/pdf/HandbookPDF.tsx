@@ -1682,6 +1682,47 @@ export default function HandbookPDF({
           </View>
         </View>
 
+        {/* Universal rules — promoted from the dropped Quick Response card so the
+            EAC fridge page carries the three rules that apply across all disasters. */}
+        <View
+          style={{
+            backgroundColor: "#F0FDFA",
+            borderRadius: 6,
+            padding: "8 12",
+            marginTop: 6,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "bold",
+              color: "#0D9488",
+              marginBottom: 4,
+            }}
+          >
+            {pt(biMode, "qrc_universal")}
+          </Text>
+          <View style={{ flexDirection: "row" }}>
+            {[
+              pt(biMode, "qrc_uni_1"),
+              pt(biMode, "qrc_uni_2"),
+              pt(biMode, "qrc_uni_3"),
+            ].map((t, i) => (
+              <View
+                key={i}
+                style={{ flex: 1, flexDirection: "row", marginRight: 6 }}
+              >
+                <Text
+                  style={{ fontSize: 8.5, color: "#0D9488", marginRight: 3 }}
+                >
+                  {"•"}
+                </Text>
+                <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
         <Footer label={pt(biMode, "action_footer")} biMode={biMode} />
       </Page>
 
@@ -2744,287 +2785,6 @@ export default function HandbookPDF({
         <Footer label={pt(biMode, "supply_title")} biMode={biMode} />
       </Page>
 
-      {/* ─── DISASTER QUICK RESPONSE CARD (condensed) ─── */}
-      <Page size="A4" style={s.page}>
-        <Text
-          style={[
-            s.scenarioTitle,
-            { borderBottomColor: "#0D9488", color: "#0D9488" },
-          ]}
-        >
-          {pt(biMode, "qrc_title")}
-        </Text>
-
-        <View style={s.twoCol}>
-          {/* Left column: Earthquake + Fire */}
-          <View style={s.col}>
-            {/* Earthquake */}
-            <View
-              style={{
-                backgroundColor: "#fef2f2",
-                borderRadius: 6,
-                padding: "8 10",
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  color: "#C93B3B",
-                  marginBottom: 2,
-                }}
-              >
-                {pt(biMode, "qrc_earthquake")}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 7.5,
-                  color: "#C93B3B",
-                  backgroundColor: "#fecaca",
-                  borderRadius: 3,
-                  padding: "2 5",
-                  marginBottom: 4,
-                  alignSelf: "flex-start",
-                  fontWeight: "bold",
-                }}
-              >
-                {pt(biMode, "qrc_eq_principle")}
-              </Text>
-              {[
-                pt(biMode, "qrc_eq_1"),
-                pt(biMode, "qrc_eq_2"),
-                pt(biMode, "qrc_eq_3"),
-                pt(biMode, "qrc_eq_4"),
-              ].map((t, i) => (
-                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      color: "#C93B3B",
-                      marginRight: 4,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {i + 1}.
-                  </Text>
-                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Fire */}
-            <View
-              style={{
-                backgroundColor: "#FEF7E6",
-                borderRadius: 6,
-                padding: "8 10",
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  color: "#d4882a",
-                  marginBottom: 2,
-                }}
-              >
-                {pt(biMode, "qrc_fire")}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 7.5,
-                  color: "#d4882a",
-                  backgroundColor: "#fed7aa",
-                  borderRadius: 3,
-                  padding: "2 5",
-                  marginBottom: 4,
-                  alignSelf: "flex-start",
-                  fontWeight: "bold",
-                }}
-              >
-                {pt(biMode, "qrc_fire_principle")}
-              </Text>
-              {[
-                pt(biMode, "qrc_fire_1"),
-                pt(biMode, "qrc_fire_2"),
-                pt(biMode, "qrc_fire_3"),
-                pt(biMode, "qrc_fire_4"),
-              ].map((t, i) => (
-                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      color: "#d4882a",
-                      marginRight: 4,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {i + 1}.
-                  </Text>
-                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Right column: Air Raid + Typhoon */}
-          <View style={s.col}>
-            {/* Air Raid */}
-            <View
-              style={{
-                backgroundColor: "#faf5ff",
-                borderRadius: 6,
-                padding: "8 10",
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  color: "#8b5cf6",
-                  marginBottom: 2,
-                }}
-              >
-                {pt(biMode, "qrc_air")}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 7.5,
-                  color: "#6d28d9",
-                  backgroundColor: "#e9d5ff",
-                  borderRadius: 3,
-                  padding: "2 5",
-                  marginBottom: 4,
-                  alignSelf: "flex-start",
-                  fontWeight: "bold",
-                }}
-              >
-                {pt(biMode, "qrc_air_principle")}
-              </Text>
-              {[
-                pt(biMode, "qrc_air_1"),
-                pt(biMode, "qrc_air_2"),
-                pt(biMode, "qrc_air_3"),
-                pt(biMode, "qrc_air_4"),
-              ].map((t, i) => (
-                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      color: "#8b5cf6",
-                      marginRight: 4,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {i + 1}.
-                  </Text>
-                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Typhoon & Flood */}
-            <View
-              style={{
-                backgroundColor: "#eff6ff",
-                borderRadius: 6,
-                padding: "8 10",
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  color: "#3b6fd4",
-                  marginBottom: 2,
-                }}
-              >
-                {pt(biMode, "qrc_typhoon")}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 7.5,
-                  color: "#3b6fd4",
-                  backgroundColor: "#bfdbfe",
-                  borderRadius: 3,
-                  padding: "2 5",
-                  marginBottom: 4,
-                  alignSelf: "flex-start",
-                  fontWeight: "bold",
-                }}
-              >
-                {pt(biMode, "qrc_ty_principle")}
-              </Text>
-              {[
-                pt(biMode, "qrc_ty_1"),
-                pt(biMode, "qrc_ty_2"),
-                pt(biMode, "qrc_ty_3"),
-                pt(biMode, "qrc_ty_4"),
-              ].map((t, i) => (
-                <View key={i} style={{ flexDirection: "row", marginBottom: 3 }}>
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      color: "#3b6fd4",
-                      marginRight: 4,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {i + 1}.
-                  </Text>
-                  <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* Universal rules */}
-        <View
-          style={{
-            backgroundColor: "#F0FDFA",
-            borderRadius: 6,
-            padding: "8 12",
-            marginTop: 2,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 10,
-              fontWeight: "bold",
-              color: "#0D9488",
-              marginBottom: 4,
-            }}
-          >
-            {pt(biMode, "qrc_universal")}
-          </Text>
-          <View style={{ flexDirection: "row" }}>
-            {[
-              pt(biMode, "qrc_uni_1"),
-              pt(biMode, "qrc_uni_2"),
-              pt(biMode, "qrc_uni_3"),
-            ].map((t, i) => (
-              <View
-                key={i}
-                style={{ flex: 1, flexDirection: "row", marginRight: 6 }}
-              >
-                <Text
-                  style={{ fontSize: 8.5, color: "#0D9488", marginRight: 3 }}
-                >
-                  {">"}
-                </Text>
-                <Text style={{ flex: 1, fontSize: 8.5 }}>{t}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <Footer label={pt(biMode, "qrc_title")} biMode={biMode} />
-      </Page>
 
       {/* ─── IMPORTANT REMINDERS ─── */}
       <Page size="A4" style={s.page}>
