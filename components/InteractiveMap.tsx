@@ -140,11 +140,14 @@ export default function InteractiveMap({
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
 
-    // Default center: Taiwan
+    // Default view: Taipei Main Station at city-zoom. If GPS succeeds below
+    // we'll jump to the user's neighborhood. Previously this was [23.7,120.9]
+    // zoom 8 (entire island), which made 'find nearby' unusable by default —
+    // the user had to zoom in three levels before any markers made sense.
     const map = L.map(ref.current, {
       zoomControl: true,
       attributionControl: true,
-    }).setView([23.7, 120.9], 8);
+    }).setView([25.0478, 121.517], 13);
     mapRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -152,14 +155,15 @@ export default function InteractiveMap({
       maxZoom: 18,
     }).addTo(map);
 
-    // Try to get user's location
+    // Try to get user's location — jump to their neighborhood on success.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           map.setView([pos.coords.latitude, pos.coords.longitude], 15);
         },
         () => {
-          /* denied or failed, stay at Taiwan view */
+          /* denied or failed — stay at Taipei Main Station default.
+             Better than country-wide: user can immediately pan/zoom locally. */
         },
         { timeout: 5000 },
       );
