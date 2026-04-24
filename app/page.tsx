@@ -500,6 +500,18 @@ export default function Home() {
       {/* === LANDING MODE === */}
       {mode === "landing" && (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+          {/* Hero illustration — warm anchor above the H1. Decorative (Formosan
+              black bear holding handbook), sets tone before language sinks in. */}
+          <div className="-mt-2">
+            <Image
+              src="/hero-illustration.jpg"
+              alt=""
+              width={1904}
+              height={640}
+              className="w-full h-auto rounded-xl"
+              priority
+            />
+          </div>
           {/* Hero — H1 + supporting desc centered; utility row below breaks
               the 'everything centered' AI-slop rhythm with tiered alignment. */}
           <div className="text-center space-y-2 pt-2">
