@@ -499,12 +499,17 @@ export default function Home() {
       {/* === LANDING MODE === */}
       {mode === "landing" && (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-          {/* Hero text — H1 (real page topic; header logo becomes <p> on landing) */}
+          {/* Hero — H1 + supporting desc centered; utility row below breaks
+              the 'everything centered' AI-slop rhythm with tiered alignment. */}
           <div className="text-center space-y-2 pt-2">
             <h1 className="text-3xl font-bold text-text leading-tight">
               {T("site_title")}
             </h1>
             <p className="text-base text-text-muted">{T("site_desc")}</p>
+          </div>
+          {/* Utility row — privacy note + migrant CTA. Left-aligned so they
+              read as 'helper' tier, not hero. */}
+          <div className="flex flex-col gap-1">
             <p className="text-xs text-text-faint">{T("privacy_notice")}</p>
             <button
               onClick={() => {
@@ -512,7 +517,7 @@ export default function Home() {
                 setMode("form");
                 setStep(1);
               }}
-              className="inline-flex items-center justify-center min-h-[44px] px-3 text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline"
+              className="inline-flex items-center min-h-[44px] text-xs text-primary hover:text-primary-dark underline-offset-2 hover:underline self-start"
             >
               {T("quick_cta_migrant")}
             </button>
