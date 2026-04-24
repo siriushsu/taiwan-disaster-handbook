@@ -1625,6 +1625,22 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/25</span>
                 <span>
                   {locale === "en"
+                    ? "PDF handbook redesign: black bear mascot on the cover, shorter by one page (merged duplicate disaster card), shared info de-duplicated on the family overview, plus a tear-off wallet card with blood types + allergies + out-of-city contact"
+                    : "PDF 手冊大改版：封面加上台灣黑熊、少了一頁（合併重複的災害卡）、家人資料頁不再重複列地址，底部多了一張可剪下放皮夾的急救卡（血型、過敏、外縣市聯絡人）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/25</span>
+                <span>
+                  {locale === "en"
+                    ? "PDF evacuation page now has a hand-drawn escape route box for you to sketch your own, a backup-shelter QR callout, and a 'refresh your emergency kit every 6 months' schedule — the handbook finally tells you when to recheck"
+                    : "PDF 避難頁加入手繪逃生路線框、備用避難所 QR 提醒、以及備品定期更換時程（水半年、電池每年、藥品每年檢查），這本手冊終於告訴你什麼時候要重新整理"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/25</span>
+                <span>
+                  {locale === "en"
                     ? "Homepage now shows a preview of the actual PDF cover (Taipei/Xinyi example) before you fill the form — see what you'll get before you commit"
                     : "首頁直接秀 PDF 封面預覽（以台北信義區為例），不用填完表單就能看到你會拿到什麼樣的手冊"}
                 </span>

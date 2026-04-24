@@ -219,7 +219,7 @@ const sample: HandbookData = {
       ],
     },
   ],
-  generatedAt: "2026-04-25",
+  generatedAt: "2026/4/25",
 };
 
 async function main() {
