@@ -1603,6 +1603,22 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/24</span>
                 <span>
                   {locale === "en"
+                    ? "Map picker now opens at Taipei city view instead of the whole island — tap-to-search works immediately; GPS still jumps to your neighborhood if you allow it"
+                    : "地圖工具改為台北市區預設視野（原本是整個台灣），可直接點按查詢；允許定位就自動跳到你的鄰里"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "Updates split into Data (government datasets, weekly refresh) and Product (features & UI) — easier to see what's fresh"
+                    : "「近期更新」拆成「資料更新」（政府開放資料，每週自動更新）和「功能更新」（介面與功能變動），兩種新鮮度各自獨立顯示"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
                     ? "Homepage polish: larger hero heading, simpler foreign-national CTA, quieter emergency shortcut so the main address-lookup is the clear primary action"
                     : "首頁介面整理：主標題放大、「外籍人士？」連結簡化、緊急電話按鈕改為次要樣式，讓「輸入我的地址」是最清楚的主要動作"}
                 </span>
