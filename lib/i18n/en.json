@@ -1,5 +1,5 @@
 {
-  "site_title": "Where's my nearest shelter?",
+  "site_title": "Where’s my nearest shelter?",
   "site_desc": "Enter your address — find the nearest shelters, hospitals, and AEDs in 3 seconds",
   "privacy_notice": "All data stays in your browser. Nothing uploaded. Cleared when you close the page.",
   "hero_cta_demo": "See an example",
@@ -88,7 +88,7 @@
   "go_back": "Go back",
   "line_share_text": "I just made my disaster handbook! My nearest shelter is \"{shelter}\" ({distance}). You can make one too:",
   "error_title": "Something went wrong",
-  "error_desc": "We're sorry, the page encountered an error. Please refresh or return to the homepage.",
+  "error_desc": "We’re sorry, the page encountered an error. Please refresh or return to the homepage.",
   "reload": "Refresh",
   "home": "Homepage",
   "find_on_map": "Find on Map",
