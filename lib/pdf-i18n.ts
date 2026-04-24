@@ -127,6 +127,15 @@ const TEXT: Record<string, [string, string]> = {
 
   // Location page
   loc_guide: ["完整避難指南", "Complete Evacuation Guide"],
+  qr_nav: ["掃碼導航", "Scan to navigate"],
+  loc_backup_title: [
+    "若主要避難所無法進入",
+    "If the main shelter is not accessible",
+  ],
+  loc_backup_body: [
+    "掃描右側 QR 可打開地圖查詢其他附近收容所；或撥打 119 詢問目前開放的避難地點。",
+    "Scan the QR to open the map and find other nearby shelters. You can also dial 119 to ask which shelters are currently open.",
+  ],
   loc_dir: ["方位速查（從住家出發）", "Direction Guide (from home)"],
   loc_meeting: ["家人集合點", "Family Meeting Point"],
   loc_meeting_desc: [

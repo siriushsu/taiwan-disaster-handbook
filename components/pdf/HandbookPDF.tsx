@@ -778,10 +778,18 @@ function LocationPage({
               </View>
               {sh.lat && sh.lng ? (
                 /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-                <Image
-                  src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
-                  style={{ width: 28, height: 28, flexShrink: 0 }}
-                />
+                <View style={{ alignItems: "center", flexShrink: 0 }}>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */}
+                  <Image
+                    src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{ fontSize: 5.5, color: "#6B6560", marginTop: 1 }}
+                  >
+                    {pt(biMode, "qr_nav")}
+                  </Text>
+                </View>
               ) : null}
             </View>
           ))
@@ -793,6 +801,52 @@ function LocationPage({
           </View>
         )}
         <Text style={s.shelterTag}>{pt(biMode, "loc_shelters_src")}</Text>
+
+        {/* Backup plan callout — reminds users the handbook snapshot may be
+            stale (shelters close, construction, etc.) and points them back
+            to the live map. Fills the empty bottom third of the page. */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            marginTop: 14,
+            padding: "10 12",
+            borderRadius: 8,
+            backgroundColor: "#FEF7E6",
+            borderWidth: 1,
+            borderColor: "#FDE68A",
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 10,
+                fontWeight: "bold",
+                color: "#854d0e",
+                marginBottom: 2,
+              }}
+            >
+              {pt(biMode, "loc_backup_title")}
+            </Text>
+            <Text style={{ fontSize: 8.5, color: "#6B6560" }}>
+              {pt(biMode, "loc_backup_body")}
+            </Text>
+          </View>
+          <View style={{ alignItems: "center", flexShrink: 0 }}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */}
+            <Image
+              src={qrUrl(
+                `https://disaster-handbook.vercel.app/?city=${encodeURIComponent(loc.city)}&district=${encodeURIComponent(loc.district)}`,
+                80,
+              )}
+              style={{ width: 44, height: 44 }}
+            />
+            <Text style={{ fontSize: 5.5, color: "#6B6560", marginTop: 1 }}>
+              {pt(biMode, "qr_nav")}
+            </Text>
+          </View>
+        </View>
 
         <Footer
           label={`${loc.label} - ${pt(biMode, "loc_shelters")}`}
@@ -833,11 +887,18 @@ function LocationPage({
                   </Text>
                 </View>
                 {sh.lat && sh.lng ? (
-                  /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-                  <Image
-                    src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
-                    style={{ width: 28, height: 28, flexShrink: 0 }}
-                  />
+                  <View style={{ alignItems: "center", flexShrink: 0 }}>
+                    {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */}
+                    <Image
+                      src={qrUrl(mapsUrl(sh.lat, sh.lng), 80)}
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text
+                      style={{ fontSize: 5.5, color: "#6B6560", marginTop: 1 }}
+                    >
+                      {pt(biMode, "qr_nav")}
+                    </Text>
+                  </View>
                 ) : null}
               </View>
             ))}
@@ -877,11 +938,18 @@ function LocationPage({
                   </Text>
                 </View>
                 {m.lat && m.lng ? (
-                  /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-                  <Image
-                    src={qrUrl(mapsUrl(m.lat, m.lng), 80)}
-                    style={{ width: 28, height: 28, flexShrink: 0 }}
-                  />
+                  <View style={{ alignItems: "center", flexShrink: 0 }}>
+                    {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */}
+                    <Image
+                      src={qrUrl(mapsUrl(m.lat, m.lng), 80)}
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text
+                      style={{ fontSize: 5.5, color: "#6B6560", marginTop: 1 }}
+                    >
+                      {pt(biMode, "qr_nav")}
+                    </Text>
+                  </View>
                 ) : null}
               </View>
             ))}
@@ -1041,6 +1109,40 @@ function LocationPage({
             </View>
           </>
         )}
+
+        {/* Hand-drawn escape route area — uses the empty bottom third of P5
+            to give the user space to sketch their actual route. Intentionally
+            blank: a pre-drawn map from us would be wrong at the last turn. */}
+        <View style={{ marginTop: 10 }}>
+          <Text style={s.sectionTitle}>
+            {biMode === "en"
+              ? "Hand-drawn evacuation route"
+              : biMode === "zh"
+                ? "手繪逃生路線"
+                : "手繪逃生路線 / Hand-drawn evacuation route"}
+          </Text>
+          <Text
+            style={{
+              fontSize: 8,
+              color: "#6B6560",
+              marginBottom: 4,
+            }}
+          >
+            {biMode === "en"
+              ? `Sketch the route from your door to ${mainShelter?.name ?? "the meeting point"}. Mark visible landmarks (shops, lights, junctions) so anyone in the family can follow it.`
+              : `在下方畫出你家到「${mainShelter?.name ?? pt(biMode, "loc_fallback_plaza")}」的路線，標上明顯地標（便利商店、紅綠燈、巷口），家裡每個人都能照著走。`}
+          </Text>
+          <View
+            style={{
+              height: 220,
+              borderWidth: 1,
+              borderColor: "#D4CFC9",
+              borderStyle: "dashed",
+              borderRadius: 4,
+              backgroundColor: "#F7F5F3",
+            }}
+          />
+        </View>
 
         <Footer
           label={`${loc.label} ${pt(biMode, "loc_evac_guide_footer")}`}
@@ -2784,7 +2886,6 @@ export default function HandbookPDF({
         </View>
         <Footer label={pt(biMode, "supply_title")} biMode={biMode} />
       </Page>
-
 
       {/* ─── IMPORTANT REMINDERS ─── */}
       <Page size="A4" style={s.page}>
