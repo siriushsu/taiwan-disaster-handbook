@@ -85,7 +85,7 @@ export default function EmergencyPage() {
       <div className="px-4 pb-4 max-w-lg mx-auto w-full">
         <button
           onClick={() => setShowOffices(!showOffices)}
-          className="w-full text-center py-3 rounded-xl border border-gray-700 text-gray-300 text-sm font-medium hover:bg-gray-900 transition-colors"
+          className="w-full text-center py-3 rounded-lg border border-gray-700 text-gray-300 text-sm font-medium hover:bg-gray-900 transition-colors"
         >
           {showOffices
             ? "▼ 關閉駐台辦事處 / Close Offices"

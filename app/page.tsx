@@ -546,7 +546,7 @@ export default function Home() {
           {/* Primary CTA */}
           <button
             onClick={() => setMode("quick")}
-            className="w-full bg-primary text-white py-4 rounded-xl font-semibold text-lg hover:bg-primary-dark transition-all active:scale-[0.98]"
+            className="w-full bg-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-all active:scale-[0.98]"
           >
             {T("hero_cta_quick")}
           </button>
@@ -555,13 +555,13 @@ export default function Home() {
           <div className="flex gap-3">
             <button
               onClick={runDemo}
-              className="flex-1 border border-border text-text py-3 rounded-xl font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
+              className="flex-1 border border-border text-text py-3 rounded-lg font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
             >
               {T("hero_cta_demo")}
             </button>
             <button
               onClick={() => setMode("map")}
-              className="flex-1 border border-border text-text py-3 rounded-xl font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
+              className="flex-1 border border-border text-text py-3 rounded-lg font-medium text-sm hover:bg-surface-muted transition-all active:scale-[0.98]"
             >
               {T("find_on_map")}
             </button>
@@ -576,7 +576,7 @@ export default function Home() {
           {/* Emergency quick link — ghost style so primary CTA keeps hierarchy */}
           <a
             href="/emergency"
-            className="block w-full text-center bg-white border border-red-600 text-red-600 py-3 rounded-xl font-semibold text-sm hover:bg-red-50 transition-colors active:scale-[0.98]"
+            className="block w-full text-center bg-white border border-red-600 text-red-600 py-3 rounded-lg font-semibold text-sm hover:bg-red-50 transition-colors active:scale-[0.98]"
           >
             {T("emergency_cta")}
           </a>
