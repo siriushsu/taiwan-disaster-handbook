@@ -1,21 +1,6 @@
-/**
- * Build-time PDF preview generator.
- *
- * Renders the first page (cover) of HandbookPDF with a fixed Taipei-Xinyi
- * sample household, then rasterizes it to `public/pdf-preview.png`.
- * Run manually after any PDF visual change:
- *   npm run gen:pdf-preview
- */
 import { createElement, type ReactElement } from "react";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
-import {
-  writeFile,
-  rename,
-  unlink,
-  mkdtemp,
-  readFile,
-  readdir,
-} from "node:fs/promises";
+import { writeFile, mkdtemp, readFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -39,7 +24,7 @@ const members: Member[] = [
     dailyLocation: "信義區上班",
     dailyCity: "台北市",
     dailyDistrict: "信義區",
-    dailyAddress: "信義路五段7號",
+    dailyAddress: "",
     hasDifferentAddress: false,
     city: "",
     district: "",
@@ -51,8 +36,8 @@ const members: Member[] = [
     birthYear: 1987,
     bloodType: "A",
     isMobilityImpaired: false,
-    hasChronic: false,
-    medications: "",
+    hasChronic: true,
+    medications: "降血壓",
     allergies: "",
     specialNeeds: "",
     dailyLocation: "大安區上班",
@@ -74,7 +59,7 @@ const members: Member[] = [
     medications: "",
     allergies: "",
     specialNeeds: "",
-    dailyLocation: "信義國小上學",
+    dailyLocation: "信義國小",
     dailyCity: "台北市",
     dailyDistrict: "信義區",
     dailyAddress: "",
@@ -103,7 +88,6 @@ const members: Member[] = [
     address: "",
   },
 ];
-
 const contacts: EmergencyContact[] = [
   {
     name: "陳外婆",
@@ -121,7 +105,6 @@ const contacts: EmergencyContact[] = [
     isOutOfCity: false,
   },
 ];
-
 const sample: HandbookData = {
   household: {
     address: "信義路五段7號",
@@ -194,6 +177,45 @@ const sample: HandbookData = {
           phone: "02-2786-1288",
           distance: 2400,
         },
+        {
+          name: "信義診所",
+          address: "台北市信義區信義路五段100號",
+          lat: 25.034,
+          lng: 121.568,
+          type: "clinic",
+          hasER: false,
+          phone: "02-2345-6789",
+          distance: 400,
+        },
+      ],
+      aed: [
+        {
+          name: "台北101",
+          address: "台北市信義區信義路五段7號",
+          lat: 25.0336,
+          lng: 121.5645,
+          location: "1樓大廳服務台",
+          phone: "02-8101-8800",
+          distance: 50,
+        },
+      ],
+      fireStation: [
+        {
+          name: "信義分隊",
+          address: "台北市信義區松仁路79號",
+          phone: "02-2758-7119",
+          city: "台北市",
+          distance: 500,
+        },
+      ],
+      policeStation: [
+        {
+          name: "信義分局",
+          address: "台北市信義區基隆路一段126號",
+          phone: "02-2722-4252",
+          city: "台北市",
+          distance: 800,
+        },
       ],
     },
   ],
@@ -201,7 +223,6 @@ const sample: HandbookData = {
 };
 
 async function main() {
-  console.log("→ Rendering HandbookPDF to buffer...");
   const heroImage = await readFile(
     path.resolve("public/hero-bear-cutout-compact.png"),
   );
@@ -212,47 +233,15 @@ async function main() {
       heroImage,
     }) as ReactElement<DocumentProps>,
   );
-  console.log(`  PDF size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
-
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), "pdf-preview-"));
+  console.log(`PDF size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
+  const tmpDir = await mkdtemp(path.join(os.tmpdir(), "pdf-review-"));
   const pdfPath = path.join(tmpDir, "handbook.pdf");
-  const pngPrefix = path.join(tmpDir, "cover");
   await writeFile(pdfPath, pdfBuffer);
-
-  console.log("→ Rasterizing page 1 via pdftoppm (poppler)...");
-  try {
-    // -r 150 → ~1240px A4 width; -f 1 -l 1 → first page only
-    const { stdout, stderr } = await execFileP("pdftoppm", [
-      "-png",
-      "-r",
-      "150",
-      "-f",
-      "1",
-      "-l",
-      "1",
-      pdfPath,
-      pngPrefix,
-    ]);
-    if (stdout) console.log("  stdout:", stdout);
-    if (stderr) console.log("  stderr:", stderr);
-  } catch (err) {
-    throw new Error(
-      "pdftoppm failed. Install poppler: `brew install poppler` (macOS) or equivalent.\n" +
-        (err instanceof Error ? err.message : String(err)),
-    );
-  }
-
-  // pdftoppm numbering format varies by version (e.g., `cover-1.png` vs `cover-01.png`),
-  // so find whatever single PNG landed in the temp dir.
-  const produced = (await readdir(tmpDir)).find((f) => f.endsWith(".png"));
-  if (!produced) throw new Error(`pdftoppm produced no PNG in ${tmpDir}`);
-  const outPath = path.resolve("public/pdf-preview.png");
-  await rename(path.join(tmpDir, produced), outPath);
-  await unlink(pdfPath);
-  console.log(`✓ Wrote ${outPath}`);
+  const outPrefix = path.resolve(".design-review-20260424/pdf-pages/page");
+  await execFileP("pdftoppm", ["-png", "-r", "110", pdfPath, outPrefix]);
+  console.log("Done. See .design-review-20260424/pdf-pages/");
 }
-
-main().catch((err) => {
-  console.error("Failed to generate PDF preview:", err);
+main().catch((e) => {
+  console.error(e);
   process.exit(1);
 });
