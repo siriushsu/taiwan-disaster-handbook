@@ -7,7 +7,7 @@ import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { DISTRICTS } from "@/lib/districts";
 import { DISTRICTS_EN } from "@/lib/districts-en";
 import { CITIES } from "@/lib/cities";
-import { t, type Locale } from "@/lib/i18n";
+import { t, LOCALES, type Locale } from "@/lib/i18n";
 import { FOREIGN_RESOURCES } from "@/lib/foreign-resources";
 import type {
   HouseholdForm,
@@ -107,6 +107,29 @@ export default function Home() {
   useEffect(() => {
     if (/Line\//i.test(navigator.userAgent)) setIsLineApp(true);
   }, []);
+
+  // Hydrate locale from ?lang= query param on first load (shareable URLs).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get("lang");
+    if (lang && (LOCALES as readonly string[]).includes(lang)) {
+      setLocale(lang as Locale);
+    }
+  }, []);
+
+  // When locale changes, mirror it to the URL (zh-TW is default → no param).
+  const handleLocaleChange = (newLocale: Locale) => {
+    setLocale(newLocale);
+    const params = new URLSearchParams(window.location.search);
+    if (newLocale === "zh-TW") {
+      params.delete("lang");
+    } else {
+      params.set("lang", newLocale);
+    }
+    const query = params.toString();
+    const url = window.location.pathname + (query ? `?${query}` : "");
+    window.history.replaceState(null, "", url);
+  };
 
   const [form, setForm] = useState<HouseholdForm>({
     address: "",
@@ -435,7 +458,7 @@ export default function Home() {
                   : "台灣家庭防災手冊"}
               </h1>
             )}
-            <LocaleSwitcher locale={locale} onChange={setLocale} />
+            <LocaleSwitcher locale={locale} onChange={handleLocaleChange} />
           </div>
         </div>
       </div>
