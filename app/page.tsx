@@ -1616,11 +1616,27 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_product_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_last")}: 2026/4/24
+              {T("updates_last")}: 2026/4/25
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/25</span>
+                <span>
+                  {locale === "en"
+                    ? "Homepage now shows a preview of the actual PDF cover (Taipei/Xinyi example) before you fill the form — see what you'll get before you commit"
+                    : "首頁直接秀 PDF 封面預覽（以台北信義區為例），不用填完表單就能看到你會拿到什麼樣的手冊"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/25</span>
+                <span>
+                  {locale === "en"
+                    ? "Warm Formosan black bear illustration on the homepage — a gentler welcome than a wall of text"
+                    : "首頁加入台灣黑熊插畫，讓第一眼比較溫暖，而不是一大片文字"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/24</span>
                 <span>
