@@ -38,6 +38,10 @@
   --color-emergency-protect: #e11d48; /* 113 women & children — rose-600 */
   --color-emergency-attn: #d97706; /* 1991 disaster msg — amber-600 */
   --color-emergency-health: #0d9488; /* 1922 CDC — teal-600 (= primary) */
+
+  /* Identity-mode banner tokens — shown at top in migrant mode */
+  --color-mode-worker: #059669; /* emerald-600 (matches 1955 tile) */
+  --color-mode-resident: #2b7ab5; /* info blue (DESIGN.md civic blue) */
 }
 
 @media (prefers-color-scheme: dark) {

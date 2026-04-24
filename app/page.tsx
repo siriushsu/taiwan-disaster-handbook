@@ -416,7 +416,7 @@ export default function Home() {
       {/* 頁首 — Notion-style white header */}
       {form.isForeignNational && mode === "form" && (
         <div
-          className={`${form.foreignType === "worker" ? "bg-emerald-600" : "bg-blue-600"} text-white text-center text-xs py-1 font-medium`}
+          className={`${form.foreignType === "worker" ? "bg-mode-worker" : "bg-mode-resident"} text-white text-center text-xs py-1.5 font-medium`}
         >
           {form.foreignType === "worker"
             ? "🌏 外籍移工模式 Migrant Worker Mode — 1955 / 113 / 用語卡 / 雇主資訊"
