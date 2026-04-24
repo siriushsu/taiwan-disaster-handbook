@@ -3,6 +3,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { FOREIGN_RESOURCES } from "@/lib/foreign-resources";
 
+// Colors reference --color-emergency-* tokens in globals.css.
+// Kept as Tailwind palette classes here so IntelliSense works; if you
+// change these, update DESIGN.md "Emergency Mode" section too.
 const NUMBERS = [
   {
     num: "119",
@@ -24,7 +27,7 @@ const NUMBERS = [
     num: "113",
     label: "婦幼保護",
     en: "Women & Children",
-    color: "bg-purple-600",
+    color: "bg-rose-600", // was purple-600 (AI-slop signature + no semantic link to women's protection)
     icon: "🛡️",
   },
   {

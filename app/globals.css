@@ -28,6 +28,16 @@
   --color-warning: #d4940a;
   --color-error: #c93b3b;
   --color-info: #2b7ab5;
+
+  /* Emergency mode tokens — see DESIGN.md "Emergency Mode" section.
+     Used on /emergency and for the in-app migrant-mode banner. */
+  --color-emergency-bg: #0f172a; /* dark navy base */
+  --color-emergency-fire: #dc2626; /* 119 fire/ambulance — red-600 */
+  --color-emergency-police: #1d4ed8; /* 110 police — blue-700 */
+  --color-emergency-worker: #059669; /* 1955 migrant worker — emerald-600 */
+  --color-emergency-protect: #e11d48; /* 113 women & children — rose-600 */
+  --color-emergency-attn: #d97706; /* 1991 disaster msg — amber-600 */
+  --color-emergency-health: #0d9488; /* 1922 CDC — teal-600 (= primary) */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,7 +56,9 @@ body {
 }
 
 /* Headings — tighter line-height for impact */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   line-height: 1.3;
 }
 
