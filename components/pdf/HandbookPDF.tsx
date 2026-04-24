@@ -45,6 +45,22 @@ Font.register({
   ],
 });
 
+/* ── color system ───────────────────────────────────────
+   PDF-wide palette. Keep in sync with DESIGN.md. Two axes:
+   1. Facility category — compass tags + numbered badges
+   2. Disaster scenario — EAC (Page 2) + Quick Response (Page 8)
+   Map pin colors are a third axis (Leaflet defaults) — deliberately
+   not reused here; leaflet legend renders its own dots on P4. */
+const CAT_SHELTER = "#0D9488"; // brand primary teal
+const CAT_AIR_RAID = "#8b5cf6"; // purple
+const CAT_MEDICAL = "#059669"; // emerald
+const CAT_AED = "#dc2626"; // red
+
+const DIS_EQ = "#C93B3B"; // earthquake — red (semantic error)
+const DIS_AIR = "#8b5cf6"; // air raid — same purple as CAT_AIR_RAID
+const DIS_FIRE = "#d4882a"; // fire — amber
+const DIS_TYPHOON = "#3b6fd4"; // typhoon — blue
+
 /* ── helpers ───────────────────────────────────────── */
 let _lang: BiMode = "zh";
 
@@ -531,7 +547,7 @@ function DirMap({ loc, mapImg }: { loc: LocationInfo; mapImg?: string }) {
         name: sh.name,
         dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng),
         dist: distText(sh.distance),
-        color: "#0D9488",
+        color: CAT_SHELTER,
         tag: pt(_lang, "label_shelter"),
       });
   }
@@ -541,7 +557,7 @@ function DirMap({ loc, mapImg }: { loc: LocationInfo; mapImg?: string }) {
         name: sh.address || sh.name,
         dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng),
         dist: distText(sh.distance),
-        color: "#8b5cf6",
+        color: CAT_AIR_RAID,
         tag: pt(_lang, "label_air_raid"),
       });
   }
@@ -551,7 +567,7 @@ function DirMap({ loc, mapImg }: { loc: LocationInfo; mapImg?: string }) {
         name: m.name,
         dir: bearing(loc.geo.lat, loc.geo.lng, m.lat, m.lng),
         dist: distText(m.distance),
-        color: "#059669",
+        color: CAT_MEDICAL,
         tag: m.hasER ? pt(_lang, "label_er") : pt(_lang, "label_medical"),
       });
   }
@@ -593,9 +609,6 @@ function DirMap({ loc, mapImg }: { loc: LocationInfo; mapImg?: string }) {
             ))}
         </View>
       </View>
-      <Text style={{ fontSize: 6.5, color: "#9C9691", marginTop: 3 }}>
-        {pt(_lang, "map_legend_short")}
-      </Text>
     </View>
   );
 }
@@ -807,7 +820,7 @@ function LocationPage({
             )}
             {air.slice(0, 3).map((sh: Shelter, i: number) => (
               <View key={i} style={s.shelterCard}>
-                <Text style={[s.shelterNum, { backgroundColor: "#8b5cf6" }]}>
+                <Text style={[s.shelterNum, { backgroundColor: CAT_AIR_RAID }]}>
                   {i + 1}
                 </Text>
                 <View style={s.shelterInfo}>
@@ -842,7 +855,7 @@ function LocationPage({
             )}
             {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
               <View key={i} style={s.medCard}>
-                <Text style={[s.shelterNum, { backgroundColor: "#059669" }]}>
+                <Text style={[s.shelterNum, { backgroundColor: CAT_MEDICAL }]}>
                   {i + 1}
                 </Text>
                 <View style={s.shelterInfo}>
@@ -902,7 +915,7 @@ function LocationPage({
                 i: number,
               ) => (
                 <View key={i} style={s.medCard}>
-                  <Text style={[s.shelterNum, { backgroundColor: "#dc2626" }]}>
+                  <Text style={[s.shelterNum, { backgroundColor: CAT_AED }]}>
                     {i + 1}
                   </Text>
                   <View style={s.shelterInfo}>
@@ -1129,7 +1142,7 @@ export default function HandbookPDF({
             </View>
             {heroImage && (
               /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-              <Image src={heroImage} style={s.coverHeroImage} />
+              <Image src={heroImage as string} style={s.coverHeroImage} />
             )}
           </View>
           <View style={s.coverBox}>
