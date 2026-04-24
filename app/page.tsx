@@ -530,10 +530,10 @@ export default function Home() {
             {T("hero_cta_full")}
           </button>
 
-          {/* Emergency quick link */}
+          {/* Emergency quick link — ghost style so primary CTA keeps hierarchy */}
           <a
             href="/emergency"
-            className="block w-full text-center bg-red-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors active:scale-[0.98]"
+            className="block w-full text-center bg-white border border-red-600 text-red-600 py-3 rounded-xl font-semibold text-sm hover:bg-red-50 transition-colors active:scale-[0.98]"
           >
             {T("emergency_cta")}
           </a>
