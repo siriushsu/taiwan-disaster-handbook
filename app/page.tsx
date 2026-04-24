@@ -405,23 +405,36 @@ export default function Home() {
       <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
-            <h1
-              className={`font-bold text-primary ${mode === "landing" ? "text-xl" : "text-base"} ${mode !== "landing" ? "cursor-pointer hover:opacity-70 transition-opacity" : ""}`}
-              onClick={
-                mode !== "landing"
-                  ? () => {
-                      setMode("landing");
-                      setStep(1);
-                      setQuickResult(null);
-                      setMapLocation(null);
-                    }
-                  : undefined
-              }
-            >
-              {locale === "en"
-                ? "Taiwan Emergency Handbook"
-                : "台灣家庭防災手冊"}
-            </h1>
+            {/* Header brand: H1 only off-landing (where no content hero exists).
+                On landing, page hero below is the H1 — see section below. */}
+            {mode === "landing" ? (
+              <p
+                className="font-bold text-primary text-xl"
+                aria-label={
+                  locale === "en"
+                    ? "Taiwan Emergency Handbook"
+                    : "台灣家庭防災手冊"
+                }
+              >
+                {locale === "en"
+                  ? "Taiwan Emergency Handbook"
+                  : "台灣家庭防災手冊"}
+              </p>
+            ) : (
+              <h1
+                className="font-bold text-primary text-base cursor-pointer hover:opacity-70 transition-opacity"
+                onClick={() => {
+                  setMode("landing");
+                  setStep(1);
+                  setQuickResult(null);
+                  setMapLocation(null);
+                }}
+              >
+                {locale === "en"
+                  ? "Taiwan Emergency Handbook"
+                  : "台灣家庭防災手冊"}
+              </h1>
+            )}
             <LocaleSwitcher locale={locale} onChange={setLocale} />
           </div>
         </div>
@@ -463,10 +476,12 @@ export default function Home() {
       {/* === LANDING MODE === */}
       {mode === "landing" && (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-          {/* Hero text */}
+          {/* Hero text — H1 (real page topic; header logo becomes <p> on landing) */}
           <div className="text-center space-y-2 pt-2">
-            <h2 className="text-2xl font-bold text-text">{T("site_title")}</h2>
-            <p className="text-sm text-text-muted">{T("site_desc")}</p>
+            <h1 className="text-3xl font-bold text-text leading-tight">
+              {T("site_title")}
+            </h1>
+            <p className="text-base text-text-muted">{T("site_desc")}</p>
             <p className="text-xs text-text-faint">{T("privacy_notice")}</p>
             <button
               onClick={() => {
