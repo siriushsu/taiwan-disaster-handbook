@@ -97,9 +97,9 @@ const s = StyleSheet.create({
   sectionTitle: {
     fontSize: 10,
     fontWeight: "bold",
-    color: "#0D7377",
+    color: "#0D9488",
     borderBottomWidth: 1,
-    borderBottomColor: "#E6F3F3",
+    borderBottomColor: "#F0FDFA",
     paddingBottom: 2,
     marginBottom: 3,
     marginTop: 6,
@@ -110,7 +110,7 @@ const s = StyleSheet.create({
   coverPage: {
     fontFamily: "NotoSansTC",
     padding: 0,
-    backgroundColor: "#0D7377",
+    backgroundColor: "#0D9488",
   },
   coverTop: { padding: "60 40 40", flex: 1 },
   coverTitle: {
@@ -121,7 +121,7 @@ const s = StyleSheet.create({
   },
   coverSub: { fontSize: 14, color: "#ffffff", opacity: 0.75, marginBottom: 30 },
   coverBox: {
-    backgroundColor: "#065A5C",
+    backgroundColor: "#0F766E",
     borderRadius: 8,
     padding: "14 20",
     marginBottom: 10,
@@ -134,7 +134,7 @@ const s = StyleSheet.create({
   },
   coverBoxValue: { fontSize: 13, color: "#ffffff", fontWeight: "bold" },
   coverFooter: {
-    backgroundColor: "#065A5C",
+    backgroundColor: "#0F766E",
     padding: "14 40",
     fontSize: 9,
     color: "#ffffff",
@@ -178,7 +178,7 @@ const s = StyleSheet.create({
   actionLabel: { fontSize: 12, fontWeight: "bold", marginBottom: 2 },
   actionBody: { fontSize: 9.5, color: "#6B6560", lineHeight: 1.4 },
   actionMeet: {
-    backgroundColor: "#0D7377",
+    backgroundColor: "#0D9488",
     borderRadius: 8,
     padding: "10 14",
     marginTop: 4,
@@ -222,18 +222,18 @@ const s = StyleSheet.create({
   numLabel: { flex: 1, fontSize: 10, color: "#6B6560" },
   // contact card
   contactCard: {
-    backgroundColor: "#E6F3F3",
+    backgroundColor: "#F0FDFA",
     borderRadius: 6,
     padding: "8 12",
     marginBottom: 6,
     borderLeftWidth: 4,
-    borderLeftColor: "#0D7377",
+    borderLeftColor: "#0D9488",
   },
   contactName: { fontWeight: "bold", fontSize: 11 },
   contactPhone: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#0D7377",
+    color: "#0D9488",
     marginTop: 4,
     lineHeight: 1.2,
   },
@@ -246,13 +246,13 @@ const s = StyleSheet.create({
     padding: "8 12",
     marginBottom: 6,
   },
-  reunionName: { fontWeight: "bold", fontSize: 10.5, color: "#0D7377" },
+  reunionName: { fontWeight: "bold", fontSize: 10.5, color: "#0D9488" },
   reunionRow: { flexDirection: "row", marginTop: 3 },
   reunionLabel: { width: 60, color: "#6B6560", fontSize: 8.5 },
   reunionValue: { flex: 1, fontSize: 8.5 },
   // location
   locHeader: {
-    backgroundColor: "#0D7377",
+    backgroundColor: "#0D9488",
     padding: "8 12",
     borderRadius: 6,
     marginBottom: 10,
@@ -271,7 +271,7 @@ const s = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: "#065A5C",
+    backgroundColor: "#0F766E",
     color: "#fff",
     fontSize: 8,
     fontWeight: "bold",
@@ -312,7 +312,7 @@ const s = StyleSheet.create({
     paddingBottom: 4,
     marginBottom: 4,
   },
-  pCardName: { fontWeight: "bold", fontSize: 12, color: "#0D7377" },
+  pCardName: { fontWeight: "bold", fontSize: 12, color: "#0D9488" },
   pCardBlood: { fontWeight: "bold", fontSize: 11, color: "#C93B3B" },
   pCardRow: { flexDirection: "row", marginTop: 2 },
   pCardLabel: { width: 52, color: "#6B6560", fontSize: 8 },
@@ -370,7 +370,7 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   tipBox: {
-    backgroundColor: "#E6F3F3",
+    backgroundColor: "#F0FDFA",
     borderRadius: 6,
     padding: "6 10",
     marginTop: 4,
@@ -378,7 +378,7 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#B8DDDE",
   },
-  tipText: { fontSize: 8.5, color: "#065A5C" },
+  tipText: { fontSize: 8.5, color: "#0F766E" },
   // member health
   memberCard: {
     borderWidth: 1,
@@ -387,7 +387,7 @@ const s = StyleSheet.create({
     padding: "8 12",
     marginBottom: 8,
   },
-  memberName: { fontWeight: "bold", fontSize: 12, color: "#0D7377" },
+  memberName: { fontWeight: "bold", fontSize: 12, color: "#0D9488" },
   infoRow: { flexDirection: "row", marginTop: 4 },
   infoLabel: { width: 70, color: "#6B6560", fontSize: 9 },
   infoValue: { flex: 1, fontSize: 9 },
@@ -523,7 +523,7 @@ function DirMap({ loc, mapImg }: { loc: LocationInfo; mapImg?: string }) {
         name: sh.name,
         dir: bearing(loc.geo.lat, loc.geo.lng, sh.lat, sh.lng),
         dist: distText(sh.distance),
-        color: "#0D7377",
+        color: "#0D9488",
         tag: pt(_lang, "label_shelter"),
       });
   }
@@ -655,13 +655,13 @@ function LocationPage({
             style={[
               s.meetCard,
               {
-                backgroundColor: "#E6F3F3",
+                backgroundColor: "#F0FDFA",
                 borderWidth: 1,
-                borderColor: "#E6F3F3",
+                borderColor: "#F0FDFA",
               },
             ]}
           >
-            <Text style={[s.meetLabel, { color: "#0D7377" }]}>
+            <Text style={[s.meetLabel, { color: "#0D9488" }]}>
               {pt(biMode, "loc_primary")}
               {biMode === "bi" ? " / " + ptEn("loc_primary") : ""}
             </Text>
@@ -1660,13 +1660,13 @@ export default function HandbookPDF({
           <Text
             style={[
               s.scenarioTitle,
-              { borderBottomColor: "#3b82f6", color: "#0D7377" },
+              { borderBottomColor: "#3b82f6", color: "#0D9488" },
             ]}
           >
             {pt(biMode, "reunion_title")}
           </Text>
           {biMode === "bi" && (
-            <Text style={{ fontSize: 8, color: "#0D7377", marginBottom: 2 }}>
+            <Text style={{ fontSize: 8, color: "#0D9488", marginBottom: 2 }}>
               {ptEn("reunion_title")}
             </Text>
           )}
@@ -1914,7 +1914,7 @@ export default function HandbookPDF({
           <Text
             style={[
               s.scenarioTitle,
-              { borderBottomColor: "#3b82f6", color: "#0D7377" },
+              { borderBottomColor: "#3b82f6", color: "#0D9488" },
             ]}
           >
             {pt(biMode, "member_title")}
@@ -2671,7 +2671,7 @@ export default function HandbookPDF({
         <Text
           style={[
             s.scenarioTitle,
-            { borderBottomColor: "#0D7377", color: "#0D7377" },
+            { borderBottomColor: "#0D9488", color: "#0D9488" },
           ]}
         >
           {pt(biMode, "qrc_title")}
@@ -2908,7 +2908,7 @@ export default function HandbookPDF({
         {/* Universal rules */}
         <View
           style={{
-            backgroundColor: "#E6F3F3",
+            backgroundColor: "#F0FDFA",
             borderRadius: 6,
             padding: "8 12",
             marginTop: 2,
@@ -2918,7 +2918,7 @@ export default function HandbookPDF({
             style={{
               fontSize: 10,
               fontWeight: "bold",
-              color: "#0D7377",
+              color: "#0D9488",
               marginBottom: 4,
             }}
           >
@@ -2935,7 +2935,7 @@ export default function HandbookPDF({
                 style={{ flex: 1, flexDirection: "row", marginRight: 6 }}
               >
                 <Text
-                  style={{ fontSize: 8.5, color: "#0D7377", marginRight: 3 }}
+                  style={{ fontSize: 8.5, color: "#0D9488", marginRight: 3 }}
                 >
                   {">"}
                 </Text>

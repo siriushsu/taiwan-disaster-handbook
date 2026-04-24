@@ -44,7 +44,7 @@ const s = StyleSheet.create({
     padding: 0,
   },
   header: {
-    backgroundColor: "#0D7377",
+    backgroundColor: "#0D9488",
     padding: "5 8 3 8",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -67,7 +67,7 @@ const s = StyleSheet.create({
   sectionLabel: {
     fontSize: 5,
     fontWeight: "bold",
-    color: "#0D7377",
+    color: "#0D9488",
     marginBottom: 1.5,
     borderBottomWidth: 0.5,
     borderBottomColor: "#d1d5db",
