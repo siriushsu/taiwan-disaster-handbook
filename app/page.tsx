@@ -1471,15 +1471,102 @@ export default function Home() {
 
       {/* Updates & Footer */}
       <div className="max-w-2xl mx-auto px-4 pb-8 space-y-4">
+        {/* 資料更新 — what the dataset contains, refreshed weekly.
+            Separated from product updates because data freshness is its own
+            trust signal (users can see the tool is actively maintained even
+            when no features shipped that week). */}
         <details className="bg-white rounded-xl shadow-card border border-border">
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
-            <span>{T("updates_title")}</span>
+            <span>{T("updates_data_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_data_date")}: 2026/4/24
+              {T("updates_last")}: 2026/4/8
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Air raid shelters expanded: 71K → 74K+ (merged g0v open data, major fills for Hsinchu, Yilan, Hualien, Kinmen)"
+                    : "防空避難資料擴充：71K → 74K+（整合 g0v 開放資料，新竹市/宜蘭/花蓮/金門大幅補齊）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 1,499 nursing institutions (nursing homes with coordinates) from MOHW"
+                    : "新增 1,499 間護理機構資料（含座標），來源：衛福部護理機構名冊"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/2</span>
+                <span>
+                  {locale === "en"
+                    ? "Weekly data refresh: medical facilities updated to 16,900+ (all with precise coordinates)"
+                    : "每週資料更新：醫療院所更新至 16,900+ 筆（全部精確定位），含金門連江離島"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 770 fire stations and 1,686 police stations with phone numbers"
+                    : "新增全國 770 個消防隊、1,686 個派出所資料（含電話）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Auto-update now runs weekly — shelters, medical, AED, fire & police stations"
+                    : "資料自動更新改為每週 — 避難所、醫療、AED、消防、派出所全部涵蓋"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/26</span>
+                <span>
+                  {locale === "en"
+                    ? "Address geocoding upgraded to Google-first for precise results"
+                    : "地址定位改為 Google 優先，定位精度提升至門牌等級"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">3/20</span>
+                <span>
+                  {locale === "en"
+                    ? "Added 83,000+ shelter/air raid data points; MRT stations as air raid shelters"
+                    : "全台避難收容、防空避難資料突破 83,000 筆；捷運站納入防空避難選項"}
+                </span>
+              </li>
+            </ul>
+            <p className="mt-3 text-[10px] text-text-faint">
+              {locale === "en"
+                ? "Data sources: MOHW, NHI, National Fire Agency, NPA, county/city open data. Auto-updated weekly."
+                : "資料來源：衛福部、健保署、消防署、警政署、各縣市政府開放資料。每週自動更新。"}
+            </p>
+          </div>
+        </details>
+
+        {/* 產品更新 — features, UI, bug fixes. */}
+        <details className="bg-white rounded-xl shadow-card border border-border">
+          <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
+            <span>{T("updates_product_title")}</span>
+            <span className="text-xs font-normal text-text-faint">
+              {T("updates_last")}: 2026/4/24
+            </span>
+          </summary>
+          <div className="px-4 pb-4 pt-1 border-t border-border/50">
+            <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "Auto-detect browser language: non-Chinese visitors now land in their language (en/vi/id/th/fil) — no more hunting for the globe dropdown"
+                    : "自動偵測瀏覽器語言：非中文使用者直接進入對應語言頁面（英/越/印/泰/菲），不用再找右上角語言切換"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/24</span>
                 <span>
@@ -1604,22 +1691,6 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/8</span>
                 <span>
                   {locale === "en"
-                    ? "Air raid shelters expanded: 71K → 74K+ (merged g0v open data, major fills for Hsinchu, Yilan, Hualien, Kinmen)"
-                    : "防空避難資料擴充：71K → 74K+（整合 g0v 開放資料，新竹市/宜蘭/花蓮/金門大幅補齊）"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">4/8</span>
-                <span>
-                  {locale === "en"
-                    ? "Added 1,499 nursing institutions (nursing homes with coordinates) from MOHW"
-                    : "新增 1,499 間護理機構資料（含座標），來源：衛福部護理機構名冊"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">4/8</span>
-                <span>
-                  {locale === "en"
                     ? "UX: fixed emergency card font, improved offline support, redesigned share preview image"
                     : "體驗優化：修復緊急卡片字型、強化離線支援、重新設計社群分享預覽圖"}
                 </span>
@@ -1641,38 +1712,6 @@ export default function Home() {
                 </span>
               </li>
               <li className="flex gap-2">
-                <span className="text-primary shrink-0">4/2</span>
-                <span>
-                  {locale === "en"
-                    ? "Weekly data refresh: medical facilities updated to 16,900+ (all with precise coordinates)"
-                    : "每週資料更新：醫療院所更新至 16,900+ 筆（全部精確定位），含金門連江離島"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/26</span>
-                <span>
-                  {locale === "en"
-                    ? "Added 770 fire stations and 1,686 police stations with phone numbers"
-                    : "新增全國 770 個消防隊、1,686 個派出所資料（含電話）"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/26</span>
-                <span>
-                  {locale === "en"
-                    ? "Auto-update now runs weekly — shelters, medical, AED, fire & police stations"
-                    : "資料自動更新改為每週 — 避難所、醫療、AED、消防、派出所全部涵蓋"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/26</span>
-                <span>
-                  {locale === "en"
-                    ? "Address geocoding upgraded to Google-first for precise results"
-                    : "地址定位改為 Google 優先，定位精度提升至門牌等級"}
-                </span>
-              </li>
-              <li className="flex gap-2">
                 <span className="text-primary shrink-0">3/26</span>
                 <span>
                   {locale === "en"
@@ -1688,20 +1727,7 @@ export default function Home() {
                     : "操作優化：搜尋結果後自動收起表單、成員可填手機號碼、輸入文字更清晰"}
                 </span>
               </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">3/20</span>
-                <span>
-                  {locale === "en"
-                    ? "Added 83,000+ shelter/air raid data points; MRT stations as air raid shelters"
-                    : "全台避難收容、防空避難資料突破 83,000 筆；捷運站納入防空避難選項"}
-                </span>
-              </li>
             </ul>
-            <p className="mt-3 text-[10px] text-text-faint">
-              {locale === "en"
-                ? "Data sources: MOHW, NHI, National Fire Agency, NPA, county/city open data. Auto-updated weekly."
-                : "資料來源：衛福部、健保署、消防署、警政署、各縣市政府開放資料。每週自動更新。"}
-            </p>
           </div>
         </details>
       </div>
