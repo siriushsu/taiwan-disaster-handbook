@@ -1475,11 +1475,43 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_data_date")}: 2026/4/17
+              {T("updates_data_date")}: 2026/4/24
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "Homepage polish: larger hero heading, simpler foreign-national CTA, quieter emergency shortcut so the main address-lookup is the clear primary action"
+                    : "首頁介面整理：主標題放大、「外籍人士？」連結簡化、緊急電話按鈕改為次要樣式，讓「輸入我的地址」是最清楚的主要動作"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "Shareable language links: ?lang=en, ?lang=vi, etc. now work — send a link in your language, recipient opens in that language"
+                    : "語系可分享：網址帶 ?lang=en / ?lang=vi 等會直接以該語言開啟，方便傳給不同語言的人"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "Accessibility: all homepage buttons and links now meet the 44px minimum tap-target — easier on mobile"
+                    : "行動裝置可用性提升：首頁所有按鈕與連結皆達 44px 最小點擊範圍"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">4/24</span>
+                <span>
+                  {locale === "en"
+                    ? "PDF and website now use the exact same brand teal — no more visible color shift between what you see and what you download"
+                    : "網站與 PDF 的主色統一（過去兩邊綠色稍有差異），下載的手冊和網站看到的顏色一致"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/17</span>
                 <span>
