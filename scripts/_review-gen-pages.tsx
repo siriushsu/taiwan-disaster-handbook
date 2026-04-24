@@ -1,6 +1,6 @@
 import { createElement, type ReactElement } from "react";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
-import { writeFile, mkdtemp, readFile } from "node:fs/promises";
+import { writeFile, mkdtemp } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -223,14 +223,10 @@ const sample: HandbookData = {
 };
 
 async function main() {
-  const heroImage = await readFile(
-    path.resolve("public/hero-bear-cutout-compact.png"),
-  );
   const pdfBuffer = await renderToBuffer(
     createElement(HandbookPDF, {
       data: sample,
       biMode: "zh",
-      heroImage,
     }) as ReactElement<DocumentProps>,
   );
   console.log(`PDF size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);

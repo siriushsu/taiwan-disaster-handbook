@@ -500,18 +500,6 @@ export default function Home() {
       {/* === LANDING MODE === */}
       {mode === "landing" && (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-          {/* Hero illustration — warm anchor above the H1. Decorative (Formosan
-              black bear holding handbook), sets tone before language sinks in. */}
-          <div className="-mt-2">
-            <Image
-              src="/hero-illustration.jpg"
-              alt=""
-              width={1904}
-              height={640}
-              className="w-full h-auto rounded-xl"
-              priority
-            />
-          </div>
           {/* Hero — H1 + supporting desc centered; utility row below breaks
               the 'everything centered' AI-slop rhythm with tiered alignment. */}
           <div className="text-center space-y-2 pt-2">
@@ -556,21 +544,32 @@ export default function Home() {
             ))}
           </div>
 
-          {/* PDF preview — shows users exactly what artifact they'll get,
-              before they commit to the primary CTA. Pre-rendered at build
-              time via `npm run gen:pdf-preview`. */}
+          {/* PDF preview — shows the cover + the shelter page side by side so
+              visitors see both what they'll get and what's inside, before they
+              commit to the primary CTA. Pre-rendered at build time via
+              `npm run gen:pdf-preview`. */}
           <div className="bg-white rounded-xl border border-border p-4 shadow-card">
             <p className="text-xs text-text-faint mb-2">
               {T("preview_caption")}
             </p>
-            <Image
-              src="/pdf-preview.png"
-              alt="PDF handbook preview"
-              width={1191}
-              height={1684}
-              className="rounded-md border border-border/50 w-full h-auto"
-              priority
-            />
+            <div className="grid grid-cols-2 gap-2">
+              <Image
+                src="/pdf-preview-cover.png"
+                alt="PDF cover preview"
+                width={1241}
+                height={1754}
+                className="rounded-md border border-border/50 w-full h-auto"
+                priority
+              />
+              <Image
+                src="/pdf-preview-map.png"
+                alt="PDF shelter page preview"
+                width={1241}
+                height={1754}
+                className="rounded-md border border-border/50 w-full h-auto"
+                priority
+              />
+            </div>
           </div>
 
           {/* Primary CTA */}
@@ -1625,8 +1624,8 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/25</span>
                 <span>
                   {locale === "en"
-                    ? "PDF handbook redesign: black bear mascot on the cover, shorter by one page (merged duplicate disaster card), shared info de-duplicated on the family overview, plus a tear-off wallet card with blood types + allergies + out-of-city contact"
-                    : "PDF 手冊大改版：封面加上台灣黑熊、少了一頁（合併重複的災害卡）、家人資料頁不再重複列地址，底部多了一張可剪下放皮夾的急救卡（血型、過敏、外縣市聯絡人）"}
+                    ? "PDF handbook redesign: one page shorter (merged duplicate disaster card), shared info de-duplicated on the family overview, plus a tear-off wallet card with blood types + allergies + out-of-city contact"
+                    : "PDF 手冊大改版：少了一頁（合併重複的災害卡）、家人資料頁不再重複列地址，底部多了一張可剪下放皮夾的急救卡（血型、過敏、外縣市聯絡人）"}
                 </span>
               </li>
               <li className="flex gap-2">
@@ -1641,16 +1640,8 @@ export default function Home() {
                 <span className="text-primary shrink-0">4/25</span>
                 <span>
                   {locale === "en"
-                    ? "Homepage now shows a preview of the actual PDF cover (Taipei/Xinyi example) before you fill the form — see what you'll get before you commit"
-                    : "首頁直接秀 PDF 封面預覽（以台北信義區為例），不用填完表單就能看到你會拿到什麼樣的手冊"}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary shrink-0">4/25</span>
-                <span>
-                  {locale === "en"
-                    ? "Warm Formosan black bear illustration on the homepage — a gentler welcome than a wall of text"
-                    : "首頁加入台灣黑熊插畫，讓第一眼比較溫暖，而不是一大片文字"}
+                    ? "Homepage preview now shows both the PDF cover and the shelter page side by side — so you see what you'll get and what's inside before you fill the form"
+                    : "首頁預覽改為封面 + 避難地點兩頁並排（以台北信義區為例），不用填表就能同時看到手冊長怎樣、裡面有什麼"}
                 </span>
               </li>
               <li className="flex gap-2">

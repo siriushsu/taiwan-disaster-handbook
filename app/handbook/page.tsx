@@ -349,7 +349,6 @@ export default function HandbookPage() {
                     data={data}
                     mapImages={mapImages}
                     biMode={biMode}
-                    heroImage="/hero-bear-cutout-compact.png"
                   />
                 }
                 fileName={fileName}

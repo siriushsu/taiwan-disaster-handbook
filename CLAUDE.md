@@ -21,14 +21,16 @@ npm run gen:pdf-preview           # regen homepage PDF cover preview (see below)
 
 ## PDF preview pipeline
 
-The homepage shows a pre-rendered PDF cover image at `public/pdf-preview.png`
-so visitors see the artifact before they commit to filling out the form.
+The homepage shows two pre-rendered PDF page thumbnails side by side —
+`public/pdf-preview-cover.png` (the cover) and `public/pdf-preview-map.png`
+(the shelter/map page) — so visitors see both the artifact and what's
+inside before they commit to filling out the form.
 
 **Rerun `npm run gen:pdf-preview` whenever you change `components/pdf/*.tsx`.**
 This is not automated — the script runs locally, reads `components/pdf/HandbookPDF.tsx`
-with a fixed Taipei/Xinyi sample household, and rasterizes page 1 to PNG via
-poppler's `pdftoppm` (requires `brew install poppler` on macOS).
-Commit the regenerated PNG along with the PDF change.
+with a fixed Taipei/Xinyi sample household, and rasterizes pages 1 and 4 to
+PNG via poppler's `pdftoppm` (requires `brew install poppler` on macOS).
+Commit the regenerated PNGs along with the PDF change.
 
 ## Design System
 

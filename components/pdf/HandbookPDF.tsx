@@ -156,14 +156,6 @@ const s = StyleSheet.create({
     color: "#ffffff",
     opacity: 0.6,
   },
-  coverHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  coverTitleBlock: { flex: 1, paddingRight: 12 },
-  coverHeroImage: { width: 120, height: 125 },
   // action card
   actionPage: {
     fontFamily: "NotoSansTC",
@@ -1193,12 +1185,10 @@ export default function HandbookPDF({
   data,
   mapImages,
   biMode = "zh",
-  heroImage,
 }: {
   data: HandbookData;
   mapImages?: Record<number, string>;
   biMode?: BiMode;
-  heroImage?: string | Uint8Array;
 }) {
   // eslint-disable-next-line react-hooks/globals -- @react-pdf/renderer renders synchronously; this is not a DOM re-render side effect
   _lang = biMode;
@@ -1222,31 +1212,23 @@ export default function HandbookPDF({
       {/* ─── PAGE 1: COVER ─── */}
       <Page size="A4" style={s.coverPage}>
         <View style={s.coverTop}>
-          <View style={s.coverHeader}>
-            <View style={s.coverTitleBlock}>
-              <Text style={s.coverTitle}>{pt(biMode, "cover_title")}</Text>
-              {biMode === "bi" && (
-                <Text
-                  style={[
-                    s.coverSub,
-                    { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
-                  ]}
-                >
-                  Family Emergency Handbook
-                </Text>
-              )}
-              <Text style={s.coverSub}>{pt(biMode, "cover_sub")}</Text>
-              {biMode === "bi" && (
-                <Text style={[s.coverSub, { fontSize: 10 }]}>
-                  {ptEn("cover_sub")}
-                </Text>
-              )}
-            </View>
-            {heroImage && (
-              /* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */
-              <Image src={heroImage as string} style={s.coverHeroImage} />
-            )}
-          </View>
+          <Text style={s.coverTitle}>{pt(biMode, "cover_title")}</Text>
+          {biMode === "bi" && (
+            <Text
+              style={[
+                s.coverSub,
+                { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+              ]}
+            >
+              Family Emergency Handbook
+            </Text>
+          )}
+          <Text style={s.coverSub}>{pt(biMode, "cover_sub")}</Text>
+          {biMode === "bi" && (
+            <Text style={[s.coverSub, { fontSize: 10 }]}>
+              {ptEn("cover_sub")}
+            </Text>
+          )}
           <View style={s.coverBox}>
             <Text style={s.coverBoxLabel}>
               {pt(biMode, "cover_addr")}

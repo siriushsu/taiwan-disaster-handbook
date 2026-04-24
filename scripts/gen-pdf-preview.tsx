@@ -2,20 +2,14 @@
  * Build-time PDF preview generator.
  *
  * Renders the first page (cover) of HandbookPDF with a fixed Taipei-Xinyi
- * sample household, then rasterizes it to `public/pdf-preview.png`.
+ * sample household, then rasterizes the cover (page 1) and shelter page
+ * (page 4) to `public/pdf-preview-cover.png` and `public/pdf-preview-map.png`.
  * Run manually after any PDF visual change:
  *   npm run gen:pdf-preview
  */
 import { createElement, type ReactElement } from "react";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
-import {
-  writeFile,
-  rename,
-  unlink,
-  mkdtemp,
-  readFile,
-  readdir,
-} from "node:fs/promises";
+import { writeFile, rename, unlink, mkdtemp, readdir } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -202,54 +196,55 @@ const sample: HandbookData = {
 
 async function main() {
   console.log("→ Rendering HandbookPDF to buffer...");
-  const heroImage = await readFile(
-    path.resolve("public/hero-bear-cutout-compact.png"),
-  );
   const pdfBuffer = await renderToBuffer(
     createElement(HandbookPDF, {
       data: sample,
       biMode: "zh",
-      heroImage,
     }) as ReactElement<DocumentProps>,
   );
   console.log(`  PDF size: ${(pdfBuffer.length / 1024).toFixed(1)} KB`);
 
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), "pdf-preview-"));
   const pdfPath = path.join(tmpDir, "handbook.pdf");
-  const pngPrefix = path.join(tmpDir, "cover");
   await writeFile(pdfPath, pdfBuffer);
 
-  console.log("→ Rasterizing page 1 via pdftoppm (poppler)...");
-  try {
-    // -r 150 → ~1240px A4 width; -f 1 -l 1 → first page only
-    const { stdout, stderr } = await execFileP("pdftoppm", [
-      "-png",
-      "-r",
-      "150",
-      "-f",
-      "1",
-      "-l",
-      "1",
-      pdfPath,
-      pngPrefix,
-    ]);
-    if (stdout) console.log("  stdout:", stdout);
-    if (stderr) console.log("  stderr:", stderr);
-  } catch (err) {
-    throw new Error(
-      "pdftoppm failed. Install poppler: `brew install poppler` (macOS) or equivalent.\n" +
-        (err instanceof Error ? err.message : String(err)),
+  // Rasterize cover (P1) and shelter/map page (P4) into two separate PNGs so
+  // the homepage can show both page types side by side.
+  const targets: { page: number; out: string }[] = [
+    { page: 1, out: "public/pdf-preview-cover.png" },
+    { page: 4, out: "public/pdf-preview-map.png" },
+  ];
+  for (const t of targets) {
+    console.log(`→ Rasterizing page ${t.page} via pdftoppm...`);
+    const prefix = path.join(tmpDir, `p${t.page}`);
+    try {
+      await execFileP("pdftoppm", [
+        "-png",
+        "-r",
+        "150",
+        "-f",
+        String(t.page),
+        "-l",
+        String(t.page),
+        pdfPath,
+        prefix,
+      ]);
+    } catch (err) {
+      throw new Error(
+        "pdftoppm failed. Install poppler: `brew install poppler` (macOS) or equivalent.\n" +
+          (err instanceof Error ? err.message : String(err)),
+      );
+    }
+    const produced = (await readdir(tmpDir)).find(
+      (f) => f.startsWith(`p${t.page}-`) && f.endsWith(".png"),
     );
+    if (!produced)
+      throw new Error(`pdftoppm produced no PNG for page ${t.page}`);
+    const outPath = path.resolve(t.out);
+    await rename(path.join(tmpDir, produced), outPath);
+    console.log(`  ✓ Wrote ${outPath}`);
   }
-
-  // pdftoppm numbering format varies by version (e.g., `cover-1.png` vs `cover-01.png`),
-  // so find whatever single PNG landed in the temp dir.
-  const produced = (await readdir(tmpDir)).find((f) => f.endsWith(".png"));
-  if (!produced) throw new Error(`pdftoppm produced no PNG in ${tmpDir}`);
-  const outPath = path.resolve("public/pdf-preview.png");
-  await rename(path.join(tmpDir, produced), outPath);
   await unlink(pdfPath);
-  console.log(`✓ Wrote ${outPath}`);
 }
 
 main().catch((err) => {
