@@ -681,9 +681,16 @@ export default function Home() {
                 </p>
               ) : (
                 <div className="space-y-3">
+                  {/* Category rows: colored dot carries the category cue.
+                      Drops the 4px colored left-border (AI-slop pattern #8)
+                      while keeping the same semantic color mapping. */}
                   {quickResult.shelters[0] && (
-                    <div className="border-l-4 border-primary pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-primary shrink-0"
+                          aria-hidden
+                        />
                         {T("quick_result_nearest_shelter")}
                       </p>
                       <p className="font-semibold text-text text-sm">
@@ -696,8 +703,12 @@ export default function Home() {
                     </div>
                   )}
                   {quickResult.airRaid[0] && (
-                    <div className="border-l-4 border-warning pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-warning shrink-0"
+                          aria-hidden
+                        />
                         {T("quick_result_nearest_airraid")}
                       </p>
                       <p className="font-semibold text-text text-sm">
@@ -710,8 +721,12 @@ export default function Home() {
                     </div>
                   )}
                   {quickResult.medical[0] && (
-                    <div className="border-l-4 border-success pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-success shrink-0"
+                          aria-hidden
+                        />
                         {T("quick_result_nearest_medical")}
                       </p>
                       <p className="font-semibold text-text text-sm">
@@ -723,8 +738,12 @@ export default function Home() {
                     </div>
                   )}
                   {quickResult.aed[0] && (
-                    <div className="border-l-4 border-accent pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-accent shrink-0"
+                          aria-hidden
+                        />
                         {T("quick_result_nearest_aed")}
                       </p>
                       <p className="font-semibold text-text text-sm">
@@ -736,8 +755,12 @@ export default function Home() {
                     </div>
                   )}
                   {quickResult.fireStation?.[0] && (
-                    <div className="border-l-4 border-red-500 pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-error shrink-0"
+                          aria-hidden
+                        />
                         {locale === "en"
                           ? "Nearest fire station"
                           : "最近消防隊"}
@@ -752,8 +775,12 @@ export default function Home() {
                     </div>
                   )}
                   {quickResult.policeStation?.[0] && (
-                    <div className="border-l-4 border-blue-500 pl-3">
-                      <p className="text-xs text-text-faint">
+                    <div>
+                      <p className="text-xs text-text-faint flex items-center gap-1.5">
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full bg-info shrink-0"
+                          aria-hidden
+                        />
                         {locale === "en"
                           ? "Nearest police station"
                           : "最近派出所"}
