@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-15T08:47:26.602Z",
+  "timestamp": "2026-06-22T01:00:01.522Z",
   "dryRun": false,
   "results": {
     "shelters": {
@@ -19,15 +19,13 @@
       "removed": 39
     },
     "aed": {
-      "total": 0,
-      "error": "download failed"
+      "total": 14858
     },
     "fireStations": {
       "total": 770
     },
     "policeStations": {
-      "total": 0,
-      "error": "download failed"
+      "total": 1687
     }
   }
 }

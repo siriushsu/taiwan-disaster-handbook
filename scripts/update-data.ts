@@ -26,7 +26,9 @@
  */
 
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
+import { spawn } from "child_process";
 
 const DATA_DIR = path.join(__dirname, "..", "public", "data");
 const SLEEP_MS = 1500; // rate limit between requests
@@ -57,6 +59,97 @@ async function fetchWithTimeout(
     clearTimeout(timer);
     throw e;
   }
+}
+
+/**
+ * Download a URL to a file via curl subprocess.
+ * Some Taiwan gov endpoints (e.g. tw-aed.mohw.gov.tw) ship incomplete TLS chains
+ * — Node's strict verifier rejects with UNABLE_TO_VERIFY_LEAF_SIGNATURE while
+ * curl (system CA bundle) succeeds. Returns true on HTTP 200 with non-empty body.
+ */
+function curlDownload(
+  url: string,
+  outPath: string,
+  timeoutSec = 120,
+): Promise<{ ok: boolean; status: number; bytes: number; error?: string }> {
+  return new Promise((resolve) => {
+    const child = spawn("curl", [
+      "-sS",
+      "-L",
+      "-m",
+      String(timeoutSec),
+      "-A",
+      "TaiwanDisasterHandbook/1.0",
+      "-o",
+      outPath,
+      "-w",
+      "%{http_code} %{size_download}",
+      url,
+    ]);
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => (stdout += d));
+    child.stderr.on("data", (d) => (stderr += d));
+    child.on("error", (e) =>
+      resolve({ ok: false, status: 0, bytes: 0, error: e.message }),
+    );
+    child.on("close", (code) => {
+      if (code !== 0) {
+        resolve({
+          ok: false,
+          status: 0,
+          bytes: 0,
+          error: stderr.trim() || `curl exit ${code}`,
+        });
+        return;
+      }
+      const [statusStr, bytesStr] = stdout.trim().split(/\s+/);
+      const status = parseInt(statusStr, 10) || 0;
+      const bytes = parseInt(bytesStr, 10) || 0;
+      resolve({ ok: status === 200 && bytes > 0, status, bytes });
+    });
+  });
+}
+
+/** Unzip a single file matching extension from a zip archive, return its text content. */
+function unzipExtractText(
+  zipPath: string,
+  extension: string,
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    // First, list contents to find the right filename
+    const list = spawn("unzip", ["-Z1", zipPath]);
+    let names = "";
+    list.stdout.on("data", (d) => (names += d));
+    list.on("close", () => {
+      // Some gov ZIPs ship a manifest.csv sidecar — prefer the actual data file.
+      const candidates = names
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((n) => n.toLowerCase().endsWith(extension.toLowerCase()))
+        .filter((n) => !/^manifest\./i.test(n.split("/").pop() || ""));
+      const target = candidates[0];
+      if (!target) {
+        resolve(null);
+        return;
+      }
+      const ext = spawn("unzip", ["-p", zipPath, target]);
+      const chunks: Buffer[] = [];
+      ext.stdout.on("data", (d) => chunks.push(d));
+      ext.on("close", () => {
+        const buf = Buffer.concat(chunks);
+        // Try UTF-8 first, fallback to Big5
+        const utf8 = new TextDecoder("utf-8", { fatal: true });
+        try {
+          resolve(utf8.decode(buf));
+        } catch {
+          resolve(new TextDecoder("big5").decode(buf));
+        }
+      });
+      ext.on("error", () => resolve(null));
+    });
+    list.on("error", () => resolve(null));
+  });
 }
 
 async function fetchCSV(url: string): Promise<string | null> {
@@ -758,12 +851,31 @@ async function updateAed(dryRun: boolean) {
   const filePath = path.join(DATA_DIR, "taiwan-aed.json");
   const url = "https://tw-aed.mohw.gov.tw/openData?t=csv";
 
-  console.log("  ⬇ 衛福部 AED 開放資料");
-  const csv = await fetchCSV(url);
-  if (!csv) {
-    console.log("  ✗ Failed to download AED data");
+  console.log(
+    "  ⬇ 衛福部 AED 開放資料 (via curl — Node fetch can't verify cert chain)",
+  );
+  // 衛福部 server 偶發 connection reset — retry up to 3 times
+  const tmpPath = path.join(os.tmpdir(), `aed-${Date.now()}.csv`);
+  let dl: Awaited<ReturnType<typeof curlDownload>> = {
+    ok: false,
+    status: 0,
+    bytes: 0,
+  };
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    dl = await curlDownload(url, tmpPath, 90);
+    if (dl.ok) break;
+    console.log(
+      `    ⚠ Attempt ${attempt}/3 failed: HTTP ${dl.status}, ${dl.bytes} bytes${dl.error ? ` (${dl.error})` : ""}`,
+    );
+    if (attempt < 3) await sleep(5000);
+  }
+  if (!dl.ok) {
+    console.log(`  ✗ All retries failed`);
     return { total: 0, error: "download failed" };
   }
+  console.log(`    ✓ ${dl.bytes} bytes`);
+  const csv = fs.readFileSync(tmpPath, "utf-8");
+  fs.unlinkSync(tmpPath);
 
   const rows = parseCSV(csv);
   console.log(`    ${rows.length} rows`);
@@ -951,49 +1063,47 @@ async function updatePoliceStations(dryRun: boolean) {
 
   const filePath = path.join(DATA_DIR, "taiwan-police-stations.json");
 
-  // The authoritative source is a ZIP from TGOS, which is complex to handle.
-  // Try the direct CSV download from data.gov.tw NPA dataset instead.
-  // Fallback: manual update with the ZIP contents.
-  const url =
-    "https://opdadm.moi.gov.tw/api/v1/no-auth/resource/api/dataset/A52DA7A0-E6F4-44E3-8687-3C04BB1EABB4/resource/89F93411-922E-4459-B7F3-0ADF444CDEAD/download";
-
-  console.log("  ⬇ 警政署派出所資料");
-  let text: string | null = null;
-
-  // Try UTF-8 first
+  // Source: data.gov.tw dataset 5958. The actual download is a ZIP hosted on TGOS
+  // with a date-stamped filename (e.g. 1150528.zip) that changes on each refresh,
+  // so we query data.gov.tw's metadata API to discover the current URL.
+  console.log("  ⬇ 查詢 data.gov.tw dataset 5958 最新下載 URL");
+  let zipUrl: string | null = null;
   try {
-    const res = await fetchWithTimeout(url);
+    const res = await fetchWithTimeout(
+      "https://data.gov.tw/api/v2/rest/dataset/5958",
+      15000,
+    );
     if (res.ok) {
-      const buf = await res.arrayBuffer();
-      // Try UTF-8 first, fallback to Big5
-      const utf8 = new TextDecoder("utf-8", { fatal: true });
-      try {
-        text = utf8.decode(buf);
-      } catch {
-        text = decodeBig5(buf);
-      }
-      if (text.trim().startsWith("<!") || text.trim().startsWith("<html")) {
-        text = null;
-        console.log("  ✗ Got HTML instead of CSV");
-      }
+      const meta = await res.json();
+      const dist = meta?.result?.distribution || [];
+      zipUrl = dist[0]?.resourceDownloadUrl || null;
     }
   } catch (e) {
-    console.log(`  ✗ Primary source failed: ${(e as Error).message}`);
+    console.log(`  ✗ Metadata lookup failed: ${(e as Error).message}`);
   }
 
-  // Fallback: try TGOS CSV URL
-  if (!text) {
-    console.log("  ⬇ Trying TGOS fallback...");
-    text = await fetchCSV(
-      "https://www.tgos.tw/tgos/VirtualDir/Product/9927eb8a-efed-40c0-8bc4-83121ad6834a/PoliceAddress1.csv",
-    );
+  if (!zipUrl) {
+    console.log("  ✗ Could not resolve police station ZIP URL");
+    return { total: 0, error: "download failed" };
   }
+  console.log(`    URL: ${zipUrl}`);
 
-  if (!text) {
+  console.log("  ⬇ 警政署派出所 ZIP (via curl)");
+  const tmpZip = path.join(os.tmpdir(), `police-${Date.now()}.zip`);
+  const dl = await curlDownload(zipUrl, tmpZip, 60);
+  if (!dl.ok) {
     console.log(
-      "  ⚠ Could not download police station data. " +
-        "TODO: manually download ZIP from https://www.tgos.tw and extract CSV.",
+      `  ✗ curl failed: HTTP ${dl.status}, ${dl.bytes} bytes${dl.error ? ` (${dl.error})` : ""}`,
     );
+    return { total: 0, error: "download failed" };
+  }
+  console.log(`    ✓ ${dl.bytes} bytes ZIP`);
+
+  const text = await unzipExtractText(tmpZip, ".csv");
+  fs.unlinkSync(tmpZip);
+
+  if (!text) {
+    console.log("  ✗ Could not extract CSV from ZIP");
     return { total: 0, error: "download failed" };
   }
 
@@ -1102,12 +1212,24 @@ async function main() {
   console.log("📊 更新摘要");
   console.log(JSON.stringify(results, null, 2));
 
-  // Write update log
+  // Write update log — partial runs merge into existing entry so we don't
+  // wipe other sources' last known state
   const logPath = path.join(DATA_DIR, "last-update.json");
+  let mergedResults: Record<string, unknown> = results;
+  if (!all && fs.existsSync(logPath)) {
+    try {
+      const prev = JSON.parse(fs.readFileSync(logPath, "utf-8"));
+      if (prev?.results && typeof prev.results === "object") {
+        mergedResults = { ...prev.results, ...results };
+      }
+    } catch {
+      /* ignore corrupt log */
+    }
+  }
   const log = {
     timestamp: new Date().toISOString(),
     dryRun,
-    results,
+    results: mergedResults,
   };
   if (!dryRun) {
     fs.writeFileSync(logPath, JSON.stringify(log, null, 2));

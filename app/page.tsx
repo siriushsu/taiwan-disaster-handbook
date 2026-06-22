@@ -1540,11 +1540,19 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_data_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_last")}: 2026/4/8
+              {T("updates_last")}: 2026/6/22
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">6/22</span>
+                <span>
+                  {locale === "en"
+                    ? "Police stations resumed (1,687 nationwide) and AED locations refreshed to 14,858 — fixed two long-broken government data feeds"
+                    : "全國派出所資料回復（1,687 筆）、AED 更新至 14,858 筆 — 修好兩個壞了 7 週的政府資料源"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/8</span>
                 <span>
