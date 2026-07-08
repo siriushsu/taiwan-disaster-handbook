@@ -1,4 +1,4 @@
-const CACHE_NAME = "disaster-handbook-v8";
+const CACHE_NAME = "disaster-handbook-v9";
 const FONT_ASSETS = [
   "/fonts/NotoSansTC-Regular-subset.ttf",
   "/fonts/NotoSansTC-Bold-subset.ttf",
@@ -12,6 +12,7 @@ const DATA_ASSETS = [
   "/data/taiwan-police-stations.json",
   "/data/taiwan-mrt-shelters.json",
   "/data/taiwan-nursing.json",
+  "/data/taiwan-migrant-health-centers.json",
 ];
 
 // Install: pre-cache fonts + data for offline use

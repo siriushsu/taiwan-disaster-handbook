@@ -1955,6 +1955,22 @@ export default function Home() {
                 <span className="text-primary shrink-0">7/8</span>
                 <span>
                   {locale === "en"
+                    ? "Corrected Philippine (MECO), Vietnam and Thailand office phone numbers & addresses against official MOFA sources; added 24h emergency hotlines"
+                    : "修正菲律賓（MECO）、越南、泰國駐台辦事處電話與地址（照外交部官方資料逐一查證），並補上 24 小時急難救助電話"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Vietnamese, Indonesian, Thai and Filipino translations reviewed sentence-by-sentence — 21 corrections applied (incl. Thai air-raid shelter terminology that could send users to the wrong facility)"
+                    : "越南文、印尼文、泰文、菲律賓文翻譯逐句校正，共修正 21 處（含泰文防空避難所術語 — 原譯可能讓人跑錯設施）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
                     ? "One-tap 'Use my current location' lookup — no typing needed, instantly see the nearest shelters around you"
                     : "快速查詢新增「用目前位置查詢」— 一鍵定位免打字，馬上看到你身邊最近的避難地點"}
                 </span>
