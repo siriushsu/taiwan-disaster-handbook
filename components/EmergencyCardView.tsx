@@ -8,28 +8,40 @@
  * - Key emergency numbers
  */
 import type { HandbookData } from "@/types";
+import { t, type Locale, type TranslationKey } from "@/lib/i18n";
 
-export default function EmergencyCardView({ data }: { data: HandbookData }) {
+export default function EmergencyCardView({
+  data,
+  locale = "zh-TW",
+}: {
+  data: HandbookData;
+  locale?: Locale;
+}) {
   const { household, locations } = data;
   const members = household.members.filter((m) => m.name);
   const contacts = household.contacts.filter((c) => c.name);
   const mainAddr = `${household.city}${household.district}${household.address}`;
+  const T = (key: TranslationKey) => t(locale, key);
+  // Section labels stay bilingual for non-zh users: the card is shown to
+  // Taiwanese rescuers/officials, so Chinese must remain visible.
+  const L = (key: TranslationKey) =>
+    locale === "zh-TW"
+      ? t("zh-TW", key)
+      : `${t(locale, key)} / ${t("zh-TW", key)}`;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
       {/* Header */}
       <div className="bg-primary px-4 py-3">
-        <h3 className="text-white font-bold text-base">緊急聯絡卡</h3>
-        <p className="text-white/70 text-xs mt-0.5">
-          截圖存手機 / 印出來放皮夾
-        </p>
+        <h3 className="text-white font-bold text-base">{L("card_title")}</h3>
+        <p className="text-white/70 text-xs mt-0.5">{T("card_subtitle")}</p>
       </div>
 
       <div className="p-4 space-y-4 text-sm">
         {/* Family members + daily locations */}
         <section>
           <h4 className="text-xs font-bold text-primary border-b border-border pb-1 mb-2">
-            家人平日所在地
+            {L("card_family")}
           </h4>
           <div className="space-y-2">
             {members.map((m, i) => (
@@ -70,7 +82,7 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
               </div>
             ))}
             {members.length === 0 && (
-              <p className="text-xs text-text-faint">尚未填寫家庭成員</p>
+              <p className="text-xs text-text-faint">{T("card_no_members")}</p>
             )}
           </div>
         </section>
@@ -78,7 +90,7 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
         {/* Emergency contacts */}
         <section>
           <h4 className="text-xs font-bold text-primary border-b border-border pb-1 mb-2">
-            緊急聯絡人
+            {L("card_contacts")}
           </h4>
           <div className="space-y-1.5">
             {contacts.map((c, i) => (
@@ -98,7 +110,7 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
               </div>
             ))}
             {contacts.length === 0 && (
-              <p className="text-xs text-text-faint">尚未填寫緊急聯絡人</p>
+              <p className="text-xs text-text-faint">{T("card_no_contacts")}</p>
             )}
           </div>
         </section>
@@ -107,7 +119,7 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
         {locations[0]?.shelters[0] && (
           <section>
             <h4 className="text-xs font-bold text-primary border-b border-border pb-1 mb-2">
-              集合地點
+              {L("card_meeting")}
             </h4>
             <div className="flex justify-between items-start">
               <div>
@@ -132,36 +144,38 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
         {/* Emergency numbers */}
         <section>
           <h4 className="text-xs font-bold text-primary border-b border-border pb-1 mb-2">
-            緊急電話
+            {L("card_numbers")}
           </h4>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
             <div className="flex justify-between">
-              <span className="text-text-muted">消防/救護</span>
+              <span className="text-text-muted">{T("label_fire_amb")}</span>
               <a href="tel:119" className="font-bold text-red-600">
                 119
               </a>
             </div>
             <div className="flex justify-between">
-              <span className="text-text-muted">報警</span>
+              <span className="text-text-muted">{T("label_police")}</span>
               <a href="tel:110" className="font-bold text-red-600">
                 110
               </a>
             </div>
             <div className="flex justify-between">
-              <span className="text-text-muted">災害通報</span>
+              <span className="text-text-muted">
+                {T("label_disaster_report")}
+              </span>
               <a href="tel:1991" className="font-bold text-text">
                 1991
               </a>
             </div>
             <div className="flex justify-between">
-              <span className="text-text-muted">中毒諮詢</span>
+              <span className="text-text-muted">{T("label_poison")}</span>
               <a href="tel:0800-008-092" className="font-bold text-text">
                 0800-008-092
               </a>
             </div>
           </div>
           <p className="text-[10px] text-text-faint mt-1.5">
-            1991 報平安留言：按 1 留言 / 按 2 聽留言（輸入家人手機號碼）
+            {T("card_1991_hint")}
           </p>
         </section>
 
@@ -170,7 +184,7 @@ export default function EmergencyCardView({ data }: { data: HandbookData }) {
           locations[0]?.policeStation?.[0]) && (
           <section>
             <h4 className="text-xs font-bold text-primary border-b border-border pb-1 mb-2">
-              附近求助
+              {L("card_nearby")}
             </h4>
             <div className="space-y-1 text-xs">
               {locations[0]?.fireStation?.[0] && (

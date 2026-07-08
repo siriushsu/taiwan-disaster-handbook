@@ -2735,8 +2735,11 @@ export default function HandbookPDF({
               >
                 {pt(biMode, "phrase_card_title")} / {ptEn("phrase_card_title")}
               </Text>
-              <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 6 }}>
+              <Text style={{ fontSize: 9, color: "#6B6560", marginBottom: 2 }}>
                 {pt(biMode, "phrase_card_sub")}
+              </Text>
+              <Text style={{ fontSize: 7, color: "#b45309", marginBottom: 6 }}>
+                {pt(biMode, "phrase_card_draft")}
               </Text>
 
               {/* Header row with language labels */}

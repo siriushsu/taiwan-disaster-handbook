@@ -10,6 +10,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import type { HandbookData, Shelter, MedicalFacility } from "@/types";
 import { APP_VERSION } from "@/lib/version";
 import { mapsDirUrl } from "@/lib/maps";
+import { t, LOCALES, type Locale, type TranslationKey } from "@/lib/i18n";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import type { BiMode } from "@/lib/pdf-i18n";
 import {
   CITY_DISASTER_LINKS,
@@ -38,6 +40,23 @@ export default function HandbookPage() {
   const [relocating, setRelocating] = useState<number | null>(null);
   const [relocateAddr, setRelocateAddr] = useState("");
   const [relocateLoading, setRelocateLoading] = useState(false);
+  const [locale, setLocale] = useState<Locale>("zh-TW");
+
+  const T = (key: TranslationKey, vars?: Record<string, string>) =>
+    t(locale, key, vars);
+  const homeHref = locale === "zh-TW" ? "/" : `/?lang=${locale}`;
+  const handleLocaleChange = (next: Locale) => {
+    setLocale(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === "zh-TW") params.delete("lang");
+    else params.set("lang", next);
+    const qs = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      qs ? `?${qs}` : window.location.pathname,
+    );
+  };
 
   useEffect(() => {
     try {
@@ -67,6 +86,13 @@ export default function HandbookPage() {
     try {
       if (/Line\//i.test(navigator.userAgent)) setIsLineApp(true);
     } catch {}
+    // Hydrate locale from ?lang= (set by middleware auto-detect or shared links)
+    try {
+      const lang = new URLSearchParams(window.location.search).get("lang");
+      if (lang && (LOCALES as readonly string[]).includes(lang)) {
+        setLocale(lang as Locale);
+      }
+    } catch {}
     setReady(true);
   }, []);
 
@@ -76,9 +102,12 @@ export default function HandbookPage() {
     return (
       <main className="min-h-screen flex items-center justify-center bg-surface">
         <div className="text-center">
-          <p className="text-text-muted mb-4">找不到手冊資料</p>
-          <Link href="/" className="bg-primary text-white px-6 py-2 rounded-xl">
-            返回填寫
+          <p className="text-text-muted mb-4">{T("data_not_found")}</p>
+          <Link
+            href={homeHref}
+            className="bg-primary text-white px-6 py-2 rounded-xl"
+          >
+            {T("go_back")}
           </Link>
         </div>
       </main>
@@ -193,9 +222,9 @@ export default function HandbookPage() {
         sessionStorage.setItem("handbookData", JSON.stringify(updated));
         return updated;
       });
-      alert(`已更新座標與距離：${dist} 公尺`);
+      alert(T("coord_updated", { dist: String(dist) }));
     } else {
-      alert("找不到此地址的座標，請確認地址正確");
+      alert(T("coord_not_found"));
     }
   };
 
@@ -211,7 +240,7 @@ export default function HandbookPage() {
         district: loc.district,
       });
       if (!geo) {
-        alert("找不到此地址，請確認輸入正確");
+        alert(T("addr_not_found"));
         setRelocateLoading(false);
         return;
       }
@@ -239,13 +268,13 @@ export default function HandbookPage() {
       setRelocating(null);
       setRelocateAddr("");
     } catch {
-      alert("重新定位失敗，請稍後再試");
+      alert(T("relocate_failed"));
     }
     setRelocateLoading(false);
   };
 
-  const memberName = data.household.members[0]?.name || "我的家庭";
-  const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, "-")}.pdf`;
+  const memberName = data.household.members[0]?.name;
+  const fileName = `防災手冊_${memberName || "我的家庭"}_${data.generatedAt.replace(/\//g, "-")}.pdf`;
 
   // Share link that restores this lookup on the homepage (QR / LINE / copy).
   // Coordinates take precedence on restore, so the recipient sees the same
@@ -274,19 +303,23 @@ export default function HandbookPage() {
   return (
     <main className="min-h-screen bg-surface">
       <div className="bg-white border-b border-border py-4 px-4 sticky top-0 z-40">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
           <h1 className="text-base font-bold text-primary">
-            <Link href="/" className="hover:opacity-70 transition-opacity">
-              台灣家庭防災手冊
+            <Link
+              href={homeHref}
+              className="hover:opacity-70 transition-opacity"
+            >
+              {T("site_name")}
             </Link>
           </h1>
+          <LocaleSwitcher locale={locale} onChange={handleLocaleChange} />
         </div>
       </div>
       <div className="bg-primary-light py-6 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-xl font-bold text-text">您的防災手冊已準備好</h2>
+          <h2 className="text-xl font-bold text-text">{T("handbook_ready")}</h2>
           <p className="text-text-muted mt-1 text-sm">
-            下載前可修改避難所資訊，確保內容正確
+            {T("handbook_ready_desc")}
           </p>
         </div>
       </div>
@@ -295,10 +328,14 @@ export default function HandbookPage() {
         {/* Download Card */}
         <div className="bg-white rounded-xl shadow-card border border-border p-6 text-center">
           <h2 className="text-lg font-bold text-text mb-2">
-            {memberName} 家庭防災手冊
+            {memberName
+              ? T("handbook_doc_title", { name: memberName })
+              : T("site_name")}
           </h2>
           <p className="text-sm text-text-muted mb-6">
-            製作日期：{data.generatedAt} · 共 {pageCount} 頁
+            {T("made_date")}
+            {locale === "zh-TW" ? "：" : ": "}
+            {data.generatedAt} · {T("pages_count", { n: String(pageCount) })}
           </p>
           <div className="flex gap-2 justify-center mb-4">
             {(
@@ -320,19 +357,14 @@ export default function HandbookPage() {
             <div className="space-y-3">
               <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 text-sm">
                 <p className="font-bold text-warning mb-2">
-                  ⚠️ 請用外部瀏覽器開啟
+                  {T("line_warning_title")}
                 </p>
                 <p className="text-warning/90 text-xs mb-2">
-                  LINE 內建瀏覽器無法下載 PDF，請依以下步驟操作：
+                  {T("line_warning_desc")}
                 </p>
                 <ol className="text-xs text-text space-y-1 mb-2 list-none pl-0">
-                  <li>
-                    1️⃣ 點擊右下角 <span className="font-bold">「⋯」</span> 按鈕
-                  </li>
-                  <li>
-                    2️⃣ 選擇{" "}
-                    <span className="font-bold">「在預設瀏覽器中開啟」</span>
-                  </li>
+                  <li>{T("line_step1")}</li>
+                  <li>{T("line_step2")}</li>
                 </ol>
               </div>
               <button
@@ -340,14 +372,12 @@ export default function HandbookPage() {
                   navigator.clipboard
                     .writeText(window.location.origin)
                     .then(() => {
-                      alert(
-                        "已複製網址！請打開 Safari 或 Chrome，貼上網址即可使用。",
-                      );
+                      alert(T("copy_url_done"));
                     });
                 }}
                 className="inline-block bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors text-base"
               >
-                或點此複製網址
+                {T("copy_url_btn")}
               </button>
             </div>
           ) : (
@@ -355,7 +385,7 @@ export default function HandbookPage() {
               label="PDFDownloadLink"
               fallback={
                 <div className="text-sm text-warning bg-warning/10 border border-warning/30 rounded-xl px-6 py-3">
-                  PDF 產生發生問題，請重新整理頁面再試。
+                  {T("pdf_error")}
                 </div>
               }
             >
@@ -372,14 +402,12 @@ export default function HandbookPage() {
                 className="inline-block bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors text-base"
               >
                 {({ loading }) =>
-                  loading ? "準備 PDF 中（首次需載入字型）..." : "下載 PDF 手冊"
+                  loading ? T("preparing_pdf") : T("download_pdf")
                 }
               </PDFDownloadLink>
             </ErrorBoundary>
           )}
-          <p className="text-xs text-text-faint mt-3">
-            所有資料僅在瀏覽器本機處理，不會上傳。
-          </p>
+          <p className="text-xs text-text-faint mt-3">{T("privacy_local")}</p>
 
           {/* QR Code */}
           <div className="mt-5 flex flex-col items-center">
@@ -389,16 +417,24 @@ export default function HandbookPage() {
               level="M"
               className="rounded"
             />
-            <p className="text-xs text-text-faint mt-2">
-              掃描 QR Code 分享給家人 — 打開就直接看到住家附近的避難地點
-            </p>
+            <p className="text-xs text-text-faint mt-2">{T("qr_caption")}</p>
           </div>
 
           {/* LINE Share */}
           {data.locations[0]?.shelters[0] && (
             <div className="mt-4 flex gap-2 justify-center">
               <a
-                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`我剛用這個免費工具做了一份專屬防災手冊 📋\n\n輸入地址就能自動產生 PDF，包含你家最近的避難所、防空避難處、醫療院所、緊急電話和物資清單。\n\n我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + "m" : ""}）。\n\n推薦你也做一份，印出來放在家裡：\n⚠️ 請用 Safari/Chrome 開啟（LINE 內建瀏覽器無法下載 PDF）`)}`}
+                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(
+                  locale === "zh-TW"
+                    ? `我剛用這個免費工具做了一份專屬防災手冊 📋\n\n輸入地址就能自動產生 PDF，包含你家最近的避難所、防空避難處、醫療院所、緊急電話和物資清單。\n\n我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + "m" : ""}）。\n\n推薦你也做一份，印出來放在家裡：\n⚠️ 請用 Safari/Chrome 開啟（LINE 內建瀏覽器無法下載 PDF）`
+                    : T("line_share_text", {
+                        shelter: data.locations[0].shelters[0].name,
+                        distance: data.locations[0].shelters[0].distance
+                          ? Math.round(data.locations[0].shelters[0].distance) +
+                            "m"
+                          : "",
+                      }),
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 bg-[#06C755] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#05b34d] transition-colors"
@@ -406,41 +442,51 @@ export default function HandbookPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
                   <path d="M12 2C6.48 2 2 5.97 2 10.74c0 3.42 2.47 6.38 6.05 7.47l-.61 2.27c-.08.3.26.53.52.36l2.89-1.93c.37.04.75.06 1.15.06 5.52 0 10-3.97 10-8.23C22 5.97 17.52 2 12 2z" />
                 </svg>
-                分享到 LINE
+                {T("share_line")}
               </a>
               <button
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: "家庭防災手冊",
-                      text: "免費產生你家專屬的防災手冊 PDF — 輸入地址就有避難所、緊急電話、物資清單。推薦你也做一份！",
+                      title: T("site_name"),
+                      text:
+                        locale === "zh-TW"
+                          ? "免費產生你家專屬的防災手冊 PDF — 輸入地址就有避難所、緊急電話、物資清單。推薦你也做一份！"
+                          : T("line_share_text", {
+                              shelter: data.locations[0].shelters[0].name,
+                              distance: data.locations[0].shelters[0].distance
+                                ? Math.round(
+                                    data.locations[0].shelters[0].distance,
+                                  ) + "m"
+                                : "",
+                            }),
                       url: shareUrl,
                     });
                   } else {
                     navigator.clipboard.writeText(shareUrl);
-                    alert("已複製連結！");
+                    alert(T("link_copied"));
                   }
                 }}
                 className="inline-flex items-center gap-1.5 border border-border text-text-muted px-4 py-2 rounded-lg text-sm hover:bg-surface transition-colors"
               >
-                複製連結
+                {T("copy_link")}
               </button>
             </div>
           )}
         </div>
 
         {/* Emergency Card — mobile-friendly, screenshot-ready */}
-        <EmergencyCardView data={data} />
+        <EmergencyCardView data={data} locale={locale} />
 
         {/* Map */}
         {data.locations[0]?.geo && (
           <div className="bg-white rounded-xl shadow-card border border-border p-6">
-            <h3 className="font-bold text-text mb-3">附近避難設施地圖</h3>
+            <h3 className="font-bold text-text mb-3">{T("map_title")}</h3>
             <ErrorBoundary
               label="ShelterMap"
               fallback={
                 <div className="h-[300px] rounded-xl bg-surface flex items-center justify-center text-sm text-text-muted">
-                  地圖載入失敗
+                  {T("map_load_failed")}
                 </div>
               }
             >
@@ -458,9 +504,9 @@ export default function HandbookPage() {
         {/* Editable locations */}
         <div className="bg-white rounded-xl shadow-card border border-border p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-text">避難所資訊（可修改）</h3>
+            <h3 className="font-bold text-text">{T("shelters_editable")}</h3>
             <span className="text-xs text-text-faint">
-              點擊名稱或地址即可編輯
+              {T("click_to_edit")}
             </span>
           </div>
 
@@ -484,14 +530,12 @@ export default function HandbookPage() {
                   }}
                   className="text-xs text-primary hover:text-primary-dark font-medium flex-shrink-0"
                 >
-                  {relocating === locIdx ? "取消" : "重新定位"}
+                  {relocating === locIdx ? T("cancel") : T("relocate")}
                 </button>
               </div>
               {relocating === locIdx && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
-                  <p className="text-xs text-blue-700">
-                    如果地圖定位不準確，可以重新輸入地址。系統將重新查詢附近所有避難設施。
-                  </p>
+                  <p className="text-xs text-blue-700">{T("relocate_hint")}</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -500,7 +544,7 @@ export default function HandbookPage() {
                       onKeyDown={(e) =>
                         e.key === "Enter" && relocateLocation(locIdx)
                       }
-                      placeholder="輸入正確地址，例如：新北市永和區成功路二段191巷2號"
+                      placeholder={T("relocate_placeholder")}
                       className="flex-1 text-sm text-text border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-light"
                       disabled={relocateLoading}
                     />
@@ -509,7 +553,7 @@ export default function HandbookPage() {
                       disabled={relocateLoading || !relocateAddr.trim()}
                       className="px-4 py-1.5 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 whitespace-nowrap"
                     >
-                      {relocateLoading ? "查詢中..." : "重新定位"}
+                      {relocateLoading ? T("quick_searching") : T("relocate")}
                     </button>
                   </div>
                 </div>
@@ -519,7 +563,7 @@ export default function HandbookPage() {
               {loc.shelters.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-text-muted mb-1">
-                    避難收容所
+                    {T("disaster_shelters")}
                   </p>
                   {loc.shelters.map((sh, si) => (
                     <div
@@ -574,7 +618,7 @@ export default function HandbookPage() {
                             onClick={() => setEditing(`s-${locIdx}-${si}-addr`)}
                             className="text-xs text-text-faint hover:text-primary text-left w-full truncate"
                           >
-                            {sh.address || "點擊編輯地址"}
+                            {sh.address || T("edit_address")}
                           </button>
                         )}
                       </div>
@@ -592,7 +636,7 @@ export default function HandbookPage() {
                           rel="noopener noreferrer"
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          導航
+                          {T("btn_navigate")}
                         </a>
                         <button
                           onClick={() =>
@@ -600,7 +644,7 @@ export default function HandbookPage() {
                           }
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          ↻ 更新
+                          ↻ {T("btn_update")}
                         </button>
                       </div>
                     </div>
@@ -612,7 +656,7 @@ export default function HandbookPage() {
               {(loc.airRaid ?? []).length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-purple-500 mb-1">
-                    防空避難所
+                    {T("air_raid_shelters")}
                   </p>
                   {(loc.airRaid ?? []).slice(0, 3).map((sh, si) => (
                     <div
@@ -667,7 +711,7 @@ export default function HandbookPage() {
                             onClick={() => setEditing(`a-${locIdx}-${si}-addr`)}
                             className="text-xs text-text-faint hover:text-primary text-left w-full truncate"
                           >
-                            {sh.address || "點擊編輯地址"}
+                            {sh.address || T("edit_address")}
                           </button>
                         )}
                       </div>
@@ -685,7 +729,7 @@ export default function HandbookPage() {
                           rel="noopener noreferrer"
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          導航
+                          {T("btn_navigate")}
                         </a>
                         <button
                           onClick={() =>
@@ -693,7 +737,7 @@ export default function HandbookPage() {
                           }
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          ↻ 更新
+                          ↻ {T("btn_update")}
                         </button>
                       </div>
                     </div>
@@ -705,7 +749,7 @@ export default function HandbookPage() {
               {loc.medical.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-success mb-1">
-                    醫療院所
+                    {T("medical_facilities")}
                   </p>
                   {loc.medical.slice(0, 3).map((m, mi) => (
                     <div
@@ -752,7 +796,7 @@ export default function HandbookPage() {
                           rel="noopener noreferrer"
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          導航
+                          {T("btn_navigate")}
                         </a>
                         <button
                           onClick={() =>
@@ -760,7 +804,7 @@ export default function HandbookPage() {
                           }
                           className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
                         >
-                          ↻ 更新
+                          ↻ {T("btn_update")}
                         </button>
                       </div>
                     </div>
@@ -771,7 +815,7 @@ export default function HandbookPage() {
               {loc.shelters.length === 0 &&
                 (loc.airRaid ?? []).length === 0 && (
                   <div className="text-xs text-yellow-700 bg-yellow-50 rounded px-2 py-1">
-                    未找到避難所資料，請向里辦公室確認
+                    {T("no_shelters")}
                   </div>
                 )}
             </div>
@@ -779,18 +823,19 @@ export default function HandbookPage() {
         </div>
 
         <div className="bg-warning/10 rounded-xl p-4 text-sm text-warning">
-          <strong>建議每年更新一次手冊</strong>
-          ，特別是聯絡電話、用藥、或搬家後請重新產生。
+          <strong>{T("update_yearly")}</strong>
+          {locale === "zh-TW" ? "，" : " — "}
+          {T("update_yearly_desc")}
         </div>
 
         <div className="bg-white rounded-xl shadow-card border border-border p-6 space-y-3">
-          <h3 className="font-bold text-text">政府防災資源</h3>
+          <h3 className="font-bold text-text">{T("gov_resources")}</h3>
 
           {/* City-specific links */}
           {data.household.city && CITY_DISASTER_LINKS[data.household.city] && (
             <div>
               <p className="text-xs font-semibold text-text-muted mb-1">
-                {data.household.city} 專屬
+                {T("city_specific", { city: data.household.city })}
               </p>
               {CITY_DISASTER_LINKS[data.household.city].map((link, i) => (
                 <a
@@ -808,7 +853,7 @@ export default function HandbookPage() {
 
           {/* General resources */}
           <p className="text-xs font-semibold text-text-muted mb-1">
-            全國防災資源
+            {T("national_resources")}
           </p>
           {GENERAL_DISASTER_LINKS.map((link, i) => (
             <div key={i} className="flex gap-2">
@@ -848,7 +893,7 @@ export default function HandbookPage() {
         {/* Feedback & contribute */}
         <div className="bg-white rounded-2xl shadow-card border border-border p-4 space-y-2">
           <p className="text-xs font-semibold text-text-muted mb-1">
-            資料有誤？幫助我們改善
+            {T("footer_help_improve")}
           </p>
           <a
             href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=data-correction.yml"
@@ -856,7 +901,7 @@ export default function HandbookPage() {
             rel="noopener noreferrer"
             className="block text-center border border-warning/30 bg-warning/10 text-warning py-2 rounded-lg text-sm hover:bg-warning/15 transition-colors"
           >
-            📍 回報避難所 / 醫療資料錯誤
+            {T("footer_report_error")}
           </a>
           <a
             href="https://github.com/siriushsu/taiwan-disaster-handbook/issues/new?template=feature-request.yml"
@@ -864,7 +909,7 @@ export default function HandbookPage() {
             rel="noopener noreferrer"
             className="block text-center border border-border text-text-muted py-2 rounded-lg text-sm hover:bg-surface transition-colors"
           >
-            💡 功能建議
+            {T("footer_feature_request")}
           </a>
           <a
             href="https://github.com/siriushsu/taiwan-disaster-handbook"
@@ -872,7 +917,7 @@ export default function HandbookPage() {
             rel="noopener noreferrer"
             className="block text-center text-text-faint text-xs py-1 hover:underline"
           >
-            ⭐ 開源專案 — 歡迎貢獻
+            {T("footer_open_source")}
           </a>
         </div>
 
@@ -926,10 +971,10 @@ export default function HandbookPage() {
         </div>
 
         <Link
-          href="/"
+          href={homeHref}
           className="block text-center text-text-muted text-sm py-2 hover:underline"
         >
-          重新填寫
+          {T("refill")}
         </Link>
 
         <p className="text-center text-[10px] text-text-faint/50 py-2">

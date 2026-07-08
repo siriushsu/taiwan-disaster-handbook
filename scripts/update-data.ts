@@ -167,6 +167,24 @@ async function fetchCSV(url: string): Promise<string | null> {
     }
     return text;
   } catch (e) {
+    // Node fetch rejects some gov endpoints (incomplete TLS chain / TLS
+    // fingerprint blocking, e.g. 嘉義市、屏東縣) that curl accepts —
+    // same workaround as the AED source.
+    const tmpPath = path.join(os.tmpdir(), `fetchcsv-${Date.now()}.csv`);
+    const dl = await curlDownload(url, tmpPath, 90);
+    if (dl.ok) {
+      const text = fs.readFileSync(tmpPath, "utf-8");
+      fs.unlinkSync(tmpPath);
+      if (!text.trim().startsWith("<!") && !text.trim().startsWith("<html")) {
+        console.log(`    ↻ Node fetch failed, recovered via curl`);
+        return text;
+      }
+      console.log(`    ✗ Got HTML instead of CSV from ${url.slice(0, 80)}...`);
+      return null;
+    }
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch {}
     console.log(
       `    ✗ Failed: ${(e as Error).message} — ${url.slice(0, 80)}...`,
     );
@@ -320,11 +338,11 @@ const SHELTER_SOURCES = [
   },
   {
     name: "新北市-避難收容處所",
-    url: "https://data.ntpc.gov.tw/api/datasets/25e439ab-e9eb-41cf-8a56-be84e0c2c22d/csv/file",
+    url: "https://data.ntpc.gov.tw/api/datasets/25e439ab-49e7-4e5e-85ce-a25c13fd2770/csv/file",
   },
   {
     name: "桃園市-避難收容所(114年)",
-    url: "https://opendata.tycg.gov.tw/api/dataset/34b07b8b-0000-0000-0000-000000000000/resource/75effe61-0000-0000-0000-000000000000/download",
+    url: "https://opendata.tycg.gov.tw/api/dataset/247820e9-0bb6-4ff9-a34e-f1df72d8b296/resource/75effe61-01f0-412a-bb01-b29dae91324b/download",
   },
   {
     name: "高雄市-災民避難收容處所",
@@ -464,23 +482,23 @@ interface AirRaid {
 const AIR_RAID_SOURCES = [
   {
     name: "臺北市",
-    url: "https://data.taipei/api/dataset/70a6216e-4855-4a76-8fb4-5c3e3ef771de/resource/3bd658e7-96c6-401e-9bdd-4cb0a61f86e4/download",
+    url: "https://data.taipei/api/dataset/70a6216e-3730-4d1d-b334-62fca2dd71cd/resource/3bd658e7-8e8a-446b-8df5-89b2b896ff97/download",
   },
   {
     name: "新北市",
-    url: "https://data.ntpc.gov.tw/api/datasets/3a9d87f0-1f10-4be4-8866-e7e1de4e9407/csv/file",
+    url: "https://data.ntpc.gov.tw/api/datasets/3a9d87f0-9490-4021-8fc9-5045ecdd8d22/csv/file",
   },
   {
     name: "桃園市",
-    url: "https://opendata.tycg.gov.tw/api/dataset/12eb630b-b480-4b30-8b8e-5dda0bd785ed/resource/fb856832-3321-43dc-a1fd-18d0c0bbf1ff/download",
+    url: "https://opendata.tycg.gov.tw/api/dataset/12eb630b-9ee9-42a0-8cd7-98373aa69aad/resource/fb856832-5c4c-4b55-97a1-b7fda54f20df/download",
   },
   {
     name: "新竹市",
-    url: "https://odws.hccg.gov.tw/001/Upload/25/OpenData/9261/1a83861a-c2c2-4c5a-b08f-7d67db6ddf7c.csv",
+    url: "https://odws.hccg.gov.tw/001/Upload/25/opendataback/9059/375/1a83861a-6b38-49a9-a2d0-6f518961e2c7.csv",
   },
   {
     name: "臺中市",
-    url: "https://newdatacenter.taichung.gov.tw/api/v2/datasets/662dbb8c-e3cb-4833-a46f-e6f6ad4fd0ab/resource/download/rid/662dbb8c-e3cb-4833-a46f-e6f6ad4fd0ab",
+    url: "https://newdatacenter.taichung.gov.tw/api/v1/no-auth/resource.download?rid=662dbb8c-a6f8-480b-8f8d-2822363988de",
   },
   {
     name: "彰化縣",
@@ -496,7 +514,7 @@ const AIR_RAID_SOURCES = [
   },
   {
     name: "嘉義市",
-    url: "https://data.chiayi.gov.tw/opendata/api/getResource?oid=9add82b7-fe2b-40fa-8ad2-c05f5d4fc5f1",
+    url: "https://data.chiayi.gov.tw/opendata/api/getResource?oid=9add82b7-bf09-42bb-88f7-5d63e0fd9c99&rid=c831e197-2884-4c32-bbcd-6bccae360727",
   },
   {
     name: "嘉義縣",
@@ -504,7 +522,7 @@ const AIR_RAID_SOURCES = [
   },
   {
     name: "臺南市",
-    url: "https://data.tainan.gov.tw/File/ResourceCsvDownload/e57347d7-d5fb-4ee3-9e98-c69da60f5fa5",
+    url: "https://data.tainan.gov.tw/File/ResourceCsvDownload/e57347d7-50a1-42f9-8d6e-44d5c787a0f3",
   },
   {
     name: "高雄市",
@@ -512,19 +530,19 @@ const AIR_RAID_SOURCES = [
   },
   {
     name: "屏東縣",
-    url: "https://www-ws.pthg.gov.tw/001/upload/ebook/89b22d69-a6f6-4da5-b7de-a399a02c0530/resource/4c7a7a7d-9a5b-41c1-b8eb-3bebc3d7a4c7.csv",
+    url: "https://www-ws.pthg.gov.tw/Upload/2015pthg/0/relfile/0/0/31a64432-7954-4738-b760-56621373875d.csv",
   },
   {
     name: "宜蘭縣",
-    url: "https://opendataap2.e-land.gov.tw/api/v1/rest/datastore/c91e84872e88d1d5bb61e8a6d756d4c8.csv",
+    url: "https://opendataap2.e-land.gov.tw/./resource/files/2025-05-06/c91e84872e88d1d5bb61e8a6d756d4c8.csv",
   },
   {
     name: "花蓮縣",
-    url: "https://ws.hl.gov.tw/Download.ashx?u=LzAwMS91cGxvYWQvNDIwL3JlbGZpbGUvMC80Mzc3MS9hYWVlYjc3Yi1mOWI0LTRiYTQtOTA2Ny1mMjYzZDQ1ODk3N2UuY3N2&n=6Iqx6JOu57ij6Ziy56m655aP5pWj6YG%2f6Zuj6Kit5pa9LmNzdg%3d%3d",
+    url: "https://ws.hl.gov.tw/Download.ashx?u=LzAwMS9VcGxvYWQvNTE4L3JlbGZpbGUvMjI2MjkvMTQ4NTEzL2Q3NjQxMWQ1LTZiMjUtNGZiNS1iZGZjLWYyZjdlOTBiY2QxNS5jc3Y%3d&n=MC7mnKzlsYDpmLLnqbrnlo%2fmlaPpgb%2fpm6PoqK3mlr3nuL3muIXlhoot5paw5aKe57aT57ev5bqm54mIY3N2LmNzdg%3d%3d",
   },
   {
     name: "澎湖縣",
-    url: "https://opendataap2.penghu.gov.tw/api/v1/rest/datastore/f133972b077d368150506b88504099e6.csv",
+    url: "https://opendataap2.penghu.gov.tw/./resource/files/2026-01-06/f133972b077d368150506b88504099e6.csv",
   },
   {
     name: "金門縣",

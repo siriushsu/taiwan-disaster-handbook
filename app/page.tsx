@@ -391,7 +391,8 @@ export default function Home() {
         sessionStorage.clear();
         sessionStorage.setItem("handbookData", JSON.stringify(handbookData));
       }
-      window.location.href = "/handbook";
+      window.location.href =
+        locale === "zh-TW" ? "/handbook" : `/handbook?lang=${locale}`;
     } catch (e) {
       console.error("Generate error:", e);
       setError(
@@ -859,7 +860,7 @@ export default function Home() {
 
           {/* Emergency quick link — ghost style so primary CTA keeps hierarchy */}
           <a
-            href="/emergency"
+            href={locale === "zh-TW" ? "/emergency" : `/emergency?lang=${locale}`}
             className="block w-full text-center bg-white border border-red-600 text-red-600 py-3 rounded-lg font-semibold text-sm hover:bg-red-50 transition-colors active:scale-[0.98]"
           >
             {T("emergency_cta")}
@@ -1863,11 +1864,19 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_data_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_last")}: 2026/6/22
+              {T("updates_last")}: 2026/7/8
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Air-raid shelter feeds restored for 10 counties (Taipei, New Taipei, Taoyuan, Hsinchu City, Taichung, Chiayi City, Tainan, Yilan, Hualien, Penghu) — 3,000+ entries added, 4,900+ refreshed"
+                    : "10 縣市防空避難資料源修復（北市/新北/桃園/竹市/中市/嘉市/南市/宜蘭/花蓮/澎湖）— 新增 3,000+ 筆、更新 4,900+ 筆"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">6/22</span>
                 <span>
@@ -1951,6 +1960,22 @@ export default function Home() {
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Your language now follows you everywhere: the handbook page, emergency numbers page and emergency contact card display in your language (vi/id/th/fil) instead of Chinese-only"
+                    : "語言全程跟著你：手冊頁、緊急電話頁、緊急聯絡卡現在都會用你選的語言顯示（越/印/泰/菲），不再只有中文"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Fixed 12 broken government data feeds (air-raid shelters in 10 counties + New Taipei/Taoyuan shelters) — agencies had moved their download URLs; 3,000+ air-raid shelter entries refreshed"
+                    : "修復 12 個失聯的政府資料源（10 縣市防空避難＋新北/桃園收容）— 機關搬移了下載網址；防空避難資料新增 3,000+ 筆"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">7/8</span>
                 <span>

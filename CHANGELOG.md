@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-07-08
+
+### Features
+- 多語言貫穿全站：/handbook、/emergency、緊急聯絡卡現在跟隨 `?lang=`（越/印/泰/菲），語言在頁面導航間保留；手冊頁新增語言切換器；緊急聯絡卡區塊標題採「譯文 / 中文」雙語（救助者可讀）
+- 新增 54 個 i18n key ×6 語言（手冊頁/緊急電話頁/聯絡卡全字串）；獨立 AI 覆審四語零 CRITICAL/HIGH（仍待母語者最終驗證）
+- PDF 緊急用語卡加註「[草稿 — 待母語人士審校]」聲明
+
+### Fixes
+- 修復 12 個失聯的政府資料源（10 縣市防空避難＋新北/桃園避難收容）：機關更換 resource URL 而腳本寫死舊網址，比對 data.gov.tw 登記連結並逐一獨立實測後套用；防空避難 +3,394 筆、更新 4,917 筆（總數 77,688）
+- `fetchCSV` 新增 curl fallback（嘉義市/屏東縣端點 Node fetch TLS 失敗、curl 可通，比照 AED 前例）
+
+### Docs
+- `docs/data-source-outreach-2026-07-08.md`：資料源通報清單——5 機關待通報（南投/雲林/嘉義縣/金門/苗栗，含聯絡窗口與通報草稿，未寄出）；屏東 CSV 格式與高雄空資料列為腳本債
+
 ## [1.1.1] - 2026-07-08
 
 ### Fixes
