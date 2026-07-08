@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import MemberForm from "@/components/form/MemberForm";
@@ -20,6 +20,7 @@ import type {
   AedLocation,
 } from "@/types";
 import { APP_VERSION } from "@/lib/version";
+import { mapsDirUrl } from "@/lib/maps";
 
 const MapExplorer = dynamic(() => import("@/components/InteractiveMap"), {
   ssr: false,
@@ -59,6 +60,52 @@ const defaultContact = (): EmergencyContact => ({
 });
 
 // CITIES imported from @/lib/cities
+
+// Data often appends non-dialable text like「分機1336」or a second number —
+// keep only the leading dialable segment for the tel: link.
+const dialable = (phone: string) => {
+  const m = phone.match(/^[\d\-() +]+/);
+  return (m ? m[0] : "").replace(/[^\d+]/g, "");
+};
+
+// Navigate / call action buttons for a quick-lookup result row
+function ResultActions({
+  item,
+  navLabel,
+  callLabel,
+}: {
+  item: {
+    lat?: number;
+    lng?: number;
+    name: string;
+    address?: string;
+    phone?: string;
+  };
+  navLabel: string;
+  callLabel: string;
+}) {
+  const tel = item.phone ? dialable(item.phone) : "";
+  return (
+    <div className="flex gap-1.5 shrink-0">
+      <a
+        href={mapsDirUrl(item)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg bg-primary-light text-primary text-xs font-semibold hover:bg-primary/15 transition-colors"
+      >
+        {navLabel} ↗
+      </a>
+      {tel && (
+        <a
+          href={`tel:${tel}`}
+          className="inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg bg-success/10 text-success text-xs font-semibold hover:bg-success/20 transition-colors"
+        >
+          {callLabel}
+        </a>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("zh-TW");
@@ -104,6 +151,11 @@ export default function Home() {
     fireStation: import("@/types").FireStation[];
     policeStation: import("@/types").PoliceStation[];
   } | null>(null);
+  // Human-readable label for coordinate-based lookups (GPS / shared links)
+  const [quickPlaceLabel, setQuickPlaceLabel] = useState<string | null>(null);
+  // In-flight guard — state alone can't stop same-render double submits
+  // (e.g. Enter in the address field while GPS lookup is running)
+  const quickBusy = useRef(false);
 
   useEffect(() => {
     if (/Line\//i.test(navigator.userAgent)) setIsLineApp(true);
@@ -350,14 +402,49 @@ export default function Home() {
     }
   };
 
-  const quickLookup = async () => {
-    if (!quickCity || !quickAddress) return;
+  // Mirror the current quick-lookup query to the URL so results are shareable
+  // — QR codes / shared links / reloads restore it on load.
+  const syncQuickUrl = (q: {
+    city?: string;
+    district?: string;
+    address?: string;
+    lat?: number;
+    lng?: number;
+  }) => {
+    const params = new URLSearchParams(window.location.search);
+    for (const k of ["city", "district", "address", "lat", "lng"]) {
+      params.delete(k);
+    }
+    if (q.city) params.set("city", q.city);
+    if (q.district) params.set("district", q.district);
+    if (q.address) params.set("address", q.address);
+    if (q.lat != null && q.lng != null) {
+      params.set("lat", q.lat.toFixed(5));
+      params.set("lng", q.lng.toFixed(5));
+    }
+    const query = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + (query ? `?${query}` : ""),
+    );
+  };
+
+  const runQuickLookup = async (
+    city: string,
+    district: string,
+    address: string,
+  ) => {
+    if (!city || !address || quickBusy.current) return;
+    quickBusy.current = true;
     setQuickLoading(true);
     setQuickResult(null);
+    setQuickPlaceLabel(null);
+    setMapLocation(null); // 改用地址查詢時，捨棄先前 GPS/地圖的預查結果
     setError("");
     try {
-      const fullAddr = `${quickCity}${quickDistrict}${quickAddress}`;
-      const result = await queryLocation(fullAddr, quickCity, quickDistrict);
+      const fullAddr = `${city}${district}${address}`;
+      const result = await queryLocation(fullAddr, city, district);
       setQuickResult({
         shelters: result.shelters,
         airRaid: result.airRaid,
@@ -366,11 +453,141 @@ export default function Home() {
         fireStation: result.fireStation,
         policeStation: result.policeStation,
       });
+      syncQuickUrl({
+        city,
+        district,
+        address,
+        lat: result.geo?.lat,
+        lng: result.geo?.lng,
+      });
     } catch {
-      setError("查詢失敗，請確認地址後再試");
+      setError(T("lookup_failed_addr"));
     } finally {
+      quickBusy.current = false;
       setQuickLoading(false);
     }
+  };
+
+  const quickLookup = () =>
+    runQuickLookup(quickCity, quickDistrict, quickAddress);
+
+  // 以座標直接查最近設施（GPS 或分享連結帶座標）——不經 geocoding，離線也可查
+  const runNearbyLookup = async (
+    lat: number,
+    lng: number,
+    opts?: {
+      label?: string;
+      sync?: { city?: string; district?: string; address?: string };
+    },
+  ) => {
+    quickBusy.current = true;
+    setQuickLoading(true);
+    setQuickResult(null);
+    setError("");
+    setQuickPlaceLabel(opts?.label ?? `📍 ${T("current_location")}`);
+    try {
+      const { findNearby } = await import("@/lib/client-lookup");
+      const result = await findNearby(lat, lng);
+      setQuickResult({
+        shelters: result.shelters,
+        airRaid: result.airRaid,
+        medical: result.medical,
+        aed: result.aed || [],
+        fireStation: result.fireStation || [],
+        policeStation: result.policeStation || [],
+      });
+      // 存成預查結果，讓「產生完整手冊」直接沿用、不再重新 geocode
+      setMapLocation({
+        lat,
+        lng,
+        shelters: result.shelters,
+        airRaid: result.airRaid,
+        medical: result.medical,
+        aed: result.aed || [],
+        erHospital: result.erHospital || [],
+        fireStation: result.fireStation || [],
+        policeStation: result.policeStation || [],
+      });
+      syncQuickUrl({ ...opts?.sync, lat, lng });
+      // 沒有明確縣市時，先從最近設施推斷（離線或反查失敗仍有正確縣市）。
+      // 縣市可能在 name 也可能在 address（各縣市資料格式不一），兩者都比對。
+      if (!opts?.sync?.city) {
+        const inferFrom = [
+          result.shelters[0]?.name,
+          result.shelters[0]?.address,
+          result.medical[0]?.name,
+          result.medical[0]?.address,
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const normInfer = inferFrom.replace(/台/g, "臺");
+        for (const [c] of CITIES) {
+          if (normInfer.includes(c)) {
+            setQuickCity(c);
+            const d = (DISTRICTS[c] ?? []).find((x) => normInfer.includes(x));
+            if (d) setQuickDistrict(d);
+            break;
+          }
+        }
+      }
+      if (!opts?.label) {
+        // 反查地址讓顯示與後續表單更友善；失敗就維持「目前位置」
+        try {
+          const res = await fetch(
+            `/api/geocode?address=${lat},${lng}&reverse=1`,
+          );
+          if (res.ok) {
+            const d = await res.json();
+            if (d.formattedAddress) {
+              setQuickPlaceLabel(d.formattedAddress);
+              const norm = (d.formattedAddress as string).replace(/台/g, "臺");
+              for (const [c] of CITIES) {
+                if (norm.includes(c)) {
+                  setQuickCity(c);
+                  const dist = (DISTRICTS[c] ?? []).find((x) =>
+                    norm.includes(x),
+                  );
+                  setQuickDistrict(dist ?? "");
+                  const anchor = dist ?? c;
+                  const tail = norm.slice(
+                    norm.indexOf(anchor) + anchor.length,
+                  );
+                  if (tail.trim()) setQuickAddress(tail.trim());
+                  break;
+                }
+              }
+            }
+          }
+        } catch {
+          /* 反查失敗，保留座標查詢結果 */
+        }
+      }
+    } catch {
+      setError(T("lookup_failed"));
+    } finally {
+      quickBusy.current = false;
+      setQuickLoading(false);
+    }
+  };
+
+  const locateMe = () => {
+    if (quickBusy.current) return;
+    if (!("geolocation" in navigator)) {
+      setError(T("geo_error"));
+      return;
+    }
+    quickBusy.current = true;
+    setError("");
+    setQuickLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => runNearbyLookup(pos.coords.latitude, pos.coords.longitude),
+      () => {
+        quickBusy.current = false;
+        setQuickLoading(false);
+        setError(T("geo_error"));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    );
   };
 
   const runDemo = async () => {
@@ -378,39 +595,75 @@ export default function Home() {
     setQuickCity("臺北市");
     setQuickDistrict("信義區");
     setQuickAddress("信義路五段7號");
-    setQuickLoading(true);
-    setQuickResult(null);
-    try {
-      const result = await queryLocation(
-        "臺北市信義區信義路五段7號",
-        "臺北市",
-        "信義區",
-      );
-      setQuickResult({
-        shelters: result.shelters,
-        airRaid: result.airRaid,
-        medical: result.medical,
-        aed: result.aed,
-        fireStation: result.fireStation,
-        policeStation: result.policeStation,
-      });
-    } catch {
-      setError("查詢失敗");
-    } finally {
-      setQuickLoading(false);
-    }
+    await runQuickLookup("臺北市", "信義區", "信義路五段7號");
   };
 
   const quickToFullForm = () => {
+    // GPS 反查失敗時 quickAddress 是空的——退回座標字串（與地圖選點行為一致），
+    // 避免產出地址空白的手冊
+    const fallbackAddr = mapLocation
+      ? `${mapLocation.lat.toFixed(5)}, ${mapLocation.lng.toFixed(5)}`
+      : "";
     setForm((prev) => ({
       ...prev,
       city: quickCity,
       district: quickDistrict,
-      address: quickAddress,
+      address: quickAddress || fallbackAddr,
     }));
     setMode("form");
     setStep(2); // Skip address step — already entered in quick lookup
   };
+
+  // Restore a shared lookup from URL params (?lat&lng / ?city&district&address).
+  // QR codes and shared links land here — run the query immediately.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const latStr = params.get("lat");
+    const lngStr = params.get("lng");
+    const lat = Number(latStr);
+    const lng = Number(lngStr);
+    // 兩個參數都要有值、可解析、且落在台灣範圍（含離島）——
+    // 連結被截斷（少 lng）或空字串會被 Number() 當 0，查到外海去
+    const hasCoords =
+      !!latStr &&
+      !!lngStr &&
+      Number.isFinite(lat) &&
+      Number.isFinite(lng) &&
+      lat >= 21 &&
+      lat <= 26.5 &&
+      lng >= 117.5 &&
+      lng <= 122.5;
+    const city = params.get("city") ?? "";
+    const district = params.get("district") ?? "";
+    const address = params.get("address") ?? "";
+    const validCity = CITIES.some(([zh]) => zh === city) ? city : "";
+    const validDistrict =
+      validCity && (DISTRICTS[validCity] ?? []).includes(district)
+        ? district
+        : "";
+    if (validCity) {
+      setQuickCity(validCity);
+      setQuickDistrict(validDistrict);
+    }
+    if (address) setQuickAddress(address);
+    if (hasCoords) {
+      setMode("quick");
+      runNearbyLookup(lat, lng, {
+        label: address
+          ? `${validCity}${validDistrict}${address}`
+          : validCity
+            ? `${validCity}${validDistrict}`
+            : `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        sync: { city: validCity, district: validDistrict, address },
+      });
+    } else if (validCity && address) {
+      setMode("quick");
+      runQuickLookup(validCity, validDistrict, address);
+    } else if (validCity) {
+      setMode("quick");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="min-h-screen bg-surface">
@@ -451,7 +704,9 @@ export default function Home() {
                   setMode("landing");
                   setStep(1);
                   setQuickResult(null);
+                  setQuickPlaceLabel(null);
                   setMapLocation(null);
+                  syncQuickUrl({});
                 }}
               >
                 {locale === "en"
@@ -621,14 +876,14 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-text">
                   <span className="font-semibold">
-                    {quickCity}
-                    {quickDistrict}
-                    {quickAddress}
+                    {quickPlaceLabel ||
+                      `${quickCity}${quickDistrict}${quickAddress}`}
                   </span>
                 </p>
                 <button
                   onClick={() => {
                     setQuickResult(null);
+                    setQuickPlaceLabel(null);
                   }}
                   className="text-xs text-primary hover:text-primary-dark underline shrink-0 ml-2"
                 >
@@ -641,6 +896,14 @@ export default function Home() {
                 <h2 className="text-lg font-bold text-text">
                   {T("quick_title")}
                 </h2>
+                <button
+                  onClick={locateMe}
+                  disabled={quickLoading}
+                  className="w-full flex items-center justify-center gap-1.5 border-2 border-primary text-primary py-3 rounded-lg font-semibold text-sm hover:bg-primary-light transition-colors disabled:opacity-40"
+                >
+                  📍{" "}
+                  {quickLoading ? T("quick_searching") : T("use_my_location")}
+                </button>
                 <div className="grid grid-cols-2 gap-3">
                   <select
                     value={quickCity}
@@ -698,6 +961,13 @@ export default function Home() {
             )}
           </div>
 
+          {/* Quick lookup errors (e.g. geolocation denied, lookup failed) */}
+          {error && !quickLoading && (
+            <div className="bg-error/10 text-error px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Quick Results */}
           {quickResult && (
             <div className="bg-white rounded-xl shadow-sm p-5 border border-border space-y-4">
@@ -714,113 +984,155 @@ export default function Home() {
                       Drops the 4px colored left-border (AI-slop pattern #8)
                       while keeping the same semantic color mapping. */}
                   {quickResult.shelters[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-primary shrink-0"
-                          aria-hidden
-                        />
-                        {T("quick_result_nearest_shelter")}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {quickResult.shelters[0].name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {quickResult.shelters[0].address} /{" "}
-                        {quickResult.shelters[0].distance}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-primary shrink-0"
+                            aria-hidden
+                          />
+                          {T("quick_result_nearest_shelter")}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {quickResult.shelters[0].name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {quickResult.shelters[0].address} /{" "}
+                          {quickResult.shelters[0].distance}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.shelters[0]}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
                   {quickResult.airRaid[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-warning shrink-0"
-                          aria-hidden
-                        />
-                        {T("quick_result_nearest_airraid")}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {quickResult.airRaid[0].name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {quickResult.airRaid[0].address} /{" "}
-                        {quickResult.airRaid[0].distance}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-warning shrink-0"
+                            aria-hidden
+                          />
+                          {T("quick_result_nearest_airraid")}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {quickResult.airRaid[0].name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {quickResult.airRaid[0].address} /{" "}
+                          {quickResult.airRaid[0].distance}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.airRaid[0]}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
                   {quickResult.medical[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-success shrink-0"
-                          aria-hidden
-                        />
-                        {T("quick_result_nearest_medical")}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {quickResult.medical[0].name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {quickResult.medical[0].address}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-success shrink-0"
+                            aria-hidden
+                          />
+                          {T("quick_result_nearest_medical")}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {quickResult.medical[0].name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {quickResult.medical[0].address}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.medical[0]}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
                   {quickResult.aed[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-accent shrink-0"
-                          aria-hidden
-                        />
-                        {T("quick_result_nearest_aed")}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {(quickResult.aed[0] as AedLocation).name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {(quickResult.aed[0] as AedLocation).address}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-accent shrink-0"
+                            aria-hidden
+                          />
+                          {T("quick_result_nearest_aed")}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {(quickResult.aed[0] as AedLocation).name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {(quickResult.aed[0] as AedLocation).address}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.aed[0] as AedLocation}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
                   {quickResult.fireStation?.[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-error shrink-0"
-                          aria-hidden
-                        />
-                        {locale === "en"
-                          ? "Nearest fire station"
-                          : "最近消防隊"}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {quickResult.fireStation[0].name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {quickResult.fireStation[0].address} /{" "}
-                        {quickResult.fireStation[0].phone}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-error shrink-0"
+                            aria-hidden
+                          />
+                          {locale === "en"
+                            ? "Nearest fire station"
+                            : "最近消防隊"}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {quickResult.fireStation[0].name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {quickResult.fireStation[0].address} /{" "}
+                          {quickResult.fireStation[0].phone}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.fireStation[0]}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
                   {quickResult.policeStation?.[0] && (
-                    <div>
-                      <p className="text-xs text-text-faint flex items-center gap-1.5">
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full bg-info shrink-0"
-                          aria-hidden
-                        />
-                        {locale === "en"
-                          ? "Nearest police station"
-                          : "最近派出所"}
-                      </p>
-                      <p className="font-semibold text-text text-sm">
-                        {quickResult.policeStation[0].name}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {quickResult.policeStation[0].address} /{" "}
-                        {quickResult.policeStation[0].phone}
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-text-faint flex items-center gap-1.5">
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full bg-info shrink-0"
+                            aria-hidden
+                          />
+                          {locale === "en"
+                            ? "Nearest police station"
+                            : "最近派出所"}
+                        </p>
+                        <p className="font-semibold text-text text-sm">
+                          {quickResult.policeStation[0].name}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          {quickResult.policeStation[0].address} /{" "}
+                          {quickResult.policeStation[0].phone}
+                        </p>
+                      </div>
+                      <ResultActions
+                        item={quickResult.policeStation[0]}
+                        navLabel={T("btn_navigate")}
+                        callLabel={T("btn_call")}
+                      />
                     </div>
                   )}
 
@@ -870,6 +1182,9 @@ export default function Home() {
                 onClick={() => {
                   setQuickResult(null);
                   setQuickAddress("");
+                  setQuickPlaceLabel(null);
+                  setMapLocation(null);
+                  syncQuickUrl({});
                 }}
                 className="w-full text-text-muted text-sm py-1 hover:text-text transition-colors"
               >
@@ -1101,13 +1416,15 @@ export default function Home() {
                   </label>
                   <select
                     value={form.city}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      // 手動改住家位置＝先前 GPS/地圖預查座標作廢
+                      setMapLocation(null);
                       setForm((prev) => ({
                         ...prev,
                         city: e.target.value,
                         district: "",
-                      }))
-                    }
+                      }));
+                    }}
                     className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                   >
                     {CITIES.map(([zh, en]) => (
@@ -1124,7 +1441,10 @@ export default function Home() {
                   </label>
                   <select
                     value={form.district}
-                    onChange={(e) => updateForm("district", e.target.value)}
+                    onChange={(e) => {
+                      setMapLocation(null);
+                      updateForm("district", e.target.value);
+                    }}
                     className="w-full border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                   >
                     <option value="">{T("select_please")}</option>
@@ -1146,7 +1466,10 @@ export default function Home() {
                     <input
                       type="text"
                       value={form.address}
-                      onChange={(e) => updateForm("address", e.target.value)}
+                      onChange={(e) => {
+                        setMapLocation(null);
+                        updateForm("address", e.target.value);
+                      }}
                       placeholder={T("address_placeholder")}
                       className="flex-1 border border-border rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary-light"
                     />
@@ -1623,11 +1946,35 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_product_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_last")}: 2026/4/25
+              {T("updates_last")}: 2026/7/8
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "One-tap 'Use my current location' lookup — no typing needed, instantly see the nearest shelters around you"
+                    : "快速查詢新增「用目前位置查詢」— 一鍵定位免打字，馬上看到你身邊最近的避難地點"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Every lookup result now has Navigate and Call buttons — tap to open Google Maps directions or dial the facility directly"
+                    : "查詢結果每項設施新增「導航」「撥打」按鈕 — 一鍵開啟 Google Maps 路線或直接撥號"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/8</span>
+                <span>
+                  {locale === "en"
+                    ? "Shareable lookups: the QR code and shared links now open directly to the results — family members scan and instantly see shelters near home"
+                    : "查詢結果可分享：QR Code 與分享連結打開就直接顯示查詢結果，家人掃描立刻看到住家附近的避難地點"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">4/25</span>
                 <span>

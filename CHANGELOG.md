@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-07-08
+
+### Features
+- 快速查詢新增「用目前位置查詢」：一鍵 GPS 定位直接查最近避難設施，免打地址（座標直查不經 geocoding，離線也可用）
+- 查詢結果 URL 化：查詢狀態同步到網址（?city&district&address&lat&lng），可分享、可收藏、重新整理不消失
+- 修復 QR Code 深連結：手冊頁的 QR Code / LINE 分享 / 複製連結現在帶完整查詢狀態，掃描或點開直接顯示避難地點結果
+- 查詢結果與手冊頁避難所清單新增「導航」按鈕（一鍵開啟 Google Maps 路線）；有電話的設施（消防隊、派出所、AED 等）加「撥打」按鈕
+- 定位查詢後自動反查地址帶入表單，可直接接續產生完整手冊
+
 ## [1.0.0] - 2026-03-23
 
 ### Features

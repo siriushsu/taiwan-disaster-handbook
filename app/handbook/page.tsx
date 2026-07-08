@@ -9,6 +9,7 @@ import EmergencyCardView from "@/components/EmergencyCardView";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import type { HandbookData, Shelter, MedicalFacility } from "@/types";
 import { APP_VERSION } from "@/lib/version";
+import { mapsDirUrl } from "@/lib/maps";
 import type { BiMode } from "@/lib/pdf-i18n";
 import {
   CITY_DISASTER_LINKS,
@@ -245,6 +246,22 @@ export default function HandbookPage() {
 
   const memberName = data.household.members[0]?.name || "我的家庭";
   const fileName = `防災手冊_${memberName}_${data.generatedAt.replace(/\//g, "-")}.pdf`;
+
+  // Share link that restores this lookup on the homepage (QR / LINE / copy).
+  // Coordinates take precedence on restore, so the recipient sees the same
+  // nearby facilities immediately without re-geocoding.
+  const shareParams = new URLSearchParams();
+  if (data.household.city) shareParams.set("city", data.household.city);
+  if (data.household.district)
+    shareParams.set("district", data.household.district);
+  if (data.household.address)
+    shareParams.set("address", data.household.address);
+  const primaryGeo = data.locations[0]?.geo;
+  if (primaryGeo) {
+    shareParams.set("lat", primaryGeo.lat.toFixed(5));
+    shareParams.set("lng", primaryGeo.lng.toFixed(5));
+  }
+  const shareUrl = `https://disaster-handbook.vercel.app/?${shareParams.toString()}`;
   const hasNamedMembers = data.household.members.some((m) => m.name);
   // Cover(1) + Usage(if foreign) + Action Card(1) + Reunion(if members) + Locations(x2 each) + Member Overview(if members) + Foreign(+phrase card) + Supply + Phones + Back
   const pageCount =
@@ -367,13 +384,13 @@ export default function HandbookPage() {
           {/* QR Code */}
           <div className="mt-5 flex flex-col items-center">
             <QRCodeSVG
-              value={`https://disaster-handbook.vercel.app/?city=${encodeURIComponent(data.household.city)}&district=${encodeURIComponent(data.household.district)}`}
+              value={shareUrl}
               size={120}
               level="M"
               className="rounded"
             />
             <p className="text-xs text-text-faint mt-2">
-              掃描 QR Code 分享給家人，讓他們也能快速產生自己的手冊
+              掃描 QR Code 分享給家人 — 打開就直接看到住家附近的避難地點
             </p>
           </div>
 
@@ -381,7 +398,7 @@ export default function HandbookPage() {
           {data.locations[0]?.shelters[0] && (
             <div className="mt-4 flex gap-2 justify-center">
               <a
-                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.origin : "https://disaster-handbook.vercel.app")}&text=${encodeURIComponent(`我剛用這個免費工具做了一份專屬防災手冊 📋\n\n輸入地址就能自動產生 PDF，包含你家最近的避難所、防空避難處、醫療院所、緊急電話和物資清單。\n\n我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + "m" : ""}）。\n\n推薦你也做一份，印出來放在家裡：\n⚠️ 請用 Safari/Chrome 開啟（LINE 內建瀏覽器無法下載 PDF）`)}`}
+                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`我剛用這個免費工具做了一份專屬防災手冊 📋\n\n輸入地址就能自動產生 PDF，包含你家最近的避難所、防空避難處、醫療院所、緊急電話和物資清單。\n\n我家最近的避難所是「${data.locations[0].shelters[0].name}」（${data.locations[0].shelters[0].distance ? Math.round(data.locations[0].shelters[0].distance) + "m" : ""}）。\n\n推薦你也做一份，印出來放在家裡：\n⚠️ 請用 Safari/Chrome 開啟（LINE 內建瀏覽器無法下載 PDF）`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 bg-[#06C755] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#05b34d] transition-colors"
@@ -397,10 +414,10 @@ export default function HandbookPage() {
                     navigator.share({
                       title: "家庭防災手冊",
                       text: "免費產生你家專屬的防災手冊 PDF — 輸入地址就有避難所、緊急電話、物資清單。推薦你也做一份！",
-                      url: window.location.origin,
+                      url: shareUrl,
                     });
                   } else {
-                    navigator.clipboard.writeText(window.location.origin);
+                    navigator.clipboard.writeText(shareUrl);
                     alert("已複製連結！");
                   }
                 }}
@@ -569,6 +586,14 @@ export default function HandbookPage() {
                               : `${(sh.distance / 1000).toFixed(1)}km`}
                           </span>
                         )}
+                        <a
+                          href={mapsDirUrl(sh)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
+                        >
+                          導航
+                        </a>
                         <button
                           onClick={() =>
                             recalcShelterDistance(locIdx, si, "shelters")
@@ -654,6 +679,14 @@ export default function HandbookPage() {
                               : `${(sh.distance / 1000).toFixed(1)}km`}
                           </span>
                         )}
+                        <a
+                          href={mapsDirUrl(sh)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
+                        >
+                          導航
+                        </a>
                         <button
                           onClick={() =>
                             recalcShelterDistance(locIdx, si, "airRaid")
@@ -713,6 +746,14 @@ export default function HandbookPage() {
                               : `${(m.distance / 1000).toFixed(1)}km`}
                           </span>
                         )}
+                        <a
+                          href={mapsDirUrl(m)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs bg-primary-light text-primary hover:bg-primary/15 hover:text-primary-dark px-1.5 py-0.5 rounded transition-colors"
+                        >
+                          導航
+                        </a>
                         <button
                           onClick={() =>
                             recalcShelterDistance(locIdx, mi, "medical")
