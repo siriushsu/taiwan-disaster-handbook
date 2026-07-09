@@ -1964,6 +1964,14 @@ export default function Home() {
                 <span className="text-primary shrink-0">7/9</span>
                 <span>
                   {locale === "en"
+                    ? "Bilingual PDF fixes: emergency-number labels no longer print Chinese and English on top of each other, and the icons on the usage guide page now show properly instead of empty boxes"
+                    : "雙語 PDF 修正：緊急電話的中英文標籤不再疊在一起，使用說明頁的圖示也正常顯示（原本是空白方框）"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/9</span>
+                <span>
+                  {locale === "en"
                     ? "PDF pagination fixed for good: info boxes, shelter cards and the hand-drawn route box no longer get cut in half across pages — blocks that don't fit now move to the next page in one piece"
                     : "PDF 分頁一次修好：提示框、避難所卡片、手繪路線框不再被切成兩半跨頁 — 放不下的區塊會整塊移到下一頁"}
                 </span>

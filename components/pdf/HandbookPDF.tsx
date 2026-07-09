@@ -33,6 +33,13 @@ Font.register({
   ],
 });
 
+// Emoji rendered as Twemoji PNGs — neither font subset carries emoji glyphs,
+// so without this source emoji code points print as tofu boxes.
+Font.registerEmojiSource({
+  format: "png",
+  url: "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/",
+});
+
 // Noto Sans Thai — separate registration because Thai glyphs are not in NotoSansTC subset.
 // Loaded from Google Fonts raw file mirror.
 Font.register({
@@ -235,7 +242,10 @@ const s = StyleSheet.create({
     flexShrink: 0,
     paddingRight: 8,
   },
-  numLabel: { flex: 1, fontSize: 10, color: "#6B6560" },
+  // No flex here: the label always sits inside a flex:1 column wrapper, and
+  // flexBasis 0 would collapse the wrapper's height so stacked bilingual
+  // labels render on top of each other.
+  numLabel: { fontSize: 10, color: "#6B6560" },
   // contact card
   contactCard: {
     backgroundColor: "#F0FDFA",
@@ -2381,7 +2391,9 @@ export default function HandbookPDF({
                     marginBottom: 4,
                   }}
                 >
-                  ✂ {pt(biMode, "wallet_title")}
+                  {/* VS16 so the scissors goes through the emoji image source —
+                      bare U+2702 is not in the font subset and prints blank */}
+                  ✂️ {pt(biMode, "wallet_title")}
                 </Text>
                 <Text
                   style={{
