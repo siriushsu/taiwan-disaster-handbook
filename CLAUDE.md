@@ -32,6 +32,21 @@ with a fixed Taipei/Xinyi sample household, and rasterizes pages 1 and 4 to
 PNG via poppler's `pdftoppm` (requires `brew install poppler` on macOS).
 Commit the regenerated PNGs along with the PDF change.
 
+## PDF pagination rules (IMPORTANT)
+
+@react-pdf/renderer splits any block that crosses a page boundary unless told
+not to. Every atomic visual block in `HandbookPDF.tsx` (cards, info boxes,
+checklist rows, the wallet card, the hand-drawn route box) carries
+`wrap={false}` so it moves to the next page whole instead of being cut in
+half; section titles carry `minPresenceAhead` so they aren't stranded at a
+page bottom. **Any new block you add must follow the same pattern.**
+
+After changing `HandbookPDF.tsx`, verify pagination with
+`npx tsx scripts/stress-test-pdf-pagination.tsx` — it renders three
+overflow-stressing scenarios (minimal form + max shelter data, 6-member
+family, foreign-national bilingual) and prints the output PDF paths; open
+them and eyeball every page for split blocks.
+
 ## Design System
 
 Always read DESIGN.md before making any visual or UI decisions.

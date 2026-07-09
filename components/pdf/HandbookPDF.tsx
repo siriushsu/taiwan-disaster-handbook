@@ -643,7 +643,9 @@ function LocationPage({
         <DirMap loc={loc} mapImg={mapImg} />
 
         {/* Meeting Points */}
-        <Text style={s.sectionTitle}>{pt(biMode, "loc_meeting")}</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={36}>
+          {pt(biMode, "loc_meeting")}
+        </Text>
         {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("loc_meeting")}
@@ -663,7 +665,7 @@ function LocationPage({
             {ptEn("loc_meeting_desc")}
           </Text>
         )}
-        <View style={s.meetBox}>
+        <View style={s.meetBox} wrap={false}>
           <View
             style={[
               s.meetCard,
@@ -725,7 +727,9 @@ function LocationPage({
         </View>
 
         {/* Nearest shelters */}
-        <Text style={s.sectionTitle}>{pt(biMode, "loc_shelters")}</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={36}>
+          {pt(biMode, "loc_shelters")}
+        </Text>
         {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("loc_shelters")}
@@ -736,7 +740,7 @@ function LocationPage({
         </Text>
         {natural.length > 0 ? (
           natural.slice(0, 5).map((sh: Shelter, i: number) => (
-            <View key={i} style={s.shelterCard}>
+            <View key={i} style={s.shelterCard} wrap={false}>
               <Text style={s.shelterNum}>{i + 1}</Text>
               <View style={s.shelterInfo}>
                 <Text style={s.shelterName}>{sh.name}</Text>
@@ -786,7 +790,7 @@ function LocationPage({
             </View>
           ))
         ) : (
-          <View style={s.noDataBox}>
+          <View style={s.noDataBox} wrap={false}>
             <Text style={{ fontSize: 9, color: "#854d0e" }}>
               {pt(biMode, "loc_no_data")}
             </Text>
@@ -798,6 +802,7 @@ function LocationPage({
             stale (shelters close, construction, etc.) and points them back
             to the live map. Fills the empty bottom third of the page. */}
         <View
+          wrap={false}
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -858,14 +863,16 @@ function LocationPage({
         {/* Air defense shelters */}
         {air.length > 0 && (
           <>
-            <Text style={s.sectionTitle}>{pt(biMode, "loc_airraid")}</Text>
+            <Text style={s.sectionTitle} minPresenceAhead={36}>
+              {pt(biMode, "loc_airraid")}
+            </Text>
             {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_airraid")}
               </Text>
             )}
             {air.slice(0, 3).map((sh: Shelter, i: number) => (
-              <View key={i} style={s.shelterCard}>
+              <View key={i} style={s.shelterCard} wrap={false}>
                 <Text style={[s.shelterNum, { backgroundColor: CAT_AIR_RAID }]}>
                   {i + 1}
                 </Text>
@@ -900,14 +907,16 @@ function LocationPage({
         {/* Medical */}
         {loc.medical.length > 0 && (
           <>
-            <Text style={s.sectionTitle}>{pt(biMode, "loc_medical")}</Text>
+            <Text style={s.sectionTitle} minPresenceAhead={36}>
+              {pt(biMode, "loc_medical")}
+            </Text>
             {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_medical")}
               </Text>
             )}
             {loc.medical.slice(0, 3).map((m: MedicalFacility, i: number) => (
-              <View key={i} style={s.medCard}>
+              <View key={i} style={s.medCard} wrap={false}>
                 <Text style={[s.shelterNum, { backgroundColor: CAT_MEDICAL }]}>
                   {i + 1}
                 </Text>
@@ -951,7 +960,7 @@ function LocationPage({
         {/* AED */}
         {(loc.aed ?? []).length > 0 && (
           <>
-            <Text style={s.sectionTitle}>
+            <Text style={s.sectionTitle} minPresenceAhead={36}>
               {biMode === "en"
                 ? "Nearest AED"
                 : "最近 AED（自動體外心臟電擊器）"}
@@ -974,7 +983,7 @@ function LocationPage({
                 },
                 i: number,
               ) => (
-                <View key={i} style={s.medCard}>
+                <View key={i} style={s.medCard} wrap={false}>
                   <Text style={[s.shelterNum, { backgroundColor: CAT_AED }]}>
                     {i + 1}
                   </Text>
@@ -997,13 +1006,16 @@ function LocationPage({
         {/* Apartment-specific evacuation */}
         {loc.housingType === "apartment" && (
           <>
-            <Text style={s.sectionTitle}>{pt(biMode, "loc_apt_title")}</Text>
+            <Text style={s.sectionTitle} minPresenceAhead={36}>
+              {pt(biMode, "loc_apt_title")}
+            </Text>
             {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_apt_title")}
               </Text>
             )}
             <View
+              wrap={false}
               style={[
                 s.warningBox,
                 {
@@ -1057,13 +1069,16 @@ function LocationPage({
 
         {loc.housingType === "house" && (
           <>
-            <Text style={s.sectionTitle}>{pt(biMode, "loc_house_title")}</Text>
+            <Text style={s.sectionTitle} minPresenceAhead={36}>
+              {pt(biMode, "loc_house_title")}
+            </Text>
             {biMode === "bi" && (
               <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
                 {ptEn("loc_house_title")}
               </Text>
             )}
             <View
+              wrap={false}
               style={[
                 s.warningBox,
                 {
@@ -1105,8 +1120,8 @@ function LocationPage({
         {/* Hand-drawn escape route area — uses the empty bottom third of P5
             to give the user space to sketch their actual route. Intentionally
             blank: a pre-drawn map from us would be wrong at the last turn. */}
-        <View style={{ marginTop: 10 }}>
-          <Text style={s.sectionTitle}>
+        <View style={{ marginTop: 10 }} wrap={false}>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
             {biMode === "en"
               ? "Hand-drawn evacuation route"
               : biMode === "zh"
@@ -1229,14 +1244,14 @@ export default function HandbookPDF({
               {ptEn("cover_sub")}
             </Text>
           )}
-          <View style={s.coverBox}>
+          <View style={s.coverBox} wrap={false}>
             <Text style={s.coverBoxLabel}>
               {pt(biMode, "cover_addr")}
               {biMode === "bi" ? " / Home Address" : ""}
             </Text>
             <Text style={s.coverBoxValue}>{fullAddr}</Text>
           </View>
-          <View style={s.coverBox}>
+          <View style={s.coverBox} wrap={false}>
             <Text style={s.coverBoxLabel}>
               {pt(biMode, "cover_members")}
               {biMode === "bi" ? " / Family Members" : ""}
@@ -1246,7 +1261,7 @@ export default function HandbookPDF({
             </Text>
           </View>
           {mainShelter && (
-            <View style={s.coverBox}>
+            <View style={s.coverBox} wrap={false}>
               <Text style={s.coverBoxLabel}>
                 {pt(biMode, "cover_meeting")}
                 {biMode === "bi" ? " / Meeting Point" : ""}
@@ -1259,7 +1274,7 @@ export default function HandbookPDF({
             </View>
           )}
           {outOfCityContact && (
-            <View style={s.coverBox}>
+            <View style={s.coverBox} wrap={false}>
               <Text style={s.coverBoxLabel}>
                 {pt(biMode, "cover_contact")}
                 {biMode === "bi" ? " / " + ptEn("cover_contact") : ""}
@@ -1277,7 +1292,7 @@ export default function HandbookPDF({
               </Text>
             </View>
           )}
-          <View style={[s.coverBox, { marginTop: 12 }]}>
+          <View style={[s.coverBox, { marginTop: 12 }]} wrap={false}>
             <Text style={s.coverBoxLabel}>
               {pt(biMode, "cover_date")}
               {biMode === "bi" ? " / Created" : ""}
@@ -1350,7 +1365,10 @@ export default function HandbookPDF({
           </Text>
 
           {/* Two-column: for self / for helpers */}
-          <View style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}>
+          <View
+            style={{ flexDirection: "row", gap: 10, marginBottom: 10 }}
+            wrap={false}
+          >
             <View
               style={{
                 flex: 1,
@@ -1418,7 +1436,7 @@ export default function HandbookPDF({
           </View>
 
           {/* Scenario guide */}
-          <Text style={s.sectionTitle}>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
             四種情況，翻到哪一頁 / 4 Scenarios &amp; Which Page
           </Text>
           <View style={{ gap: 4, marginBottom: 10 }}>
@@ -1450,6 +1468,7 @@ export default function HandbookPDF({
             ].map((item, i) => (
               <View
                 key={i}
+                wrap={false}
                 style={{
                   flexDirection: "row",
                   alignItems: "flex-start",
@@ -1494,8 +1513,11 @@ export default function HandbookPDF({
           </View>
 
           {/* Important tips */}
-          <Text style={s.sectionTitle}>重要提醒 / Important Reminders</Text>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
+            重要提醒 / Important Reminders
+          </Text>
           <View
+            wrap={false}
             style={{
               backgroundColor: "#fef3c7",
               borderRadius: 6,
@@ -1563,7 +1585,7 @@ export default function HandbookPDF({
         </View>
 
         {/* Earthquake */}
-        <View style={[s.actionRow, { borderColor: "#e04545" }]}>
+        <View style={[s.actionRow, { borderColor: "#e04545" }]} wrap={false}>
           <Text style={s.actionEmoji}>1</Text>
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#C93B3B" }]}>
@@ -1580,7 +1602,7 @@ export default function HandbookPDF({
         </View>
 
         {/* Air Raid */}
-        <View style={[s.actionRow, { borderColor: "#8b5cf6" }]}>
+        <View style={[s.actionRow, { borderColor: "#8b5cf6" }]} wrap={false}>
           <Text style={s.actionEmoji}>2</Text>
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#8b5cf6" }]}>
@@ -1597,7 +1619,7 @@ export default function HandbookPDF({
         </View>
 
         {/* Fire */}
-        <View style={[s.actionRow, { borderColor: "#d4882a" }]}>
+        <View style={[s.actionRow, { borderColor: "#d4882a" }]} wrap={false}>
           <Text style={s.actionEmoji}>3</Text>
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#d4882a" }]}>
@@ -1624,7 +1646,7 @@ export default function HandbookPDF({
         </View>
 
         {/* Typhoon */}
-        <View style={[s.actionRow, { borderColor: "#3b6fd4" }]}>
+        <View style={[s.actionRow, { borderColor: "#3b6fd4" }]} wrap={false}>
           <Text style={s.actionEmoji}>4</Text>
           <View style={{ flex: 1 }}>
             <Text style={[s.actionLabel, { color: "#3b6fd4" }]}>
@@ -1643,6 +1665,7 @@ export default function HandbookPDF({
         {/* Infant Warning */}
         {household.hasInfant && (
           <View
+            wrap={false}
             style={[
               s.warningBox,
               {
@@ -1693,7 +1716,7 @@ export default function HandbookPDF({
         )}
 
         {/* MAIN MEETING POINT */}
-        <View style={s.actionMeet}>
+        <View style={s.actionMeet} wrap={false}>
           <Text style={s.actionMeetLabel}>
             {pt(biMode, "meeting_label")}
             {biMode === "bi" ? " / " + ptEn("meeting_label") : ""}
@@ -1722,7 +1745,7 @@ export default function HandbookPDF({
               const nums = ["119", "110", "166"];
               const n = nums[ni];
               return (
-                <View key={n} style={s.numRow}>
+                <View key={n} style={s.numRow} wrap={false}>
                   <Text style={s.numBig}>{n}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={s.numLabel}>{pt(biMode, key)}</Text>
@@ -1746,7 +1769,7 @@ export default function HandbookPDF({
                 : ["1991", "1925", "0800-024-985"];
               const n = nums[ni];
               return (
-                <View key={n} style={s.numRow}>
+                <View key={n} style={s.numRow} wrap={false}>
                   <Text
                     style={[s.numBig, { fontSize: n.length > 4 ? 14 : 20 }]}
                   >
@@ -1769,6 +1792,7 @@ export default function HandbookPDF({
         {/* Universal rules — promoted from the dropped Quick Response card so the
             EAC fridge page carries the three rules that apply across all disasters. */}
         <View
+          wrap={false}
           style={{
             backgroundColor: "#F0FDFA",
             borderRadius: 6,
@@ -1842,7 +1866,9 @@ export default function HandbookPDF({
           )}
 
           {/* Each member's location and nearest shelter */}
-          <Text style={s.sectionTitle}>{pt(biMode, "reunion_members")}</Text>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
+            {pt(biMode, "reunion_members")}
+          </Text>
           {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("reunion_members")}
@@ -1856,7 +1882,7 @@ export default function HandbookPDF({
             const sharedShelter = mainLocation?.shelters[0];
             if (anyDiff) return null;
             return (
-              <View style={s.reunionBox}>
+              <View style={s.reunionBox} wrap={false}>
                 <View style={s.reunionRow}>
                   <Text style={s.reunionLabel}>
                     {pt(biMode, "reunion_addr")}
@@ -1890,7 +1916,7 @@ export default function HandbookPDF({
             const nearestShelter = loc?.shelters[0];
             const anyDiff = allMembers.some((mm) => mm.hasDifferentAddress);
             return (
-              <View key={i} style={s.reunionBox}>
+              <View key={i} style={s.reunionBox} wrap={false}>
                 <Text style={s.reunionName}>{m.name}</Text>
                 {anyDiff && (
                   <>
@@ -1955,13 +1981,15 @@ export default function HandbookPDF({
           })}
 
           {/* Communication Plan */}
-          <Text style={s.sectionTitle}>{pt(biMode, "comm_title")}</Text>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
+            {pt(biMode, "comm_title")}
+          </Text>
           {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("comm_title")}
             </Text>
           )}
-          <View style={[s.tipBox]}>
+          <View style={[s.tipBox]} wrap={false}>
             {(
               [
                 "comm_1",
@@ -2001,13 +2029,16 @@ export default function HandbookPDF({
           </View>
 
           {/* When phone doesn't work */}
-          <Text style={s.sectionTitle}>{pt(biMode, "nophone_title")}</Text>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
+            {pt(biMode, "nophone_title")}
+          </Text>
           {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("nophone_title")}
             </Text>
           )}
           <View
+            wrap={false}
             style={[
               s.warningBox,
               {
@@ -2043,14 +2074,16 @@ export default function HandbookPDF({
           </View>
 
           {/* Emergency Contacts */}
-          <Text style={s.sectionTitle}>{pt(biMode, "contacts_title")}</Text>
+          <Text style={s.sectionTitle} minPresenceAhead={36}>
+            {pt(biMode, "contacts_title")}
+          </Text>
           {biMode === "bi" && (
             <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
               {ptEn("contacts_title")}
             </Text>
           )}
           {allContacts.map((c, i) => (
-            <View key={i} style={s.contactCard}>
+            <View key={i} style={s.contactCard} wrap={false}>
               <Text style={s.contactName}>
                 {c.name}
                 {pt(biMode, "label_contact_relation_wrap")}
@@ -2131,6 +2164,7 @@ export default function HandbookPDF({
             const sharedShelter = mainLocation?.shelters[0];
             return (
               <View
+                wrap={false}
                 style={{
                   backgroundColor: "#F7F5F3",
                   borderRadius: 6,
@@ -2196,7 +2230,7 @@ export default function HandbookPDF({
               (mm) => mm.hasDifferentAddress,
             );
             return (
-              <View key={i} style={s.pCard}>
+              <View key={i} style={s.pCard} wrap={false}>
                 <View style={s.pCardHeader}>
                   <Text style={s.pCardName}>{m.name}</Text>
                   <Text style={s.pCardBlood}>
@@ -2306,7 +2340,7 @@ export default function HandbookPDF({
           })}
 
           {mainHospital && (
-            <View style={[s.tipBox, { marginTop: 4 }]}>
+            <View style={[s.tipBox, { marginTop: 4 }]} wrap={false}>
               <Text style={s.tipText}>
                 {pt(biMode, "label_nearest_medical")}：{mainHospital.name}
                 {mainHospital.hasER ? pt(biMode, "label_has_er_paren") : ""}
@@ -2328,6 +2362,7 @@ export default function HandbookPDF({
             const shelter = mainLocation?.shelters[0];
             return (
               <View
+                wrap={false}
                 style={{
                   marginTop: 14,
                   width: 240,
@@ -2478,7 +2513,7 @@ export default function HandbookPDF({
                 </Text>
               )}
 
-              <Text style={s.sectionTitle}>
+              <Text style={s.sectionTitle} minPresenceAhead={36}>
                 {biMode === "en"
                   ? "Multilingual Hotlines"
                   : biMode === "zh"
@@ -2486,7 +2521,7 @@ export default function HandbookPDF({
                     : `${pt(biMode, "foreign_hotlines")} / Multilingual Hotlines`}
               </Text>
               {FOREIGN_HOTLINES.map((h, i) => (
-                <View key={i} style={s.numRow}>
+                <View key={i} style={s.numRow} wrap={false}>
                   <View style={{ width: 150, flexShrink: 0 }}>
                     <Text
                       style={{
@@ -2514,11 +2549,11 @@ export default function HandbookPDF({
 
               {res && (
                 <>
-                  <Text style={s.sectionTitle}>
+                  <Text style={s.sectionTitle} minPresenceAhead={36}>
                     {bi(biMode, "foreign_embassy_pre", "Representative Office")}{" "}
                     ({res.nameNative})
                   </Text>
-                  <View style={s.contactCard}>
+                  <View style={s.contactCard} wrap={false}>
                     <Text style={s.contactName}>{res.embassy}</Text>
                     <Text style={s.contactPhone}>{res.embassyPhone}</Text>
                     <Text style={[s.contactMeta, { marginTop: 2 }]}>
@@ -2545,11 +2580,11 @@ export default function HandbookPDF({
 
               {(household.employerName || household.brokerName) && (
                 <>
-                  <Text style={s.sectionTitle}>
+                  <Text style={s.sectionTitle} minPresenceAhead={36}>
                     {bi(biMode, "foreign_employer", "Employer / Broker")}
                   </Text>
                   {household.employerName && (
-                    <View style={s.contactCard}>
+                    <View style={s.contactCard} wrap={false}>
                       <Text style={s.contactName}>
                         {bi(biMode, "foreign_employer_label", "Employer")}：
                         {household.employerName}
@@ -2562,7 +2597,7 @@ export default function HandbookPDF({
                     </View>
                   )}
                   {household.brokerName && (
-                    <View style={s.contactCard}>
+                    <View style={s.contactCard} wrap={false}>
                       <Text style={s.contactName}>
                         {bi(biMode, "foreign_broker_label", "Broker")}：
                         {household.brokerName}
@@ -2577,10 +2612,11 @@ export default function HandbookPDF({
                 </>
               )}
 
-              <Text style={s.sectionTitle}>
+              <Text style={s.sectionTitle} minPresenceAhead={36}>
                 {bi(biMode, "foreign_reminders", "Important Reminders")}
               </Text>
               <View
+                wrap={false}
                 style={[
                   s.warningBox,
                   {
@@ -2646,6 +2682,7 @@ export default function HandbookPDF({
                 return (
                   <View>
                     <Text
+                      minPresenceAhead={36}
                       style={[
                         s.sectionTitle,
                         {
@@ -2670,7 +2707,7 @@ export default function HandbookPDF({
                       {pt(biMode, "migrant_health_desc")}
                     </Text>
                     {centers.slice(0, 3).map((c, i) => (
-                      <View key={i} style={s.contactCard}>
+                      <View key={i} style={s.contactCard} wrap={false}>
                         <Text
                           style={{
                             fontSize: 9,
@@ -2894,7 +2931,7 @@ export default function HandbookPDF({
         </Text>
         <View style={s.twoCol}>
           <View style={s.col}>
-            <Text style={s.checkCat}>
+            <Text style={s.checkCat} minPresenceAhead={24}>
               {pt(biMode, "supply_food")}（{allMembers.length}{" "}
               {pt(biMode, "supply_food_count")}）
             </Text>
@@ -2915,13 +2952,15 @@ export default function HandbookPDF({
             )
               .filter(Boolean)
               .map((item, i) => (
-                <View key={i} style={s.checkItem}>
+                <View key={i} style={s.checkItem} wrap={false}>
                   <View style={s.checkbox} />
                   <Text style={s.checkText}>{item}</Text>
                 </View>
               ))}
 
-            <Text style={s.checkCat}>{pt(biMode, "supply_medical")}</Text>
+            <Text style={s.checkCat} minPresenceAhead={24}>
+              {pt(biMode, "supply_medical")}
+            </Text>
             {(
               [
                 pt(biMode, "chk_firstaid"),
@@ -2948,13 +2987,15 @@ export default function HandbookPDF({
             )
               .filter(Boolean)
               .map((item, i) => (
-                <View key={i} style={s.checkItem}>
+                <View key={i} style={s.checkItem} wrap={false}>
                   <View style={s.checkbox} />
                   <Text style={s.checkText}>{item}</Text>
                 </View>
               ))}
 
-            <Text style={s.checkCat}>{pt(biMode, "supply_hygiene")}</Text>
+            <Text style={s.checkCat} minPresenceAhead={24}>
+              {pt(biMode, "supply_hygiene")}
+            </Text>
             {(
               [
                 pt(biMode, "chk_wipes"),
@@ -2972,7 +3013,7 @@ export default function HandbookPDF({
             )
               .filter(Boolean)
               .map((item, i) => (
-                <View key={i} style={s.checkItem}>
+                <View key={i} style={s.checkItem} wrap={false}>
                   <View style={s.checkbox} />
                   <Text style={s.checkText}>{item}</Text>
                 </View>
@@ -2980,7 +3021,9 @@ export default function HandbookPDF({
           </View>
 
           <View style={s.col}>
-            <Text style={s.checkCat}>{pt(biMode, "supply_comm")}</Text>
+            <Text style={s.checkCat} minPresenceAhead={24}>
+              {pt(biMode, "supply_comm")}
+            </Text>
             {[
               pt(biMode, "chk_radio"),
               pt(biMode, "chk_flashlight"),
@@ -2988,13 +3031,15 @@ export default function HandbookPDF({
               pt(biMode, "chk_whistle"),
               pt(biMode, "chk_glowstick"),
             ].map((item, i) => (
-              <View key={i} style={s.checkItem}>
+              <View key={i} style={s.checkItem} wrap={false}>
                 <View style={s.checkbox} />
                 <Text style={s.checkText}>{item}</Text>
               </View>
             ))}
 
-            <Text style={s.checkCat}>{pt(biMode, "supply_docs")}</Text>
+            <Text style={s.checkCat} minPresenceAhead={24}>
+              {pt(biMode, "supply_docs")}
+            </Text>
             {[
               pt(biMode, "chk_id"),
               pt(biMode, "chk_bank"),
@@ -3002,13 +3047,15 @@ export default function HandbookPDF({
               pt(biMode, "chk_cash"),
               pt(biMode, "chk_waterproof"),
             ].map((item, i) => (
-              <View key={i} style={s.checkItem}>
+              <View key={i} style={s.checkItem} wrap={false}>
                 <View style={s.checkbox} />
                 <Text style={s.checkText}>{item}</Text>
               </View>
             ))}
 
-            <Text style={s.checkCat}>{pt(biMode, "supply_clothes")}</Text>
+            <Text style={s.checkCat} minPresenceAhead={24}>
+              {pt(biMode, "supply_clothes")}
+            </Text>
             {(
               [
                 `${pt(biMode, "chk_raincoat")} ${allMembers.length} ${pt(biMode, "chk_raincoat_unit")}`,
@@ -3023,14 +3070,14 @@ export default function HandbookPDF({
             )
               .filter(Boolean)
               .map((item, i) => (
-                <View key={i} style={s.checkItem}>
+                <View key={i} style={s.checkItem} wrap={false}>
                   <View style={s.checkbox} />
                   <Text style={s.checkText}>{item}</Text>
                 </View>
               ))}
           </View>
         </View>
-        <View style={[s.tipBox, { marginTop: 4 }]}>
+        <View style={[s.tipBox, { marginTop: 4 }]} wrap={false}>
           <Text style={s.tipText}>{pt(biMode, "supply_tip")}</Text>
         </View>
 
@@ -3038,6 +3085,7 @@ export default function HandbookPDF({
             leak, meds lose potency. Pairs with the half-yearly 定期檢查 on the
             next page (3 月 / 9 月). */}
         <View
+          wrap={false}
           style={{
             marginTop: 10,
             padding: "10 12",
@@ -3095,7 +3143,9 @@ export default function HandbookPDF({
           {pt(biMode, "remind_title")}
         </Text>
 
-        <Text style={s.sectionTitle}>{pt(biMode, "remind_equip")}</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={36}>
+          {pt(biMode, "remind_equip")}
+        </Text>
         {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_equip")}
@@ -3114,7 +3164,9 @@ export default function HandbookPDF({
           </Text>
         ))}
 
-        <Text style={s.sectionTitle}>{pt(biMode, "remind_check")}</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={36}>
+          {pt(biMode, "remind_check")}
+        </Text>
         {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_check")}
@@ -3135,13 +3187,15 @@ export default function HandbookPDF({
           pt(biMode, "remind_chk_9"),
           pt(biMode, "remind_chk_10"),
         ].map((item, i) => (
-          <View key={i} style={s.checkItem}>
+          <View key={i} style={s.checkItem} wrap={false}>
             <View style={s.checkbox} />
             <Text style={s.checkText}>{item}</Text>
           </View>
         ))}
 
-        <Text style={s.sectionTitle}>{pt(biMode, "remind_memo")}</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={36}>
+          {pt(biMode, "remind_memo")}
+        </Text>
         {biMode === "bi" && (
           <Text style={{ fontSize: 7.5, color: "#6B6560" }}>
             {ptEn("remind_memo")}
@@ -3159,7 +3213,7 @@ export default function HandbookPDF({
           </Text>
         ))}
 
-        <View style={[s.tipBox, { marginTop: 8 }]}>
+        <View style={[s.tipBox, { marginTop: 8 }]} wrap={false}>
           <Text style={s.tipText}>{pt(biMode, "remind_final")}</Text>
         </View>
 

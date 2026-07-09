@@ -1955,11 +1955,19 @@ export default function Home() {
           <summary className="px-4 py-3 cursor-pointer select-none flex items-center justify-between text-sm font-semibold text-text-muted hover:text-text transition-colors">
             <span>{T("updates_product_title")}</span>
             <span className="text-xs font-normal text-text-faint">
-              {T("updates_last")}: 2026/7/8
+              {T("updates_last")}: 2026/7/9
             </span>
           </summary>
           <div className="px-4 pb-4 pt-1 border-t border-border/50">
             <ul className="space-y-2 text-xs text-text-muted">
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/9</span>
+                <span>
+                  {locale === "en"
+                    ? "PDF pagination fixed for good: info boxes, shelter cards and the hand-drawn route box no longer get cut in half across pages — blocks that don't fit now move to the next page in one piece"
+                    : "PDF 分頁一次修好：提示框、避難所卡片、手繪路線框不再被切成兩半跨頁 — 放不下的區塊會整塊移到下一頁"}
+                </span>
+              </li>
               <li className="flex gap-2">
                 <span className="text-primary shrink-0">7/8</span>
                 <span>
