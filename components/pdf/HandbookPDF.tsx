@@ -99,6 +99,52 @@ function memberAddr(m: Member, householdAddr: string) {
   return householdAddr;
 }
 
+/* Thai text needs two render-time fixes (react-pdf/fontkit limitations):
+   1. Thai has no spaces between words, and textkit only breaks lines at
+      ASCII spaces — long strings clip at the column edge or overlap the
+      next column. (ZWSP does NOT help: textkit ignores it and NotoSansThai
+      renders it as tofu.) Fix: split into dictionary words via
+      Intl.Segmenter and render each word as its own <Text> chip inside a
+      flexWrap row, which wraps at word boundaries with no inserted glyphs.
+   2. SARA AM (ำ U+0E33): fontkit's ccmp decomposition turns it into two
+      glyphs, desyncing textkit's glyph-vs-string indices — every ำ in a
+      run silently drops one trailing glyph (ลำบาก → ลำบา), and the
+      nikhahit ring overprints a preceding tone mark (น้ำ). Fix:
+      pre-decompose to NIKHAHIT + tone + SARA AA (HarfBuzz mark order) so
+      glyph count matches char count and marks stack correctly. */
+const thaiSegmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter("th", { granularity: "word" })
+    : null;
+
+function decomposeSaraAm(text: string): string {
+  return text.replace(/([่-๋]?)ำ/g, "ํ$1า");
+}
+
+const THAI_OPENERS = /^[([{«“‘（]+$/;
+
+function thaiChips(text: string): string[] {
+  if (!thaiSegmenter) return [decomposeSaraAm(text)];
+  const chips: string[] = [];
+  let pending = ""; // opening punctuation carried onto the next word
+  for (const seg of thaiSegmenter.segment(text)) {
+    const t = seg.segment;
+    if (seg.isWordLike) {
+      chips.push(pending + t);
+      pending = "";
+    } else if (THAI_OPENERS.test(t.trim())) {
+      if (chips.length && t.startsWith(" ")) chips[chips.length - 1] += " ";
+      pending += t.trim();
+    } else if (chips.length) {
+      chips[chips.length - 1] += t; // spaces / closing punctuation
+    } else {
+      pending += t;
+    }
+  }
+  if (pending) chips.push(pending);
+  return chips.map(decomposeSaraAm);
+}
+
 /* ── styles ────────────────────────────────────────── */
 const s = StyleSheet.create({
   page: {
@@ -2911,17 +2957,27 @@ export default function HandbookPDF({
                         >
                           {phrase.text.id}
                         </Text>
-                        <Text
+                        <View
                           style={{
                             width: "16%",
-                            fontSize: 6.5,
-                            lineHeight: 1.15,
-                            color: "#475569",
-                            fontFamily: "NotoSansThai",
+                            flexDirection: "row",
+                            flexWrap: "wrap",
                           }}
                         >
-                          {phrase.text.th}
-                        </Text>
+                          {thaiChips(phrase.text.th).map((word, wi) => (
+                            <Text
+                              key={wi}
+                              style={{
+                                fontSize: 6.5,
+                                lineHeight: 1.15,
+                                color: "#475569",
+                                fontFamily: "NotoSansThai",
+                              }}
+                            >
+                              {word}
+                            </Text>
+                          ))}
+                        </View>
                         <Text
                           style={{
                             width: "16%",

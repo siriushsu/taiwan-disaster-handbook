@@ -1964,6 +1964,14 @@ export default function Home() {
                 <span className="text-primary shrink-0">7/9</span>
                 <span>
                   {locale === "en"
+                    ? "Thai phrases on the emergency phrase card now wrap and display in full — long sentences were cut off at the column edge or missing their last letter"
+                    : "緊急溝通卡的泰文正常換行且完整顯示：較長的句子原本會被欄位切掉或少最後一個字母，現已修正"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/9</span>
+                <span>
+                  {locale === "en"
                     ? "Vietnamese and Thai text in the PDF handbook now displays correctly — the emergency phrase card, usage guide and embassy info previously showed scrambled characters"
                     : "PDF 手冊的越南文與泰文不再亂碼：緊急溝通卡、使用說明與駐台辦事處名稱原本會顯示錯誤字元，現已正確顯示"}
                 </span>
