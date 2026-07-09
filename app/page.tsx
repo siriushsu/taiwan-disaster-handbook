@@ -1964,6 +1964,14 @@ export default function Home() {
                 <span className="text-primary shrink-0">7/9</span>
                 <span>
                   {locale === "en"
+                    ? "Supply checklist now assumes at least 1 person: drinking water, raincoats and other per-person quantities no longer show 0 when no family members are filled in"
+                    : "物資清單改以至少 1 人計算：沒填家庭成員時，飲用水、雨衣等數量不再顯示 0"}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary shrink-0">7/9</span>
+                <span>
+                  {locale === "en"
                     ? "Bilingual PDF fixes: emergency-number labels no longer print Chinese and English on top of each other, and the icons on the usage guide page now show properly instead of empty boxes"
                     : "雙語 PDF 修正：緊急電話的中英文標籤不再疊在一起，使用說明頁的圖示也正常顯示（原本是空白方框）"}
                 </span>

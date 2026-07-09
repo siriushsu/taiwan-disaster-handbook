@@ -1219,6 +1219,8 @@ export default function HandbookPDF({
   _lang = biMode;
   const { household } = data;
   const allMembers = household.members.filter((m) => m.name);
+  // Supply quantities assume at least 1 person even when no members are filled in
+  const supplyCount = Math.max(allMembers.length, 1);
   const allContacts = household.contacts.filter((c) => c.name && c.phone);
   const outOfCityContact = allContacts.find((c) => c.isOutOfCity);
   const mainLocation = data.locations[0];
@@ -2944,12 +2946,12 @@ export default function HandbookPDF({
         <View style={s.twoCol}>
           <View style={s.col}>
             <Text style={s.checkCat} minPresenceAhead={24}>
-              {pt(biMode, "supply_food")}（{allMembers.length}{" "}
+              {pt(biMode, "supply_food")}（{supplyCount}{" "}
               {pt(biMode, "supply_food_count")}）
             </Text>
             {(
               [
-                `${pt(biMode, "chk_water_dynamic_pre")} ${allMembers.length * 6} ${pt(biMode, "chk_water_dynamic_unit")}`,
+                `${pt(biMode, "chk_water_dynamic_pre")} ${supplyCount * 6} ${pt(biMode, "chk_water_dynamic_unit")}`,
                 pt(biMode, "chk_food_instant"),
                 pt(biMode, "chk_food_rice"),
                 household.hasInfant
@@ -3070,7 +3072,7 @@ export default function HandbookPDF({
             </Text>
             {(
               [
-                `${pt(biMode, "chk_raincoat")} ${allMembers.length} ${pt(biMode, "chk_raincoat_unit")}`,
+                `${pt(biMode, "chk_raincoat")} ${supplyCount} ${pt(biMode, "chk_raincoat_unit")}`,
                 pt(biMode, "chk_clothes"),
                 pt(biMode, "chk_jacket"),
                 pt(biMode, "chk_gloves"),
