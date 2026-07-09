@@ -21,7 +21,7 @@ import { pt, ptEn, type BiMode } from "@/lib/pdf-i18n";
 // Fonts served from jsDelivr CDN (free, unlimited bandwidth)
 // Pin to commit hash to bust jsDelivr cache after font re-subset
 const CDN_FONTS =
-  "https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@71b728b/public/fonts";
+  "https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@e71bdf1/public/fonts";
 Font.register({
   family: "NotoSansTC",
   fonts: [

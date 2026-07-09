@@ -19,7 +19,7 @@ import {
 import type { HandbookData } from "@/types";
 
 const CDN_FONTS =
-  "https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@71b728b/public/fonts";
+  "https://cdn.jsdelivr.net/gh/siriushsu/taiwan-disaster-handbook@e71bdf1/public/fonts";
 
 Font.register({
   family: "NotoSansTC",
