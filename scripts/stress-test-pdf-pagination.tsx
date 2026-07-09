@@ -217,7 +217,7 @@ const foreignBi: HandbookData = {
     ...baseHousehold,
     isForeignNational: true,
     foreignType: "worker" as const,
-    nationality: "越南",
+    nationality: "VN", // must be a FOREIGN_RESOURCES code, not a label — else the embassy block silently drops out
     employerName: "台灣電子股份有限公司",
     employerPhone: "02-2345-6789",
     brokerName: "宏福人力仲介",

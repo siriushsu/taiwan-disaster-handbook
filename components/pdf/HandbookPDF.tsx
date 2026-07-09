@@ -1360,7 +1360,9 @@ export default function HandbookPDF({
             使用說明 / How to Use This Handbook
           </Text>
           <Text style={{ fontSize: 7, color: "#64748b", marginBottom: 2 }}>
-            Hướng dẫn sử dụng · Cara penggunaan · วิธีใช้ · Paano gamitin
+            Hướng dẫn sử dụng · Cara penggunaan ·{" "}
+            <Text style={{ fontFamily: "NotoSansThai" }}>วิธีใช้</Text> · Paano
+            gamitin
           </Text>
           <Text
             style={{
@@ -2565,7 +2567,17 @@ export default function HandbookPDF({
                 <>
                   <Text style={s.sectionTitle} minPresenceAhead={36}>
                     {bi(biMode, "foreign_embassy_pre", "Representative Office")}{" "}
-                    ({res.nameNative})
+                    (
+                    <Text
+                      style={
+                        res.nationality === "TH"
+                          ? { fontFamily: "NotoSansThai" }
+                          : {}
+                      }
+                    >
+                      {res.nameNative}
+                    </Text>
+                    )
                   </Text>
                   <View style={s.contactCard} wrap={false}>
                     <Text style={s.contactName}>{res.embassy}</Text>
@@ -2808,7 +2820,7 @@ export default function HandbookPDF({
                   { w: 17, label: "English" },
                   { w: 17, label: "Tiếng Việt" },
                   { w: 17, label: "Bahasa" },
-                  { w: 16, label: "ไทย" },
+                  { w: 16, label: "ไทย", font: "NotoSansThai" },
                   { w: 16, label: "Filipino" },
                 ].map((col, i) => (
                   <Text
@@ -2818,6 +2830,7 @@ export default function HandbookPDF({
                       fontSize: 6.5,
                       fontWeight: "bold",
                       color: "#0369a1",
+                      fontFamily: col.font,
                     }}
                   >
                     {col.label}
