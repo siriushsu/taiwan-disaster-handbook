@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-13T06:13:40.257Z",
+  "timestamp": "2026-07-20T06:15:21.940Z",
   "dryRun": false,
   "results": {
     "shelters": {
@@ -14,9 +14,9 @@
       "total": 77688
     },
     "medical": {
-      "total": 17084,
-      "added": 25,
-      "removed": 14
+      "total": 0,
+      "added": 0,
+      "removed": 17084
     },
     "aed": {
       "total": 0,
