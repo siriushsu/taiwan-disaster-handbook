@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-10T04:35:14.772Z",
+  "timestamp": "2026-08-17T03:54:20.833Z",
   "dryRun": false,
   "results": {
     "shelters": {
@@ -9,14 +9,14 @@
     },
     "airRaid": {
       "added": 0,
-      "updated": 638,
-      "failed": 9,
+      "updated": 471,
+      "failed": 10,
       "total": 77688
     },
     "medical": {
-      "total": 17130,
-      "added": 13,
-      "removed": 5
+      "total": 17137,
+      "added": 14,
+      "removed": 7
     },
     "aed": {
       "total": 0,
